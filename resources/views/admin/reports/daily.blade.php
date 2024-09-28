@@ -1,0 +1,65 @@
+@extends('layouts.admin')
+
+@section('content')
+<div class="container-fluid">
+    <div class="card shadow p-4">
+        <h1 class="text-center mb-4">التقرير اليومي للمبيعات</h1>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">إجمالي الكمية المباعة</h5>
+                        <p class="card-text">{{ $totalQuantity }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">إجمالي الإيرادات</h5>
+                        <p class="card-text">{{ number_format($totalRevenue, 2) }} ج . م</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-info mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">إجمالي الربح</h5>
+                        <p class="card-text">{{ number_format($totalProfit, 2) }} ج . م</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-hover table-bordered text-center">
+            <thead class="thead-dark">
+                <tr>
+                    <th>كود الفاتورة</th>
+                    <th>المبلغ المدفوع</th>
+                    <th>الإجمالي بعد الخصم</th>
+                    <th>التغيير (المبلغ المتبقي/الزائد)</th>
+                    <th>تفاصيل المبيعات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($invoices as $invoice)
+                    <tr>
+                        <td>{{ $invoice->invoice_code }}</td>
+                        <td>{{ number_format($invoice->paid_amount, 2) }} ج . م</td>
+                        <td>{{ number_format($invoice->total_amount, 2) }} ج . م</td>
+                        <td>{{ number_format($invoice->change, 2) }} ج . م</td>
+                        <td>
+                            <ul>
+                                @foreach($invoice->sales as $sale)
+                                    <li>{{ $sale->product->name }} - الكمية: {{ $sale->quantity }} - سعر البيع: {{ $sale->product->selling_price }} ج.م</li>
+                                @endforeach
+                            </ul>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+@endsection
