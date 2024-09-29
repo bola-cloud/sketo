@@ -29,7 +29,9 @@
                     <td>{{ $purchase->total_amount }}</td>
                     <td>
                         <a href="{{ route('purchases.show', $purchase->id) }}" class="btn btn-secondary">عرض التفاصيل</a>
-                        <a href="{{ route('purchases.installments.create', ['purchase' => $purchase->id] ) }}" class="btn btn-info"> اضافة قسط </a>
+                        @if ($purchase->total_amount != $purchase->paid_amount)
+                            <a href="{{ route('purchases.installments.create', ['purchase' => $purchase->id] ) }}" class="btn btn-info"> اضافة قسط </a>
+                        @endif                    
                     </td>
                 </tr>
             @endforeach
