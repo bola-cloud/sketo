@@ -103,7 +103,7 @@
                     <tr class="table-warning">
                         <th colspan="3" class="text-right">الخصم</th>
                         <th>
-                            <input type="text" id="discount" name="discount" class="form-control" value="{{ $discount ?? 0 }}" placeholder="أدخل الخصم" />
+                            <input type="text" id="discount" name="discount" class="form-control" value="0" placeholder="أدخل الخصم" />
                         </th>
                         <th></th>
                     </tr>
@@ -174,9 +174,7 @@
                 </div>
 
                 <!-- Hidden Fields for Discount Handling (if needed) -->
-                <!-- 
                 <input type="hidden" name="apply_discount_hidden" id="apply_discount_hidden" value="0" />
-                -->
 
                 <!-- Submit Button -->
                 <div class="text-center">
@@ -213,34 +211,6 @@
             }
         });
     }
-
-    // Toggle discount based on predefined rules (if using a checkbox or similar)
-    /*
-    function toggleDiscount() {
-        var applyDiscount = $('#apply_discount').is(':checked');
-        var subtotal = {{ $subtotal }};
-        var discount = 0;
-
-        if (applyDiscount) {
-            if (subtotal >= 6000) {
-                discount = 500;
-            } else if (subtotal >= 5000) {
-                discount = 400;
-            } else if (subtotal >= 4000) {
-                discount = 300;
-            } else if (subtotal >= 3000) {
-                discount = 200;
-            }
-            $('#discount').val(discount);
-            $('#apply_discount_hidden').val(1);
-        } else {
-            $('#discount').val(0);
-            $('#apply_discount_hidden').val(0);
-        }
-
-        $('#total_after_discount').text((subtotal - discount).toFixed(2));
-    }
-    */
 
     $(document).ready(function() {
         // Barcode input handling
@@ -294,7 +264,7 @@
                     },
                     error: function() {
                         $('#productList').empty();
-                        $('#productList').append('<li class="list-group-item">حدث خطأ ما، حاول مرة أخرى.</li>');
+                        $('#productList').append('<li class="list-group-item">حدث خطأ ما، حاول مرة أخرى.');
                     }
                 });
             } else {
@@ -302,14 +272,19 @@
             }
         });
 
-        // Discount input handling
+        // Discount input handling and updating total
         $('#discount').on('input', function() {
             var discount = parseFloat($(this).val()) || 0; // Get discount value or default to 0
             var subtotal = {{ $subtotal }}; // Assuming subtotal is passed from the server
 
             // Calculate total after discount
             var totalAfterDiscount = subtotal - discount;
-            $('#total_after_discount').text(totalAfterDiscount.toFixed(2)); // Update the total displayed
+
+            // Update the total displayed
+            $('#total_after_discount').text(totalAfterDiscount.toFixed(2));
+
+            // Update the hidden discount field to submit the discount value
+            $('#apply_discount_hidden').val(discount);
         });
     });
 

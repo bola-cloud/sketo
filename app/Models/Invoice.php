@@ -19,4 +19,21 @@ class Invoice extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function installments()
+    {
+        return $this->hasMany(SalesInstallment::class);
+    }
+
+    // Method to calculate the total paid so far
+    public function getTotalPaidAttribute()
+    {
+        return $this->installments()->sum('amount_paid');
+    }
+
+    // Method to calculate the remaining amount (change)
+    public function getChangeAttribute()
+    {
+        return $this->total_amount - $this->total_paid;
+    }
 }

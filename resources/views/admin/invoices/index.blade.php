@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container">
+<div class="container-fluid">
     <h1 class="text-center mb-3">جميع الفواتير</h1>
 
     <form id="search-form" class="mb-4" action="{{ route('invoices.search') }}" method="GET">
@@ -48,6 +48,7 @@
                 <th>هاتف المشتري</th>
                 <th>اسم البائع</th>
                 <th>تاريخ الإنشاء</th>
+                <th>الاقساط</th> <!-- New column for Installments -->
                 <th>إجراءات</th>
                 <th>حذف</th>
             </tr>
@@ -60,6 +61,12 @@
                     <td>{{ $invoice->buyer_phone }}</td>
                     <td>{{ $invoice->user->name }}</td>
                     <td>{{ $invoice->created_at->format('Y-m-d') }}</td>
+                    <td>
+                        <!-- Installment button -->
+                        @if($invoice->total_amount > $invoice->paid_amount)
+                            <a href="{{ route('sales.installments.index', $invoice->id) }}" class="btn btn-info btn-sm">عرض الأقساط</a> <!-- Link to Installments -->
+                        @endif
+                    </td>                    
                     <td>
                         <a href="{{ route('invoices.show', ['invoice' => $invoice->id]) }}" class="btn btn-secondary btn-sm">عرض التفاصيل</a>
                         <a class="btn btn-primary btn-sm" href="{{ route('cashier.printInvoice', $invoice->id) }}">طباعة الفاتورة</a>

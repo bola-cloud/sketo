@@ -20,118 +20,123 @@
 }
 </style>
 
-<div class="row">
-  <div class="col-xl-3 col-lg-6 col-12">
-      <div class="card pull-up">
-          <div class="card-content">
-              <div class="card-body">
-                  <div class="media d-flex">
-                      <div class="media-body text-left">
-                          <h3 class="info" id="productsSold">{{ $productsSold }}</h3>
-                          <h6>المنتجات المباعة</h6>
-                      </div>
-                      <div>
-                          <i class="icon-basket-loaded info font-large-2 float-left"></i>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
-
-  <div class="col-xl-3 col-lg-6 col-12">
-      <div class="card pull-up">
-          <div class="card-content">
-              <div class="card-body">
-                  <div class="media d-flex">
-                      <div class="media-body text-left">
-                          <h3 class="warning" id="totalRevenue">{{ $totalRevenue }} ج.م</h3>
-                          <h6>إجمالي الإيرادات</h6>
-                      </div>
-                      <div>
-                          <i class="icon-pie-chart warning font-large-2 float-left"></i>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
-
-  <div class="col-xl-3 col-lg-6 col-12">
-      <div class="card pull-up">
-          <div class="card-content">
-              <div class="card-body">
-                  <div class="media d-flex">
-                      <div class="media-body text-left">
-                          <h3 class="success" id="totalUnsoldProducts">{{ $totalUnsoldProducts }}</h6>
-                          <h6>المنتجات غير المباعة</h6>
-                      </div>
-                      <div>
-                          <i class="icon-handbag success font-large-2 float-left"></i>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
-
-  <div class="col-xl-3 col-lg-6 col-12">
-      <div class="card pull-up">
-          <div class="card-content">
-              <div class="card-body">
-                  <div class="media d-flex">
-                      <div class="media-body text-left">
-                          <h3 class="danger" id="totalPurchases"> {{ $totalPurchases }} ج.م </h3>
-                          <h6>إجمالي المشتريات</h6>
-                      </div>
-                      <div>
-                          <i class="icon-wallet danger font-large-2 float-left"></i>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
-
-  <div class="col-xl-3 col-lg-6 col-12">
-    <div class="card pull-up">
-        <div class="card-content">
-            <div class="card-body">
-                <div class="media d-flex">
-                    <div class="media-body text-left">
-                        <h3 class="primary" id="totalProfit"> {{ $totalProfit }} ج.م</h3>
-                        <h6>إجمالي الأرباح</h6>
-                    </div>
-                    <div>
-                        <i class="icon-graph primary font-large-2 float-left"></i>
+@php
+    $user = auth()->user();
+    $permissions = $user->roles()->with('permissions')->get()->pluck('permissions.*.name')->flatten()->unique();
+@endphp
+@if($user->hasRole('admin'))
+    <div class="row">
+    <div class="col-xl-3 col-lg-6 col-12">
+        <div class="card pull-up">
+            <div class="card-content">
+                <div class="card-body">
+                    <div class="media d-flex">
+                        <div class="media-body text-left">
+                            <h3 class="info" id="productsSold">{{ $productsSold }}</h3>
+                            <h6>المنتجات المباعة</h6>
+                        </div>
+                        <div>
+                            <i class="icon-basket-loaded info font-large-2 float-left"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-  </div>
 
-</div>
-
-<!-- Date Range Picker -->
-<div class="row">
-    <div class="col-12">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="form-group">
-              <label for="start_date">Start Date</label>
-              <input type="text" id="start_date" name="start_date" class="form-control datepicker">
-          </div>
+    <div class="col-xl-3 col-lg-6 col-12">
+        <div class="card pull-up">
+            <div class="card-content">
+                <div class="card-body">
+                    <div class="media d-flex">
+                        <div class="media-body text-left">
+                            <h3 class="warning" id="totalRevenue">{{ $totalRevenue }} ج.م</h3>
+                            <h6>إجمالي الإيرادات</h6>
+                        </div>
+                        <div>
+                            <i class="icon-pie-chart warning font-large-2 float-left"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6">
-          <div class="form-group">
-              <label for="end_date">End Date</label>
-              <input type="text" id="end_date" name="end_date" class="form-control datepicker">
-          </div>
-        </div>
-      </div>
     </div>
-</div>
+
+    <div class="col-xl-3 col-lg-6 col-12">
+        <div class="card pull-up">
+            <div class="card-content">
+                <div class="card-body">
+                    <div class="media d-flex">
+                        <div class="media-body text-left">
+                            <h3 class="success" id="totalUnsoldProducts">{{ $totalUnsoldProducts }}</h6>
+                            <h6>المنتجات غير المباعة</h6>
+                        </div>
+                        <div>
+                            <i class="icon-handbag success font-large-2 float-left"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-lg-6 col-12">
+        <div class="card pull-up">
+            <div class="card-content">
+                <div class="card-body">
+                    <div class="media d-flex">
+                        <div class="media-body text-left">
+                            <h3 class="danger" id="totalPurchases"> {{ $totalPurchases }} ج.م </h3>
+                            <h6>إجمالي المشتريات</h6>
+                        </div>
+                        <div>
+                            <i class="icon-wallet danger font-large-2 float-left"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-lg-6 col-12">
+        <div class="card pull-up">
+            <div class="card-content">
+                <div class="card-body">
+                    <div class="media d-flex">
+                        <div class="media-body text-left">
+                            <h3 class="primary" id="totalProfit"> {{ $totalProfit }} ج.م</h3>
+                            <h6>إجمالي الأرباح</h6>
+                        </div>
+                        <div>
+                            <i class="icon-graph primary font-large-2 float-left"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+    <!-- Date Range Picker -->
+    <div class="row">
+        <div class="col-12">
+        <div class="row">
+            <div class="col-md-6">
+            <div class="form-group">
+                <label for="start_date">Start Date</label>
+                <input type="text" id="start_date" name="start_date" class="form-control datepicker">
+            </div>
+            </div>
+            <div class="col-md-6">
+            <div class="form-group">
+                <label for="end_date">End Date</label>
+                <input type="text" id="end_date" name="end_date" class="form-control datepicker">
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+@endif
 
 @if($lowStockProducts->count() > 0)
     <div class="alert alert-danger">

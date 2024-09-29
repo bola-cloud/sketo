@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\PurchaseProduct;
+use App\Models\PurchaseInstallment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -28,7 +29,7 @@ class PurchasesController extends Controller
             'invoice_number' => 'required|string|unique:purchases,invoice_number',
             'type' => 'required|in:product,expense',
             'description' => 'nullable|string|max:255',
-            'paid_amount' => 'required|numeric|min:0',
+            'paid_amount' => 'required|numeric|min:0', // Paid amount will be stored as an installment
         ];
     
         // Conditional validation based on 'type'
@@ -56,17 +57,31 @@ class PurchasesController extends Controller
             // For product purchases, total_amount will be 0 initially, and updated later when products are added
             $totalAmount = $request->type == 'expense' ? $validatedData['total_amount'] : 0;
     
-            // Create the purchase with the required data
+            // Step 1: Create the purchase with the required data (excluding paid_amount)
             $purchase = Purchase::create([
                 'invoice_number' => $validatedData['invoice_number'],
                 'type' => $validatedData['type'],
                 'description' => $validatedData['description'],
                 'total_amount' => $totalAmount,
-                'paid_amount' => $validatedData['paid_amount'],
-                'change' => $validatedData['paid_amount'] - $totalAmount, // Calculate the change
+                'paid_amount' => 0, // Initial paid amount is 0, installments will adjust this later
+                'change' => -$totalAmount, // Will be recalculated based on installments
             ]);
     
-            return redirect()->route('purchases.index')->with('success', 'تم إنشاء الفاتورة بنجاح.');
+            // Step 2: Save the paid_amount as an installment
+            PurchaseInstallment::create([
+                'purchase_id' => $purchase->id,
+                'amount_paid' => $validatedData['paid_amount'],
+                'date_paid' => now(),
+            ]);
+    
+            // Step 3: Recalculate the total paid and change based on installments
+            $totalPaid = $purchase->installments()->sum('amount_paid');
+            $purchase->update([
+                'paid_amount' => $totalPaid,
+                'change' => $totalPaid - $purchase->total_amount, // Recalculate the change
+            ]);
+    
+            return redirect()->route('purchases.index')->with('success', 'تم إنشاء الفاتورة وإضافة الدفعة بنجاح.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء الفاتورة: ' . $e->getMessage());
         }
@@ -124,7 +139,6 @@ class PurchasesController extends Controller
 
     public function transferProduct(Request $request, Purchase $purchase, Product $product)
     {
-        // Validation outside of try-catch to allow Laravel to handle validation exceptions
         $validatedData = $request->validate([
             'product_name' => 'string|unique:products,name',
             'new_purchase_id' => 'required|exists:purchases,id',
@@ -159,7 +173,6 @@ class PurchasesController extends Controller
             // Step 3: Generate a unique barcode string and create the barcode image
             $barcodeString = strtoupper(uniqid());
             $barcodePath = 'barcodes/' . $barcodeString . '.svg';
-    
             $barcodeSvg = Barcode::imageType('svg')
                 ->foregroundColor('#000000')
                 ->height(30)
@@ -218,8 +231,16 @@ class PurchasesController extends Controller
             ]);
     
             // Step 10: Update the total amounts for the old and new purchases
-            $purchase->update(['total_amount' => $purchase->products()->sum(DB::raw('purchase_products.quantity * purchase_products.cost_price'))]);
-            $newPurchase->update(['total_amount' => $newPurchase->products()->sum(DB::raw('purchase_products.quantity * purchase_products.cost_price'))]);
+            $oldPurchaseTotal = $purchase->products()->sum(DB::raw('purchase_products.quantity * purchase_products.cost_price'));
+            $newPurchaseTotal = $newPurchase->products()->sum(DB::raw('purchase_products.quantity * purchase_products.cost_price'));
+    
+            // Update the total amounts
+            $purchase->update(['total_amount' => $oldPurchaseTotal]);
+            $newPurchase->update(['total_amount' => $newPurchaseTotal]);
+    
+            // Step 11: Recalculate the change for both the original and new purchases
+            $purchase->update(['change' => $purchase->total_amount - $purchase->paid_amount]);
+            $newPurchase->update(['change' => $newPurchase->total_amount - $newPurchase->paid_amount]);
     
             DB::commit();
     
@@ -228,7 +249,7 @@ class PurchasesController extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', 'حدث خطأ أثناء نقل الكمية: ' . $e->getMessage());
         }
-    }   
+    }      
 
     public function productTransfersReport()
     {

@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Sales;
 use App\Models\Invoice;
+use App\Models\SalesInstallment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
 
 class CashierController extends Controller
 {
@@ -101,33 +103,47 @@ class CashierController extends Controller
 
     public function checkout(Request $request)
     {
-        // Perform validation outside of try-catch block
-        $request->validate([
+        $cart = session()->get('cart', []);
+        $subtotal = 0;
+    
+        foreach ($cart as $barcode => $details) {
+            $subtotal += $details['price'] * $details['quantity'];
+        }
+    
+        // Retrieve the discount from the request
+        $discount = $request->input('apply_discount_hidden', 0);
+        $totalAfterDiscount = $subtotal - $discount;
+    
+        // Custom validation to ensure paid_amount <= totalAfterDiscount
+        $validator = Validator::make($request->all(), [
             'buyer_name' => 'nullable|string|max:255',
             'buyer_phone' => 'nullable|string|max:15',
-            'discount' => 'nullable|numeric|min:0', // Ensure discount is numeric and not negative
-            'paid_amount' => 'required|numeric|min:0', // Paid amount is required and should be non-negative
+            'apply_discount_hidden' => 'nullable|numeric|min:0',
+            'paid_amount' => 'required|numeric|min:0',
+        ], [
+            'paid_amount.required' => 'يرجى إدخال المبلغ المدفوع.',
+            'paid_amount.numeric' => 'المبلغ المدفوع يجب أن يكون رقماً.',
+            'paid_amount.min' => 'المبلغ المدفوع يجب أن يكون على الأقل 0.',
         ]);
+    
+        // Add the custom validation for paid_amount
+        $validator->after(function ($validator) use ($totalAfterDiscount, $request) {
+            if ($request->input('paid_amount') > $totalAfterDiscount) {
+                $validator->errors()->add('paid_amount', 'المبلغ المدفوع لا يمكن أن يكون أكبر من الإجمالي بعد الخصم.');
+            }
+        });
+    
+        // Check validation
+        if ($validator->fails()) {
+            return redirect()->route('cashier.viewCart')
+                             ->withErrors($validator)
+                             ->withInput();
+        }
     
         DB::beginTransaction();
     
         try {
-            $cart = session()->get('cart', []);
-            $subtotal = 0;
-    
-            // Calculate subtotal
-            foreach ($cart as $barcode => $details) {
-                $subtotal += $details['price'] * $details['quantity'];
-            }
-    
-            // Get the discount from user input
-            $discount = $request->input('discount', 0); // Default to 0 if no discount is entered
-            $totalAfterDiscount = $subtotal - $discount;
-    
-            // Get the paid amount from the request
             $paidAmount = $request->input('paid_amount');
-    
-            // Calculate the deferred amount (change) — how much the customer still owes
             $change = $totalAfterDiscount - $paidAmount;
     
             // Create the invoice
@@ -138,7 +154,7 @@ class CashierController extends Controller
                 'subtotal' => $subtotal,
                 'discount' => $discount,
                 'total_amount' => $totalAfterDiscount,
-                'paid_amount' => $paidAmount,
+                'paid_amount' => 0,
                 'change' => $change, // Positive if they owe, negative if they overpaid
                 'user_id' => auth()->id(),
             ]);
@@ -146,17 +162,13 @@ class CashierController extends Controller
             // Process each item in the cart
             foreach ($cart as $barcode => $details) {
                 $product = Product::where('barcode', $barcode)->first();
-    
                 if ($product->quantity < $details['quantity']) {
                     DB::rollBack();
-                    // Throw a validation exception for insufficient stock
                     throw ValidationException::withMessages([
                         'cart' => "الكمية المتاحة غير كافية للمنتج: {$product->name}",
                     ]);
                 }
-    
                 $product->decrement('quantity', $details['quantity']);
-    
                 Sales::create([
                     'product_id' => $product->id,
                     'quantity' => $details['quantity'],
@@ -165,13 +177,27 @@ class CashierController extends Controller
                 ]);
             }
     
+            // Create an installment for the initial payment
+            SalesInstallment::create([
+                'invoice_id' => $invoice->id,
+                'amount_paid' => $paidAmount,
+                'date_paid' => now(),
+            ]);
+    
+            // Calculate the total paid amount from all installments
+            $totalPaid = SalesInstallment::where('invoice_id', $invoice->id)->sum('amount_paid');
+    
+            // Update the paid_amount in the invoice and recalculate the change
+            $invoice->update([
+                'paid_amount' => $totalPaid,
+                'change' => $invoice->total_amount - $totalPaid,
+            ]);
+    
             DB::commit();
-    
             session()->forget('cart');
+            return redirect()->route('cashier.printInvoice', $invoice->id)->with('success', 'تمت عملية الدفع بنجاح!');
     
-            return redirect()->route('cashier.printInvoice', $invoice->id)->with('success', 'تمت عملية الدفع بنجاح! كود الفاتورة: ' . $invoice->invoice_code);
         } catch (ValidationException $e) {
-            // Handle validation errors
             DB::rollBack();
             return redirect()->route('cashier.viewCart')->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
@@ -179,6 +205,7 @@ class CashierController extends Controller
             return redirect()->route('cashier.viewCart')->with('error', 'فشل في الدفع: ' . $e->getMessage());
         }
     }
+    
 
     private function calculateDiscount($subtotal)
     {

@@ -77,4 +77,12 @@ Route::middleware([
     Route::get('/admin/users/create', [App\Http\Controllers\UserController::class, 'create'])->name('users.create');
     Route::post('/admin/users', [App\Http\Controllers\UserController::class, 'store'])->name('users.store');  
     Route::put('/invoices/{invoice}/update-payment', [App\Http\Controllers\InvoiceController::class, 'updatePayment'])->name('invoices.updatePayment'); 
+    //purchases installments
+    Route::get('purchases/installments/create/{purchase}', [App\Http\Controllers\PurchaseInstallmentController::class, 'create'])->name('purchases.installments.create');
+    Route::post('purchases/installments/store', [App\Http\Controllers\PurchaseInstallmentController::class, 'store'])->name('purchases.installments.store');
+    Route::delete('purchases/installments/{installment}', [App\Http\Controllers\PurchaseInstallmentController::class, 'destroy'])->name('purchases.installments.destroy');
+    //sales installments
+    Route::get('sales/installments/{invoice}', [App\Http\Controllers\SalesInstallmentController::class, 'indexInstallments'])->name('sales.installments.index');
+    Route::post('sales/installments/{invoice}', [App\Http\Controllers\SalesInstallmentController::class, 'storeInstallment'])->name('sales.installments.store');
+    Route::get('/treasury', [App\Http\Controllers\TreasuryController::class, 'treasury'])->name('treasury');
 });

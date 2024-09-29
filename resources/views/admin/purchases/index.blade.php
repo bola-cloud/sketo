@@ -13,6 +13,8 @@
             <tr>
                 <th>رقم الفاتورة</th>
                 <th>نوع الفاتورة</th>
+                <th>المدفوع </th>
+                <th>الباقي</th>
                 <th>الإجمالي</th>
                 <th>الإجراءات</th>
             </tr>
@@ -22,9 +24,12 @@
                 <tr>
                     <td>{{ $purchase->invoice_number }}</td>
                     <td>{{ $purchase->type == 'product' ? 'شراء منتجات' : 'نفقات' }}</td>
+                    <td>{{ $purchase->paid_amount }}</td>
+                    <td>{{ $purchase->change }}</td>
                     <td>{{ $purchase->total_amount }}</td>
                     <td>
                         <a href="{{ route('purchases.show', $purchase->id) }}" class="btn btn-secondary">عرض التفاصيل</a>
+                        <a href="{{ route('purchases.installments.create', ['purchase' => $purchase->id] ) }}" class="btn btn-info"> اضافة قسط </a>
                     </td>
                 </tr>
             @endforeach

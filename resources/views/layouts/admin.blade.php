@@ -244,6 +244,11 @@ data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
                 </ul>
             </li>
         @endif
+
+        <li class="{{ Route::currentRouteName() == 'treasury' ? 'active':'' }} ">
+          <a class="menu-item" href="{{route('treasury')}}" data-i18n="nav.dash.crypto"> الخزينة </a>
+        </li>
+        
       </ul>
     </div>
 </div>

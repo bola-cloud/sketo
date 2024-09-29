@@ -28,4 +28,21 @@ class Purchase extends Model
     {
         return $this->hasMany(ProductTransfer::class, 'new_purchase_id');
     }
+
+    public function installments()
+    {
+        return $this->hasMany(PurchaseInstallment::class);
+    }
+
+    // Method to calculate total paid so far
+    public function getTotalPaidAttribute()
+    {
+        return $this->installments()->sum('amount_paid');
+    }
+
+    // Method to calculate the remaining change
+    public function getChangeAttribute()
+    {
+        return $this->total_amount - $this->total_paid;
+    }
 }

@@ -6,7 +6,9 @@
 
     <h3>رقم الفاتورة: {{ $purchase->invoice_number }}</h3>
     <h4>النوع: {{ $purchase->type == 'product' ? 'شراء منتجات' : 'نفقات' }}</h4>
-    <h4>الإجمالي: {{ $purchase->total_amount }}</h4>
+    <h4>المبلغ المدفوع: {{ $purchase->paid_amount }} ج.م</h4>
+    <h4>التغيير (الباقي): {{ $purchase->change }} ج.م</h4>
+    <h4>الإجمالي: {{ $purchase->total_amount }} ج.م</h4>
 
     @if($purchase->type == 'product')
         <h4>المنتجات</h4>
