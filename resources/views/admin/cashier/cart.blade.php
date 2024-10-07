@@ -214,30 +214,37 @@
 
     $(document).ready(function() {
         // Barcode input handling
+        let barcodeTimer;
         $('#barcode').on('input', function() {
-            var barcode = $(this).val().trim();
+            clearTimeout(barcodeTimer);  // Clear the previous timer if there is one
+
+            let barcode = $(this).val().trim();
 
             if (barcode.length) {
-                $('#barcode').prop('disabled', true);
-                $.ajax({
-                    url: "{{ route('cashier.addToCart') }}",
-                    type: "POST",
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        barcode: barcode
-                    },
-                    success: function(response) {
-                        $('#barcode').val('');
-                        $('#barcode').prop('disabled', false);
-                        $('body').html(response); // Replace the entire body with the updated content
-                    },
-                    error: function(xhr) {
-                        alert('المنتج غير موجود أو فشل في الإضافة إلى العربة.');
-                        $('#barcode').prop('disabled', false);
-                    }
-                });
+                // Set a new timer to delay the execution of the AJAX request by 1 second (1000 ms)
+                barcodeTimer = setTimeout(function() {
+                    $('#barcode').prop('disabled', true);
+                    $.ajax({
+                        url: "{{ route('cashier.addToCart') }}",
+                        type: "POST",
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            barcode: barcode
+                        },
+                        success: function(response) {
+                            $('#barcode').val('');  // Clear the barcode input
+                            $('#barcode').prop('disabled', false);  // Enable the input again
+                            $('body').html(response);  // Replace the entire body with the updated content
+                        },
+                        error: function(xhr) {
+                            alert('المنتج غير موجود أو فشل في الإضافة إلى العربة.');
+                            $('#barcode').prop('disabled', false);
+                        }
+                    });
+                }, 1000);  // Delay the execution by 1 second (1000 ms)
             }
         });
+
 
         // Product name search handling
         $('#product_name').on('input', function() {
