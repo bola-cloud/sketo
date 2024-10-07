@@ -25,6 +25,7 @@
     <form action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
+
         <div class="form-group">
             <label for="name">اسم المنتج</label>
             <input type="text" class="form-control" id="name" name="name" value="{{ $product->name }}" required>
@@ -36,19 +37,6 @@
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}" {{ $product->category_id == $category->id ? 'selected' : '' }}>
                         {{ $category->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="purchase_id">فاتورة الشراء</label>
-            <select class="form-control" id="purchase_id" name="purchase_id" required>
-                <option>اختر الفاتورة</option>
-                @foreach($purchases as $purchase)
-                    <option value="{{ $purchase->id }}" 
-                        @if($product->purchases->contains($purchase->id)) selected @endif>
-                        {{ $purchase->invoice_number }}
                     </option>
                 @endforeach
             </select>
@@ -70,11 +58,6 @@
         </div>
 
         <div class="form-group">
-            <label for="quantity">الكمية</label>
-            <input type="number" class="form-control" id="quantity" name="quantity" value="{{ $product->quantity }}" required>
-        </div>
-
-        <div class="form-group">
             <label for="threshold">الحد الأدنى للكمية</label>
             <input type="number" class="form-control" id="threshold" name="threshold" value="{{ $product->threshold }}" required>
         </div>
@@ -83,6 +66,35 @@
             <label for="image">صورة المنتج</label>
             <input type="file" class="form-control" id="image" name="image" accept="image/*">
         </div>        
+
+        <!-- Display and update purchase quantities -->
+        <h3>الكميات لكل فاتورة</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>رقم الفاتورة</th>
+                    <th>الكمية</th>
+                    <th>إجمالي الفاتورة</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($purchases as $purchase)
+                    <tr>
+                        <td>{{ $purchase->invoice_number }}</td>
+                        <td>
+                            <input type="number" name="purchase_quantities[{{ $purchase->id }}]" class="form-control" value="{{ $purchase->pivot->quantity }}">
+                        </td>
+                        <td>{{ $purchase->total_amount }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <!-- Display the total quantity (read-only) -->
+        <div class="form-group">
+            <label for="total_quantity">إجمالي الكمية</label>
+            <input type="number" class="form-control" id="total_quantity" name="total_quantity" value="{{ $totalQuantity }}" readonly>
+        </div>
 
         <button type="submit" class="btn btn-primary">تحديث المنتج</button>
     </form>
