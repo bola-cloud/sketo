@@ -8,6 +8,11 @@
         <!-- <button id="print-selected-barcodes" class="btn btn-secondary">طباعة الباركودات المختارة</button> -->
     </div>
 
+    @php
+        $user = auth()->user();
+        $permissions = $user->roles()->with('permissions')->get()->pluck('permissions.*.name')->flatten()->unique();
+    @endphp
+    
     @if(session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
@@ -61,7 +66,9 @@
                     <th>اسم المنتج</th>
                     <th>صورة المنتج</th>
                     <th>الفئة</th>
-                    <th>سعر التكلفة</th>
+                    @if($user->hasRole('admin'))
+                        <th>سعر التكلفة</th>
+                    @endif
                     <th>سعر البيع</th>
                     <th>الكمية</th>
                     <th>الباركود</th>
@@ -84,7 +91,9 @@
                             @endif
                         </td>                    
                         <td>{{ $product->category ? $product->category->name : 'لا يوجد فئة' }}</td>
-                        <td>{{ $product->cost_price }}</td>
+                        @if($user->hasRole('admin'))
+                            <td>{{ $product->cost_price }}</td>
+                        @endif
                         <td>{{ $product->selling_price }}</td>
                         <td>{{ $product->quantity }}</td>
                         <td>{{ $product->color }}</td>
