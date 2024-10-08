@@ -12,6 +12,7 @@
         <thead>
             <tr>
                 <th>رقم الفاتورة</th>
+                <th>اسم المورد</th>
                 <th>نوع الفاتورة</th>
                 <th>المدفوع </th>
                 <th>الباقي</th>
@@ -23,6 +24,7 @@
             @foreach($purchases as $purchase)
                 <tr>
                     <td>{{ $purchase->invoice_number }}</td>
+                    <td>{{ $purchase->supplier ? $purchase->supplier->name : 'لا يوجد مورد' }}</td>
                     <td>{{ $purchase->type == 'product' ? 'شراء منتجات' : 'نفقات' }}</td>
                     <td>{{ $purchase->paid_amount }}</td>
                     <td>{{ $purchase->change }}</td>

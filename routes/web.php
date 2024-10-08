@@ -85,4 +85,6 @@ Route::middleware([
     Route::get('sales/installments/{invoice}', [App\Http\Controllers\SalesInstallmentController::class, 'indexInstallments'])->name('sales.installments.index');
     Route::post('sales/installments/{invoice}', [App\Http\Controllers\SalesInstallmentController::class, 'storeInstallment'])->name('sales.installments.store');
     Route::get('/treasury', [App\Http\Controllers\TreasuryController::class, 'treasury'])->name('treasury');
+    Route::resource('suppliers', App\Http\Controllers\Suppliercontroller::class);
+    Route::resource('clients', App\Http\Controllers\ClientController::class);
 });

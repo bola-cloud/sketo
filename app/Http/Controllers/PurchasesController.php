@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Purchase;
+use App\Models\Supplier;
 use App\Models\PurchaseProduct;
 use App\Models\PurchaseInstallment;
 use Illuminate\Http\Request;
@@ -19,7 +20,8 @@ class PurchasesController extends Controller
     public function create()
     {
         $products = Product::all();
-        return view('admin.purchases.create', compact('products'));
+        $suppliers = Supplier::all();  // Fetch all suppliers to display in the Select2 dropdown
+        return view('admin.purchases.create', compact('products','suppliers'));
     }
 
     public function store(Request $request)
@@ -31,12 +33,6 @@ class PurchasesController extends Controller
             'description' => 'nullable|string|max:255',
             'paid_amount' => 'required|numeric|min:0', // Paid amount will be stored as an installment
         ];
-    
-        // Conditional validation based on 'type'
-        if ($request->type == "expense") {
-            $rules['total_amount'] = 'required|numeric|min:0'; // For expenses, total_amount is required
-        }
-    
         // Validation messages
         $messages = [
             'invoice_number.required' => 'يرجى إدخال رقم الفاتورة.',
@@ -48,39 +44,48 @@ class PurchasesController extends Controller
             'total_amount.numeric' => 'يجب أن يكون المبلغ الإجمالي رقماً.',
             'total_amount.min' => 'يجب أن يكون المبلغ الإجمالي أكبر من أو يساوي 0.',
         ];
-    
+
+        // Conditional validation for 'product' type
+        if ($request->type == "product") {
+            $rules['supplier_id'] = 'required|exists:suppliers,id';  // Supplier required for 'product'
+        }
+
+        // Conditional validation for 'expense' type
+        if ($request->type == "expense") {
+            $rules['total_amount'] = 'required|numeric|min:0'; // For expenses, total_amount is required
+        }
+
         // Validate the request
-        $validatedData = $request->validate($rules, $messages);
-    
+        $validatedData = $request->validate($rules);
+
         try {
-            // For expense purchases, we use the user-entered total_amount
-            // For product purchases, total_amount will be 0 initially, and updated later when products are added
             $totalAmount = $request->type == 'expense' ? $validatedData['total_amount'] : 0;
-    
-            // Step 1: Create the purchase with the required data (excluding paid_amount)
+
+            // Create the purchase record
             $purchase = Purchase::create([
                 'invoice_number' => $validatedData['invoice_number'],
                 'type' => $validatedData['type'],
                 'description' => $validatedData['description'],
                 'total_amount' => $totalAmount,
-                'paid_amount' => 0, // Initial paid amount is 0, installments will adjust this later
-                'change' => -$totalAmount, // Will be recalculated based on installments
+                'paid_amount' => 0,  // Initial paid amount is 0, installments will adjust this later
+                'change' => -$totalAmount,  // Will be recalculated based on installments
+                'supplier_id' => $request->type == 'product' ? $validatedData['supplier_id'] : null,  // Set supplier for product purchases
             ]);
-    
-            // Step 2: Save the paid_amount as an installment
+
+            // Save the paid_amount as an installment
             PurchaseInstallment::create([
                 'purchase_id' => $purchase->id,
                 'amount_paid' => $validatedData['paid_amount'],
                 'date_paid' => now(),
             ]);
-    
-            // Step 3: Recalculate the total paid and change based on installments
+
+            // Recalculate total paid and change
             $totalPaid = $purchase->installments()->sum('amount_paid');
             $purchase->update([
                 'paid_amount' => $totalPaid,
-                'change' => $totalPaid - $purchase->total_amount, // Recalculate the change
+                'change' => $totalPaid - $purchase->total_amount,
             ]);
-    
+
             return redirect()->route('purchases.index')->with('success', 'تم إنشاء الفاتورة وإضافة الدفعة بنجاح.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء الفاتورة: ' . $e->getMessage());
@@ -90,7 +95,7 @@ class PurchasesController extends Controller
 
     public function index()
     {
-        $purchases = Purchase::all();
+        $purchases = Purchase::with('supplier')->get();
         return view('admin.purchases.index', compact('purchases'));
     }
 

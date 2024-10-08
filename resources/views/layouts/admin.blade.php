@@ -178,6 +178,11 @@ data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
                             <a class="menu-item" href="{{route('invoices.index')}}" data-i18n="nav.dash.crypto"> عرض فواتير البيع </a>
                         </li>
                     @endif
+                    @if($user->hasRole('admin') || $permissions->contains('إنشاء الفواتير'))
+                        <li class="{{ Route::currentRouteName() == 'clients.index' ? 'active':'' }} ">
+                            <a class="menu-item" href="{{route('clients.index')}}" data-i18n="nav.dash.ecommerce">  ادارة العملاء </a>
+                        </li>
+                    @endif
                 </ul>
             </li>
         @endif
@@ -198,6 +203,11 @@ data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
                     @if(auth()->user()->hasRole('admin') )
                         <li class="{{ Route::currentRouteName() == 'reports.productTransfers' ? 'active':'' }} ">
                             <a class="menu-item" href="{{route('reports.productTransfers')}}" data-i18n="nav.dash.ecommerce"> تقرير نقل المنتجات </a>
+                        </li>
+                    @endif
+                    @if($user->hasRole('admin') || $permissions->contains('إنشاء الفواتير'))
+                        <li class="{{ Route::currentRouteName() == 'suppliers.index' ? 'active':'' }} ">
+                            <a class="menu-item" href="{{route('suppliers.index')}}" data-i18n="nav.dash.ecommerce">  ادارة الموردين </a>
                         </li>
                     @endif
                 </ul>

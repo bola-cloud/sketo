@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Invoice extends Model
 {
     use HasFactory;
-    protected $fillable = ['buyer_name', 'buyer_phone', 'invoice_code', 'subtotal', 'discount', 'total_amount', 'paid_amount', 'change', 'user_id'];
+    protected $fillable = ['buyer_name', 'buyer_phone', 'invoice_code', 'subtotal', 'discount', 'total_amount', 'paid_amount', 'change', 'user_id','client_id'];
 
     public function sales()
     {
@@ -35,5 +35,10 @@ class Invoice extends Model
     public function getChangeAttribute()
     {
         return $this->total_amount - $this->total_paid;
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Sales;
+use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\SalesInstallment;
 use Illuminate\Support\Facades\DB;
@@ -84,8 +85,8 @@ class CashierController extends Controller
         foreach ($cart as $barcode => $details) {
             $subtotal += $details['price'] * $details['quantity'];
         }
-
-        return view('admin.cashier.cart', compact('cart', 'subtotal'));
+        $clients = Client::all();  // Fetch all suppliers to display in the Select2 dropdown
+        return view('admin.cashier.cart', compact('cart', 'subtotal','clients'));
     }
 
     public function removeFromCart(Request $request)
@@ -120,6 +121,7 @@ class CashierController extends Controller
             'buyer_phone' => 'nullable|string|max:15',
             'apply_discount_hidden' => 'nullable|numeric|min:0',
             'paid_amount' => 'required|numeric|min:0',
+            'client_id'=>'nullable',
         ], [
             'paid_amount.required' => 'يرجى إدخال المبلغ المدفوع.',
             'paid_amount.numeric' => 'المبلغ المدفوع يجب أن يكون رقماً.',
@@ -148,8 +150,6 @@ class CashierController extends Controller
     
             // Create the invoice
             $invoice = Invoice::create([
-                'buyer_name' => $request->input('buyer_name'),
-                'buyer_phone' => $request->input('buyer_phone'),
                 'invoice_code' => strtoupper(uniqid('INV-')),
                 'subtotal' => $subtotal,
                 'discount' => $discount,
@@ -157,6 +157,7 @@ class CashierController extends Controller
                 'paid_amount' => 0,
                 'change' => $change, // Positive if they owe, negative if they overpaid
                 'user_id' => auth()->id(),
+                'client_id' => $request->input('client_id'),
             ]);
     
             // Process each item in the cart

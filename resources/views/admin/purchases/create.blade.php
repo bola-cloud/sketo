@@ -22,9 +22,20 @@
         <div class="form-group">
             <label for="type">نوع الفاتورة</label>
             <select name="type" id="type" class="form-control" required>
-                <option selected>اختر نوع الفاتورة</option>
+                <option selected disabled>اختر نوع الفاتورة</option>
                 <option value="product">شراء منتجات</option>
                 <option value="expense">نفقات</option>
+            </select>
+        </div>
+
+        <!-- Supplier selection for "شراء منتجات" type only -->
+        <div class="form-group w-100" id="supplier-section" style="display:none;">
+            <label for="supplier_id">المورد</label>
+            <select name="supplier_id" id="supplier_id" class="form-control select2-single">
+                <option value="" selected disabled>اختر المورد</option>
+                @foreach($suppliers as $supplier)
+                    <option value="{{ $supplier->id }}">{{ $supplier->name }} - {{ $supplier->phone }}</option>
+                @endforeach
             </select>
         </div>
 
@@ -48,18 +59,37 @@
     </form>
 </div>
 
-<script src="{{asset('assets/js/jquery.js')}}"></script>
+
+@endsection
+@push('scripts')
+<link href="{{asset('css/select2.min.css')}}" rel="stylesheet" />
+
+<!-- Include Select2 JS -->
+<script src="{{asset('js/select2.min.js')}}"></script>
 
 <script>
     $(document).ready(function() {
+        // Initialize Select2 for supplier dropdown
+        $('.select2-single').select2({
+            placeholder: "اختر المورد",
+            allowClear: true,
+            width: '100%' // Ensure the Select2 dropdowns are 100% width
+        });
+
+        // Show/Hide supplier section and total amount section based on invoice type
         $('#type').on('change', function() {
             var type = $(this).val();
-            if (type === 'expense') {
-                $('#total-amount-section').show();
+            if (type === 'product') {
+                $('#supplier-section').show();  // Show supplier dropdown for "product"
+                $('#total-amount-section').hide();  // Hide total amount section for "product"
+            } else if (type === 'expense') {
+                $('#supplier-section').hide();  // Hide supplier dropdown for "expense"
+                $('#total-amount-section').show();  // Show total amount section for "expense"
             } else {
+                $('#supplier-section').hide();
                 $('#total-amount-section').hide();
             }
         });
     });
 </script>
-@endsection
+@endpush

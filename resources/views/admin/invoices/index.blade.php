@@ -45,7 +45,6 @@
             <tr>
                 <th>كود الفاتورة</th>
                 <th>اسم المشتري</th>
-                <th>هاتف المشتري</th>
                 <th>اسم البائع</th>
                 <th>تاريخ الإنشاء</th>
                 <th>الاقساط</th> <!-- New column for Installments -->
@@ -57,8 +56,7 @@
             @foreach($invoices as $invoice)
                 <tr>
                     <td>{{ $invoice->invoice_code }}</td>
-                    <td>{{ $invoice->buyer_name }}</td>
-                    <td>{{ $invoice->buyer_phone }}</td>
+                    <td>{{ $invoice->client ? $invoice->client->name : 'لا يوجد عميل' }}</td>
                     <td>{{ $invoice->user->name }}</td>
                     <td>{{ $invoice->created_at->format('Y-m-d') }}</td>
                     <td>

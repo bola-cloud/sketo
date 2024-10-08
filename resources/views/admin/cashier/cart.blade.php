@@ -124,38 +124,18 @@
             <h3 class="text-center">تفاصيل الفاتورة</h3>
             <form action="{{ route('cashier.checkout') }}" method="POST">
                 @csrf
-                <!-- Buyer Name -->
+        
+                <!-- client Selection -->
                 <div class="form-group">
-                    <label for="buyer_name">اسم المشتري</label>
-                    <input type="text" 
-                           class="form-control @error('buyer_name') is-invalid @enderror" 
-                           id="buyer_name" 
-                           name="buyer_name" 
-                           placeholder="أدخل اسم المشتري" 
-                           value="{{ old('buyer_name') }}">
-                    @error('buyer_name')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
+                    <label for="client_id">اختر العميل (اختياري)</label>
+                    <select class="form-control select2-client" id="client_id" name="client_id">
+                        <option value="" selected>اختر العميل (اختياري)</option>
+                        @foreach($clients as $client)
+                            <option value="{{ $client->id }}">{{ $client->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
-
-                <!-- Buyer Phone -->
-                <div class="form-group">
-                    <label for="buyer_phone">هاتف المشتري</label>
-                    <input type="text" 
-                           class="form-control @error('buyer_phone') is-invalid @enderror" 
-                           id="buyer_phone" 
-                           name="buyer_phone" 
-                           placeholder="أدخل هاتف المشتري" 
-                           value="{{ old('buyer_phone') }}">
-                    @error('buyer_phone')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-
+        
                 <!-- Paid Amount -->
                 <div class="form-group">
                     <label for="paid_amount">المبلغ المدفوع</label>
@@ -172,10 +152,10 @@
                         </div>
                     @enderror
                 </div>
-
+        
                 <!-- Hidden Fields for Discount Handling (if needed) -->
                 <input type="hidden" name="apply_discount_hidden" id="apply_discount_hidden" value="0" />
-
+        
                 <!-- Submit Button -->
                 <div class="text-center">
                     <button type="submit" class="btn btn-success mt-4">إتمام الدفع و طباعة الفاتورة</button>
@@ -320,3 +300,18 @@
     }
 </script>
 @endsection
+@push('scripts')
+<script src="{{ asset('js/select2.min.js') }}"></script>
+<link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
+
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 for supplier dropdown
+        $('.select2-client').select2({
+            placeholder: "اختر المورد (اختياري)",
+            allowClear: true,
+            width: '100%' // Ensure the Select2 dropdowns are 100% width
+        });
+    });
+</script>
+@endpush

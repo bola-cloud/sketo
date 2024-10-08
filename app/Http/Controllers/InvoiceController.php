@@ -12,7 +12,7 @@ class InvoiceController extends Controller
 {
     public function index(Request $request)
     {
-        $invoices = Invoice::all(); // Get all invoices
+        $invoices = Invoice::with('client')->get(); // Get all invoices
         return view('admin.invoices.index', compact('invoices'));
     }
     

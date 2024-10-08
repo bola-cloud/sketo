@@ -240,38 +240,61 @@ class ProductController extends Controller
                 if ($product->image) {
                     \Storage::disk('public')->delete($product->image);
                 }
-
+    
                 $imagePath = $request->file('image')->store('product_images', 'public');
                 $validated['image'] = $imagePath;
             }
-
-            // Update product details (except for quantity)
+    
+            // Check if barcode (color field) is changed
+            if ($request->color !== $product->color) {
+                // Generate a new barcode string based on the new 'color' field
+                $barcodeString = $request->color;
+    
+                // Define the path for the new barcode SVG
+                $barcodePath = 'barcodes/' . $barcodeString . '.svg';
+    
+                // Generate the new barcode image using the AgeekDev\Barcode package
+                $barcodeSvg = Barcode::imageType('svg')
+                    ->foregroundColor('#000000')
+                    ->height(30)
+                    ->widthFactor(2)
+                    ->type(Type::TYPE_CODE_128) // Generate CODE 128 barcodes
+                    ->generate($barcodeString);
+    
+                // Save the new barcode SVG
+                Storage::disk('public')->put($barcodePath, $barcodeSvg);
+    
+                // Update the product with the new barcode string and path
+                $product->update(['barcode' => $barcodeString, 'barcode_path' => $barcodePath]);
+            }
+    
+            // Update the remaining product details (excluding quantity)
             $product->update($validated);
-
+    
             // Variables to store total quantities
             $totalQuantity = 0;
-
+    
             // Loop over each purchase and update quantities
             foreach ($request->input('purchase_quantities') as $purchaseId => $newQuantity) {
                 $purchase = Purchase::find($purchaseId);
                 $oldQuantity = $purchase->products()->where('product_id', $product->id)->first()->pivot->quantity;
-
+    
                 // Update the pivot table with the new quantity
                 $purchase->products()->updateExistingPivot($product->id, [
                     'quantity' => $newQuantity,
                 ]);
-
+    
                 // Update total amount of the purchase (quantity * cost_price)
                 $totalAmount = $purchase->products()->sum(DB::raw('purchase_products.quantity * purchase_products.cost_price'));
                 $purchase->update(['total_amount' => $totalAmount]);
-
+    
                 // Recalculate the change (total_amount - paid_amount)
                 $change = $totalAmount - $purchase->paid_amount;
                 $purchase->update(['change' => $change]);
-
+    
                 // Accumulate total quantity for the product
                 $totalQuantity += $newQuantity;
-
+    
                 // Log quantity updates if quantity has changed
                 if ($oldQuantity != $newQuantity) {
                     DB::table('quantity_updates')->insert([
@@ -285,12 +308,12 @@ class ProductController extends Controller
                     ]);
                 }
             }
-
+    
             // Update the total quantity of the product in the products table
             $product->update(['quantity' => $totalQuantity]);
-
+    
             DB::commit();
-        
+    
             return redirect()->route('products.index')->with('success', 'تم تحديث المنتج بنجاح.');
         } catch (\Exception $e) {
             DB::rollBack();
