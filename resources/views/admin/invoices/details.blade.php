@@ -82,6 +82,18 @@
         </form>
     </div>
 
+    <!-- Display the discount and provide an option to edit it -->
+    <form action="{{ route('invoices.updateDiscount', $invoice->id) }}" method="POST" class="p-2 mt-2">
+        @csrf
+        @method('PUT') <!-- PUT method for updating -->
+        <div class="form-group">
+            <label for="discount">تعديل الخصم:</label>
+            <input type="number" class="form-control" id="discount" name="discount" value="{{ number_format($invoice->discount, 2) }}" step="0.01" required>
+        </div>
+        
+        <button type="submit" class="btn btn-warning">تحديث الخصم</button>
+    </form>
+
     <!-- Sold Products Section -->
     <h2 class="mt-4">المنتجات المباعة</h2>
     <form action="{{ route('invoices.returnProducts', $invoice->id) }}" method="POST">

@@ -33,11 +33,24 @@
                         <a href="{{ route('purchases.show', $purchase->id) }}" class="btn btn-secondary">عرض التفاصيل</a>
                         @if ($purchase->total_amount != $purchase->paid_amount)
                             <a href="{{ route('purchases.installments.create', ['purchase' => $purchase->id] ) }}" class="btn btn-info"> اضافة قسط </a>
-                        @endif                    
+                        @endif     
+                        @if($purchase->type == 'expense')
+                            <form action="{{ route('purchases.destroy', $purchase->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('هل أنت متأكد من أنك تريد حذف هذه الفاتورة؟');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">حذف</button>
+                            </form>
+                        @endif
                     </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
+    <div class="row">
+        <div class="col-md-12 d-flex justify-content-center">
+            {{ $purchases->onEachSide(1)->links('pagination::bootstrap-4') }}
+        </div>
+    </div>
+    
 </div>
 @endsection

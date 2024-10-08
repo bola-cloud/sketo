@@ -183,11 +183,6 @@ data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
                             <a class="menu-item" href="{{route('clients.index')}}" data-i18n="nav.dash.ecommerce">  ادارة العملاء </a>
                         </li>
                     @endif
-                    @if($user->hasRole('admin') || $permissions->contains('إنشاء المنتجات'))
-                        <li class="{{ Route::currentRouteName() == 'products.create' ? 'active':'' }} ">
-                            <a class="menu-item" href="{{route('products.create')}}" data-i18n="nav.dash.crypto">اضافة منتج</a>
-                        </li>
-                    @endif
                 </ul>
             </li>
         @endif
@@ -198,6 +193,11 @@ data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
                     @if($user->hasRole('admin') || $permissions->contains('إنشاء الفواتير'))
                         <li class="{{ Route::currentRouteName() == 'purchases.create' ? 'active':'' }} ">
                             <a class="menu-item" href="{{route('purchases.create')}}" data-i18n="nav.dash.ecommerce">  اضافة فاتورة </a>
+                        </li>
+                    @endif
+                    @if($user->hasRole('admin') || $permissions->contains('إنشاء المنتجات'))
+                        <li class="{{ Route::currentRouteName() == 'products.create' ? 'active':'' }} ">
+                            <a class="menu-item" href="{{route('products.create')}}" data-i18n="nav.dash.crypto">اضافة منتج</a>
                         </li>
                     @endif
                     @if($user->hasRole('admin') || $permissions->contains('عرض الفواتير'))

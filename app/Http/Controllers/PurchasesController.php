@@ -95,7 +95,7 @@ class PurchasesController extends Controller
 
     public function index()
     {
-        $purchases = Purchase::with('supplier')->get();
+        $purchases = Purchase::with('supplier')->paginate(20);
         return view('admin.purchases.index', compact('purchases'));
     }
 
@@ -279,6 +279,25 @@ class PurchasesController extends Controller
     
         return view('admin.reports.product_transfers', compact('transfers'));
     }
-    
+
+    public function destroy($id)
+    {
+        // Find the purchase by ID
+        $purchase = Purchase::findOrFail($id);
+
+        // Only allow deletion if the type is 'expense'
+        if ($purchase->type != 'expense') {
+            return redirect()->route('purchases.index')->with('error', 'لا يمكنك حذف الفاتورة لأنها ليست من نوع النفقات.');
+        }
+
+        try {
+            // Delete the purchase
+            $purchase->delete();
+
+            return redirect()->route('purchases.index')->with('success', 'تم حذف الفاتورة بنجاح.');
+        } catch (\Exception $e) {
+            return redirect()->route('purchases.index')->with('error', 'حدث خطأ أثناء حذف الفاتورة: ' . $e->getMessage());
+        }
+    }
 }
 

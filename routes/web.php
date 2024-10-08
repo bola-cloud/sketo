@@ -87,4 +87,7 @@ Route::middleware([
     Route::get('/treasury', [App\Http\Controllers\TreasuryController::class, 'treasury'])->name('treasury');
     Route::resource('suppliers', App\Http\Controllers\Suppliercontroller::class);
     Route::resource('clients', App\Http\Controllers\ClientController::class);
+    Route::put('invoices/{invoice}/update-discount', [App\Http\Controllers\InvoiceController::class, 'updateDiscount'])->name('invoices.updateDiscount');
+    Route::delete('/purchases/{purchase}', [App\Http\Controllers\PurchasesController::class, 'destroy'])->name('purchases.destroy');
+
 });

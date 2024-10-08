@@ -12,7 +12,7 @@ class InvoiceController extends Controller
 {
     public function index(Request $request)
     {
-        $invoices = Invoice::with('client')->get(); // Get all invoices
+        $invoices = Invoice::with('client')->paginate(20); // Get all invoices
         return view('admin.invoices.index', compact('invoices'));
     }
     
@@ -40,7 +40,7 @@ class InvoiceController extends Controller
             $invoices->whereDate('created_at', '<=', $date_to);
         }
     
-        $invoices = $invoices->get();
+        $invoices = $invoices->paginate(20);
     
         return view('admin.invoices.index', compact('invoices'));
     }
@@ -82,6 +82,36 @@ class InvoiceController extends Controller
     {
         $invoice->load('sales.product'); // Load related sales and products
         return response()->json($invoice);
+    }
+
+    public function updateDiscount(Request $request, $id)
+    {
+        // Validate the input
+        $request->validate([
+            'discount' => 'required|numeric|min:0',
+        ]);
+
+        // Find the invoice
+        $invoice = Invoice::findOrFail($id);
+
+        // Update the discount and recalculate total_amount and change
+        $subtotal = $invoice->subtotal; // Retrieve the existing subtotal
+        $newDiscount = $request->input('discount'); // Get the new discount
+
+        // Recalculate total_amount and change
+        $totalAfterDiscount = $subtotal - $newDiscount;
+        $change = $totalAfterDiscount - $invoice->paid_amount;
+
+        // Update the invoice with the new values
+        $invoice->update([
+            'discount' => $newDiscount,
+            'total_amount' => $totalAfterDiscount,
+            'change' => $change, // Recalculate the change based on paid_amount
+        ]);
+
+        // Redirect back to the invoice with a success message
+        return redirect()->route('invoices.show', $invoice->id)
+                        ->with('success', 'تم تحديث الخصم والإجمالي بنجاح.');
     }
 
     public function returnProducts(Request $request, Invoice $invoice)

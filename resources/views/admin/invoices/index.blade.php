@@ -80,6 +80,11 @@
             @endforeach
         </tbody>
     </table>
+    <div class="row">
+        <div class="col-md-12 d-flex justify-content-center">
+            {{ $invoices->onEachSide(1)->links('pagination::bootstrap-4') }}
+        </div>
+    </div>
 </div>
 
 <script src="{{ asset('assets/js/jquery.js') }}"></script>
