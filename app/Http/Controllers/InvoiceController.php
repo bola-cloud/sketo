@@ -198,7 +198,6 @@ class InvoiceController extends Controller
         return redirect()->route('invoices.show', $invoice->id)->with('success', 'تمت إضافة المنتج إلى الفاتورة بنجاح.');
     }
     
-    
     public function destroy(Invoice $invoice)
     {
         foreach ($invoice->sales as $sale) {

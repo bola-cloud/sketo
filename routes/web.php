@@ -89,5 +89,8 @@ Route::middleware([
     Route::resource('clients', App\Http\Controllers\ClientController::class);
     Route::put('invoices/{invoice}/update-discount', [App\Http\Controllers\InvoiceController::class, 'updateDiscount'])->name('invoices.updateDiscount');
     Route::delete('/purchases/{purchase}', [App\Http\Controllers\PurchasesController::class, 'destroy'])->name('purchases.destroy');
-
+    // Route to show the edit form
+    Route::get('sales/installments/{invoice}/{installment}/edit', [App\Http\Controllers\SalesInstallmentController::class, 'editInstallment'])->name('sales.installments.edit');
+    // Route to update the installment
+    Route::put('sales/installments/{invoice}/{installment}', [App\Http\Controllers\SalesInstallmentController::class, 'updateInstallment'])->name('sales.installments.update');
 });
