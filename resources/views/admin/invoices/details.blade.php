@@ -27,7 +27,7 @@
 
     <!-- Update Paid Amount and Change Form -->
     <div class="container mt-4">
-        <h2>تحديث المبلغ المدفوع والتغيير</h2>
+        <h2>تحديث المبلغ المدفوع والاقساط </h2>
 
         @if(session('success'))
             <div class="alert alert-success">
@@ -45,7 +45,7 @@
             </div>
         @endif
 
-        <form action="{{ route('invoices.updatePayment', $invoice->id) }}" method="POST">
+        {{-- <form action="{{ route('invoices.updatePayment', $invoice->id) }}" method="POST">
             @csrf
             @method('PUT') <!-- PUT method for updating -->
 
@@ -79,7 +79,11 @@
 
             <!-- Submit Button -->
             <button type="submit" class="btn btn-primary">تحديث الفاتورة</button>
-        </form>
+        </form> --}}
+
+        @if($invoice->total_amount > $invoice->paid_amount)
+            <a href="{{ route('sales.installments.index', $invoice->id) }}" class="btn btn-info btn-sm">عرض الأقساط</a> <!-- Link to Installments -->
+        @endif
     </div>
 
     <!-- Display the discount and provide an option to edit it -->
@@ -93,6 +97,8 @@
         
         <button type="submit" class="btn btn-warning">تحديث الخصم</button>
     </form>
+
+
 
     <!-- Sold Products Section -->
     <h2 class="mt-4">المنتجات المباعة</h2>
