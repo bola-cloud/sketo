@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Sales;
+use App\Models\PurchaseProduct;
 use App\Models\Category;
 use App\Models\Purchase;
 use Illuminate\Support\Facades\DB;
@@ -105,9 +107,7 @@ class ProductController extends Controller
                 $purchase->update(['change' => $change]);
             
                 // Update the total quantity of the product across all purchases
-                $totalQuantity = DB::table('purchase_products')
-                    ->where('product_id', $product->id)
-                    ->sum('quantity');
+                $totalQuantity = $product->quantity + $request->quantity_existing;
                 
                 // Update the product's total quantity
                 $product->update(['quantity' => $totalQuantity]);
@@ -272,45 +272,54 @@ class ProductController extends Controller
             $product->update($validated);
     
             // Variables to store total quantities
-            $totalQuantity = 0;
+            $totalPurchasedQuantity = 0;
     
-            // Loop over each purchase and update quantities
-            foreach ($request->input('purchase_quantities') as $purchaseId => $newQuantity) {
-                $purchase = Purchase::find($purchaseId);
-                $oldQuantity = $purchase->products()->where('product_id', $product->id)->first()->pivot->quantity;
-    
-                // Update the pivot table with the new quantity
-                $purchase->products()->updateExistingPivot($product->id, [
-                    'quantity' => $newQuantity,
-                ]);
-    
-                // Update total amount of the purchase (quantity * cost_price)
-                $totalAmount = $purchase->products()->sum(DB::raw('purchase_products.quantity * purchase_products.cost_price'));
-                $purchase->update(['total_amount' => $totalAmount]);
-    
-                // Recalculate the change (total_amount - paid_amount)
-                $change = $totalAmount - $purchase->paid_amount;
-                $purchase->update(['change' => $change]);
-    
-                // Accumulate total quantity for the product
-                $totalQuantity += $newQuantity;
-    
-                // Log quantity updates if quantity has changed
-                if ($oldQuantity != $newQuantity) {
-                    DB::table('quantity_updates')->insert([
-                        'product_id' => $product->id,
-                        'old_quantity' => $oldQuantity,
-                        'new_quantity' => $newQuantity,
-                        'user_id' => auth()->id(),
-                        'action' => 'تحديث',
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
+            // Loop through each purchase_product entry using the pivot table's `id`
+            foreach ($request->input('purchase_quantities') as $purchaseProductId => $newQuantity) {
+                $purchaseProduct = DB::table('purchase_products')->where('id', $purchaseProductId)->first();
+
+                if ($purchaseProduct) {
+                    $oldQuantity = $purchaseProduct->quantity;
+
+                    // Update the specific pivot row by its ID
+                    DB::table('purchase_products')
+                        ->where('id', $purchaseProductId)
+                        ->update(['quantity' => $newQuantity]);
+
+                    // Recalculate total amount and change for the related purchase
+                    $purchase = Purchase::find($purchaseProduct->purchase_id);
+                    $totalAmount = DB::table('purchase_products')
+                        ->where('purchase_id', $purchase->id)
+                        ->sum(DB::raw('quantity * cost_price'));
+                    $purchase->update(['total_amount' => $totalAmount]);
+
+                    $change = $totalAmount - $purchase->paid_amount;
+                    $purchase->update(['change' => $change]);
+
+                    // Accumulate the total purchased quantity
+                    $totalPurchasedQuantity += $newQuantity;
+
+                    // Log changes if the quantity was modified
+                    if ($oldQuantity != $newQuantity) {
+                        DB::table('quantity_updates')->insert([
+                            'product_id' => $product->id,
+                            'old_quantity' => $oldQuantity,
+                            'new_quantity' => $newQuantity,
+                            'user_id' => auth()->id(),
+                            'action' => 'تحديث',
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
                 }
             }
-    
-            // Update the total quantity of the product in the products table
-            $product->update(['quantity' => $totalQuantity]);
+
+            // Calculate the total sold quantity
+            $totalSoldQuantity = Sales::where('product_id', $product->id)->sum('quantity');
+
+            // Update the total quantity in the products table
+            $updatedQuantity = $totalPurchasedQuantity - $totalSoldQuantity;
+            $product->update(['quantity' => max($updatedQuantity, 0)]); // Ensure quantity doesn't go below zero
     
             DB::commit();
     

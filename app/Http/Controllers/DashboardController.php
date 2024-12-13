@@ -7,6 +7,8 @@ use App\Models\Sales;
 use App\Models\Product;
 use App\Models\Invoice;
 use App\Models\Purchase;
+use App\Models\SalesInstallment;
+use App\Models\PurchaseInstallment;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -19,20 +21,24 @@ class DashboardController extends Controller
     
             $salesQuery = Sales::query();
             $purchaseQuery = Purchase::query();
-            $invoiceQuery = Invoice::query(); // New query for invoices
+            $invoiceQuery = Invoice::query();
+            $salesInstallmentQuery = SalesInstallment::query(); // New query for Sales Installments
+            $purchaseInstallmentQuery = PurchaseInstallment::query(); // New query for Purchase Installments
     
-            // Check if dates are provided
+            // Apply date range filter if provided
             if ($startDate && $endDate) {
                 $salesQuery->whereBetween('sales.created_at', [$startDate, $endDate]);
                 $purchaseQuery->whereBetween('purchases.created_at', [$startDate, $endDate]);
-                $invoiceQuery->whereBetween('invoices.created_at', [$startDate, $endDate]); // Apply date range to invoices
+                $invoiceQuery->whereBetween('invoices.created_at', [$startDate, $endDate]);
+                $salesInstallmentQuery->whereBetween('date_paid', [$startDate, $endDate]);
+                $purchaseInstallmentQuery->whereBetween('date_paid', [$startDate, $endDate]);
             }
     
             // Calculate total products sold
             $productsSold = $salesQuery->sum('quantity');
     
             // Calculate total revenue from invoices
-            $totalRevenue = $invoiceQuery->sum('paid_amount'); // Changed to sum of paid_amount in invoices table
+            $totalRevenue = $invoiceQuery->sum('paid_amount');
     
             // Calculate total unsold products (quantity in stock)
             $totalUnsoldProducts = Product::where('quantity', '>', 0)->sum('quantity');
@@ -41,9 +47,16 @@ class DashboardController extends Controller
             $totalPurchases = $purchaseQuery->sum('total_amount');
     
             // Calculate total profit (total paid from invoices - total paid from purchases)
-            $totalPaidInvoices = $invoiceQuery->sum('paid_amount'); // Total paid amount from invoices
-            $totalPaidPurchases = $purchaseQuery->sum('paid_amount'); // Total paid amount from purchases
-            $totalProfit = $totalPaidInvoices - $totalPaidPurchases; // Profit calculation
+            $totalPaidInvoices = $invoiceQuery->sum('paid_amount');
+            $totalPaidPurchases = $purchaseQuery->sum('paid_amount');
+            $totalProfit = $totalPaidInvoices - $totalPaidPurchases;
+    
+            // Calculate total sales installments and purchase installments
+            $totalSalesInstallments = $salesInstallmentQuery->sum('amount_paid');
+            $totalPurchaseInstallments = $purchaseInstallmentQuery->sum('amount_paid');
+    
+            // Calculate the amount of money the user has
+            $availableMoney = $totalSalesInstallments - $totalPurchaseInstallments;
     
             // Prepare data for the charts (products sold and total revenue per month)
             $monthlyData = Sales::selectRaw('MONTH(sales.created_at) as month, YEAR(sales.created_at) as year, SUM(sales.quantity) as total_sold, SUM(sales.total_price) as total_revenue')
@@ -61,13 +74,23 @@ class DashboardController extends Controller
                     'totalRevenue' => $totalRevenue,
                     'totalUnsoldProducts' => $totalUnsoldProducts,
                     'totalPurchases' => $totalPurchases,
-                    'totalProfit' => $totalProfit ?? 0,  // Ensure profit is not null
+                    'totalProfit' => $totalProfit ?? 0,
                     'lowStockProducts' => $lowStockProducts,
+                    'availableMoney' => $availableMoney, // Include available money
                 ]);
             }
     
             // Return the view with the data
-            return view('admin.dashboard', compact('productsSold', 'totalRevenue', 'totalUnsoldProducts', 'totalPurchases', 'totalProfit', 'monthlyData', 'lowStockProducts'));
+            return view('admin.dashboard', compact(
+                'productsSold',
+                'totalRevenue',
+                'totalUnsoldProducts',
+                'totalPurchases',
+                'totalProfit',
+                'monthlyData',
+                'lowStockProducts',
+                'availableMoney' // Include available money
+            ));
         } catch (\Exception $e) {
             \Log::error('DashboardController Error: ' . $e->getMessage(), [
                 'startDate' => $startDate,
@@ -76,6 +99,6 @@ class DashboardController extends Controller
             ]);
             return response()->json(['error' => 'Something went wrong'], 500);
         }
-    }    
+    }
 }
 

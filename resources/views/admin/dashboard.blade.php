@@ -116,6 +116,24 @@
         </div>
     </div>
 
+    <div class="col-xl-3 col-lg-6 col-12">
+        <div class="card pull-up">
+            <div class="card-content">
+                <div class="card-body">
+                    <div class="media d-flex">
+                        <div class="media-body text-left">
+                            <h3 class="primary" id="availableMoney">{{ $availableMoney }} ج.م</h3>
+                            <h6>المبلغ المتوفر</h6>
+                        </div>
+                        <div>
+                            <i class="icon-wallet primary font-large-2 float-left"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+
     </div>
     <!-- Date Range Picker -->
     <div class="row">
@@ -212,13 +230,16 @@
         });
     }
 
-      function updateDashboard(data) {
-          $('#productsSold').text(data.productsSold);
-          $('#totalRevenue').text('ج.م' + data.totalRevenue);
-          $('#totalUnsoldProducts').text(data.totalUnsoldProducts);
-          $('#totalPurchases').text('ج.م' + data.totalPurchases);
-          $('#totalProfit').text('ج.م' + data.totalProfit);
-      }
+        function updateDashboard(data) {
+            $('#productsSold').text(data.productsSold);
+            $('#totalRevenue').text('ج.م ' + data.totalRevenue);
+            $('#totalUnsoldProducts').text(data.totalUnsoldProducts);
+            $('#totalPurchases').text('ج.م ' + data.totalPurchases);
+            $('#totalProfit').text('ج.م ' + data.totalProfit);
+            $('#availableMoney').text('ج.م ' + data.availableMoney); // Update available money
+        }
+
+
   });
 
 
