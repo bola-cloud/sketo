@@ -47,27 +47,59 @@
                 <th>اسم المشتري</th>
                 <th>اسم البائع</th>
                 <th>تاريخ الإنشاء</th>
-                <th>الاقساط</th> <!-- New column for Installments -->
+                <th>الحالة</th>
+                <th>الاقساط</th>
                 <th>إجراءات</th>
                 <th>حذف</th>
             </tr>
         </thead>
         <tbody>
             @foreach($invoices as $invoice)
+                @php
+                    $returnsCount = $invoice->returns()->count();
+                    $hasUnpaidAmount = $invoice->total_amount > $invoice->paid_amount;
+                @endphp
                 <tr>
-                    <td>{{ $invoice->invoice_code }}</td>
+                    <td>
+                        {{ $invoice->invoice_code }}
+                        @if($returnsCount > 0)
+                            <span class="badge badge-warning" title="يحتوي على {{ $returnsCount }} عملية إرجاع">
+                                <i class="fa fa-undo"></i> {{ $returnsCount }}
+                            </span>
+                        @endif
+                    </td>
                     <td>{{ $invoice->client ? $invoice->client->name : 'لا يوجد عميل' }}</td>
                     <td>{{ $invoice->user->name }}</td>
                     <td>{{ $invoice->created_at->format('Y-m-d') }}</td>
                     <td>
-                        <!-- Installment button -->
-                        @if($invoice->total_amount > $invoice->paid_amount)
-                            <a href="{{ route('sales.installments.index', $invoice->id) }}" class="btn btn-info btn-sm">عرض الأقساط</a> <!-- Link to Installments -->
+                        @if($hasUnpaidAmount)
+                            <span class="badge badge-danger">غير مكتمل السداد</span>
+                        @else
+                            <span class="badge badge-success">مدفوع</span>
                         @endif
-                    </td>                    
+
+                        @if($returnsCount > 0)
+                            <br><small class="text-warning">
+                                <i class="fa fa-exclamation-triangle"></i> يحتوي على مرتجعات
+                            </small>
+                        @endif
+                    </td>
+                    <td>
+                        <!-- Installment button -->
+                        @if($hasUnpaidAmount)
+                            <a href="{{ route('sales.installments.index', $invoice->id) }}" class="btn btn-info btn-sm">عرض الأقساط</a>
+                        @else
+                            <span class="text-muted">مكتمل</span>
+                        @endif
+                    </td>
                     <td>
                         <a href="{{ route('invoices.show', ['invoice' => $invoice->id]) }}" class="btn btn-secondary btn-sm">عرض التفاصيل</a>
                         <a class="btn btn-primary btn-sm" href="{{ route('cashier.printInvoice', $invoice->id) }}">طباعة الفاتورة</a>
+                        @if($returnsCount > 0)
+                            <br><a href="{{ route('customer-returns.index') }}?invoice_code={{ $invoice->invoice_code }}" class="btn btn-warning btn-sm mt-1">
+                                <i class="fa fa-eye"></i> المرتجعات ({{ $returnsCount }})
+                            </a>
+                        @endif
                     </td>
                     <td>
                         <form action="{{ route('invoices.destroy', $invoice->id) }}" method="POST" style="display:inline;">

@@ -43,6 +43,18 @@
         </div>
 
         <div class="form-group">
+            <label for="brand_id">الماركة</label>
+            <select class="form-control" id="brand_id" name="brand_id">
+                <option value="">بدون ماركة</option>
+                @foreach($brands as $brand)
+                    <option value="{{ $brand->id }}" {{ $product->brand_id == $brand->id ? 'selected' : '' }}>
+                        {{ $brand->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="form-group">
             <label for="cost_price">سعر التكلفة</label>
             <input type="number" step="0.01" class="form-control" id="cost_price" name="cost_price" value="{{ $product->cost_price }}" required>
         </div>
@@ -65,7 +77,7 @@
         <div class="form-group">
             <label for="image">صورة المنتج</label>
             <input type="file" class="form-control" id="image" name="image" accept="image/*">
-        </div>        
+        </div>
 
         <!-- Display and update purchase quantities -->
         <h3>الكميات لكل فاتورة</h3>

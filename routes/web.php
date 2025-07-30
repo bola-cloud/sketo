@@ -38,6 +38,7 @@ Route::middleware([
     Route::get('products/{product}/print-barcode', [App\Http\Controllers\ProductController::class, 'printBarcode'])->name('products.printBarcode');
     Route::post('/products/print-selected-barcodes', [App\Http\Controllers\ProductController::class, 'printSelectedBarcodes'])->name('products.printSelectedBarcodes');
     Route::get('/products/print/barcodes/{id}',[App\Http\Controllers\ProductController::class, 'printBarcodes'])->name('products.printBarcodes');
+    Route::get('/all-products/recalculate/quantities', [App\Http\Controllers\ProductController::class, 'recalculateAllProductQuantities'])->name('products.recalculateQuantities');
 
    Route::get('/cashier/search-product', [CashierController::class, 'searchProductByName'])->name('cashier.searchProductByName');
 
@@ -57,6 +58,7 @@ Route::middleware([
     Route::post('/invoices/{invoice}/addProduct', [App\Http\Controllers\InvoiceController::class, 'addProduct'])->name('invoices.addProduct'); // New route
     Route::delete('/invoices/{invoice}', [App\Http\Controllers\InvoiceController::class, 'destroy'])->name('invoices.destroy');
     Route::resource('categories', App\Http\Controllers\CategoryController::class);
+    Route::resource('brands', App\Http\Controllers\BrandController::class);
     Route::prefix('purchases')->name('purchases.')->group(function () {
         Route::get('/', [PurchasesController::class, 'index'])->name('index');
         Route::get('/create', [PurchasesController::class, 'create'])->name('create');
@@ -69,14 +71,16 @@ Route::middleware([
     Route::get('/report/date/range', [App\Http\Controllers\ReportController::class, 'dateRangeReport'])->name('reports.dateRange');
     Route::get('/purchases/{purchase}/transfer-product/{product}', [App\Http\Controllers\PurchasesController::class, 'transferProductForm'])->name('purchases.transferProduct');
     Route::post('/purchases/{purchase}/transfer-product/{product}', [App\Http\Controllers\PurchasesController::class, 'transferProduct'])->name('purchases.transferProduct.store');
+    Route::get('/purchases/{purchase}/transfer-history/{product}', [App\Http\Controllers\PurchasesController::class, 'getTransferHistory'])->name('purchases.transferHistory');
+    Route::get('/purchases/{purchase}/recalculate-total', [App\Http\Controllers\PurchasesController::class, 'recalculatePurchaseTotal'])->name('purchases.recalculateTotal');
     Route::get('/reports/product-transfers', [App\Http\Controllers\PurchasesController::class, 'productTransfersReport'])->name('reports.productTransfers');
 
     Route::get('admin/role-user', [App\Http\Controllers\RoleUserController::class, 'index'])->name('role_user.index');
     Route::post('admin/role-user/attach', [App\Http\Controllers\RoleUserController::class, 'attachRole'])->name('role_user.attach');
-    Route::post('admin/role-user/detach', [App\Http\Controllers\RoleUserController::class, 'detachRole'])->name('role_user.detach'); 
+    Route::post('admin/role-user/detach', [App\Http\Controllers\RoleUserController::class, 'detachRole'])->name('role_user.detach');
     Route::get('/admin/users/create', [App\Http\Controllers\UserController::class, 'create'])->name('users.create');
-    Route::post('/admin/users', [App\Http\Controllers\UserController::class, 'store'])->name('users.store');  
-    Route::put('/invoices/{invoice}/update-payment', [App\Http\Controllers\InvoiceController::class, 'updatePayment'])->name('invoices.updatePayment'); 
+    Route::post('/admin/users', [App\Http\Controllers\UserController::class, 'store'])->name('users.store');
+    Route::put('/invoices/{invoice}/update-payment', [App\Http\Controllers\InvoiceController::class, 'updatePayment'])->name('invoices.updatePayment');
     //purchases installments
     Route::get('purchases/installments/create/{purchase}', [App\Http\Controllers\PurchaseInstallmentController::class, 'create'])->name('purchases.installments.create');
     Route::post('purchases/installments/store', [App\Http\Controllers\PurchaseInstallmentController::class, 'store'])->name('purchases.installments.store');
@@ -93,4 +97,17 @@ Route::middleware([
     Route::get('sales/installments/{invoice}/{installment}/edit', [App\Http\Controllers\SalesInstallmentController::class, 'editInstallment'])->name('sales.installments.edit');
     // Route to update the installment
     Route::put('sales/installments/{invoice}/{installment}', [App\Http\Controllers\SalesInstallmentController::class, 'updateInstallment'])->name('sales.installments.update');
+    Route::get('/admin/product-transactions', [App\Http\Controllers\ProductController::class, 'productTransactions'])->name('product.transactions');
+
+    // Customer Returns Routes
+    Route::resource('customer-returns', App\Http\Controllers\CustomerReturnsController::class);
+    Route::get('/customer-returns/create/invoice/{invoice}', [App\Http\Controllers\CustomerReturnsController::class, 'createForInvoice'])->name('customer-returns.createForInvoice');
+    Route::post('/customer-returns/search', [App\Http\Controllers\CustomerReturnsController::class, 'search'])->name('customer-returns.search');
+
+    // Supplier Returns Routes
+    Route::resource('supplier-returns', App\Http\Controllers\SupplierReturnController::class);
+    Route::get('/supplier-returns/products-by-supplier/{supplier}', [App\Http\Controllers\SupplierReturnController::class, 'getProductsBySupplier'])->name('supplier-returns.productsBySupplier');
+    Route::get('/supplier-returns/purchases-by-supplier/{supplier}', [App\Http\Controllers\SupplierReturnController::class, 'getPurchasesBySupplier'])->name('supplier-returns.purchasesBySupplier');
+    Route::get('/supplier-returns/stock-batches/{product}/{supplier}', [App\Http\Controllers\SupplierReturnController::class, 'getStockBatches'])->name('supplier-returns.stockBatches');
+    Route::get('/cashier/cart-content', [\App\Http\Controllers\CashierController::class, 'cartContent'])->name('cashier.cartContent');
 });

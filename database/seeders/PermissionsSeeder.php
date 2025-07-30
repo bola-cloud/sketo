@@ -9,6 +9,8 @@ class PermissionsSeeder extends Seeder
 {
     public function run()
     {
+        $this->command->info('Creating permissions...');
+
         // Define Permissions in Arabic
         $permissions = [
             'عرض لوحة التحكم',
@@ -25,9 +27,17 @@ class PermissionsSeeder extends Seeder
             'إنشاء الفواتير',
         ];
 
+        $createdCount = 0;
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            $perm = Permission::firstOrCreate(['name' => $permission]);
+            if ($perm->wasRecentlyCreated) {
+                $createdCount++;
+            }
         }
+
+        $this->command->info("Permissions: {$createdCount} created, " . (count($permissions) - $createdCount) . " already existed");
+
+                $this->command->info('Creating roles...');
 
         // Define Roles in Arabic
         $roles = [
@@ -36,21 +46,32 @@ class PermissionsSeeder extends Seeder
             'supervisor' => 'المشرف'
         ];
 
+        $rolesCreatedCount = 0;
         foreach ($roles as $roleKey => $roleName) {
-            $role = Role::create(['name' => $roleKey, 'display_name' => $roleName]);
+            $role = Role::firstOrCreate(
+                ['name' => $roleKey],
+                ['display_name' => $roleName]
+            );
+
+            if ($role->wasRecentlyCreated) {
+                $rolesCreatedCount++;
+            }
 
             // Assign Permissions to Roles
             if ($roleKey === 'admin') {
                 $role->permissions()->sync(Permission::all()->pluck('id'));
+                $this->command->info("Admin role: assigned all permissions");
             } elseif ($roleKey === 'cashier') {
-                $role->permissions()->sync(Permission::whereIn('name', [
+                $permissions = Permission::whereIn('name', [
                     'عرض لوحة التحكم',
                     'عرض عربة التسوق',
                     'إدارة الفواتير',
                     'عرض المنتجات',
-                ])->pluck('id'));
+                ])->pluck('id');
+                $role->permissions()->sync($permissions);
+                $this->command->info("Cashier role: assigned {$permissions->count()} permissions");
             } elseif ($roleKey === 'supervisor') {
-                $role->permissions()->sync(Permission::whereIn('name', [
+                $permissions = Permission::whereIn('name', [
                     'عرض لوحة التحكم',
                     'عرض الفئات',
                     'تعديل الفئات',
@@ -58,8 +79,13 @@ class PermissionsSeeder extends Seeder
                     'تعديل المنتجات',
                     'عرض تقارير المنتجات',
                     'عرض الفواتير',
-                ])->pluck('id'));
+                ])->pluck('id');
+                $role->permissions()->sync($permissions);
+                $this->command->info("Supervisor role: assigned {$permissions->count()} permissions");
             }
         }
+
+        $this->command->info("Roles: {$rolesCreatedCount} created, " . (count($roles) - $rolesCreatedCount) . " already existed");
+        $this->command->info('✅ Permissions and roles seeding completed!');
     }
 }

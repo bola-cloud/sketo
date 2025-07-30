@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\Sales;
+use App\Models\PurchaseProduct;
 use Carbon\Carbon;
 
 class InvoiceController extends Controller
@@ -15,15 +16,15 @@ class InvoiceController extends Controller
         $invoices = Invoice::with('client')->paginate(20); // Get all invoices
         return view('admin.invoices.index', compact('invoices'));
     }
-    
+
     public function search(Request $request)
     {
         $query = $request->input('query');
         $date_from = $request->input('date_from') ? Carbon::parse($request->input('date_from'))->startOfDay() : null;
         $date_to = $request->input('date_to') ? Carbon::parse($request->input('date_to'))->endOfDay() : null;
-    
+
         $invoices = Invoice::query();
-    
+
         if ($query) {
             $invoices->where(function($q) use ($query) {
                 $q->where('buyer_name', 'like', "%{$query}%")
@@ -31,7 +32,7 @@ class InvoiceController extends Controller
                   ->orWhere('invoice_code', 'like', "%{$query}%");
             });
         }
-    
+
         if ($date_from && $date_to) {
             $invoices->whereBetween('created_at', [$date_from, $date_to]);
         } elseif ($date_from) {
@@ -39,12 +40,12 @@ class InvoiceController extends Controller
         } elseif ($date_to) {
             $invoices->whereDate('created_at', '<=', $date_to);
         }
-    
+
         $invoices = $invoices->paginate(20);
-    
+
         return view('admin.invoices.index', compact('invoices'));
     }
-    
+
     public function updatePayment(Request $request, $id)
     {
         // Validate the input
@@ -69,14 +70,14 @@ class InvoiceController extends Controller
         // Redirect back to the invoice with a success message
         return redirect()->route('invoices.show', $invoice->id)
                         ->with('success', 'تم تحديث المبلغ المدفوع والتغيير بنجاح.');
-    }    
+    }
 
     public function show(Invoice $invoice)
     {
         $products = Product::where('quantity', '>', 0)->get(); // Get all products with stock available
         return view('admin.invoices.details', compact('invoice', 'products'));
     }
-    
+
 
     public function getDetails(Invoice $invoice)
     {
@@ -94,9 +95,38 @@ class InvoiceController extends Controller
         // Find the invoice
         $invoice = Invoice::findOrFail($id);
 
+        // Get the new discount amount
+        $newDiscount = $request->input('discount');
+
+        // Check if the entire invoice has been returned
+        $totalSalesAmount = $invoice->sales()->sum('total_price');
+        $totalReturnsAmount = $invoice->returns()->sum('return_amount');
+
+        if ($totalReturnsAmount >= $totalSalesAmount) {
+            return redirect()->back()->withErrors([
+                'discount' => 'لا يمكن تعديل الخصم لأن جميع منتجات الفاتورة تم إرجاعها.'
+            ]);
+        }
+
+        // Calculate the effective subtotal after returns
+        $effectiveSubtotal = $totalSalesAmount - $totalReturnsAmount;
+
+        // Check if discount exceeds the effective subtotal
+        if ($newDiscount > $effectiveSubtotal) {
+            return redirect()->back()->withErrors([
+                'discount' => 'قيمة الخصم (' . number_format($newDiscount, 2) . ' ج.م) لا يمكن أن تكون أكبر من إجمالي الفاتورة بعد المرتجعات (' . number_format($effectiveSubtotal, 2) . ' ج.م).'
+            ]);
+        }
+
+        // Check if discount would make the total negative
+        if ($newDiscount >= $invoice->subtotal) {
+            return redirect()->back()->withErrors([
+                'discount' => 'قيمة الخصم لا يمكن أن تكون مساوية أو أكبر من الإجمالي الفرعي (' . number_format($invoice->subtotal, 2) . ' ج.م).'
+            ]);
+        }
+
         // Update the discount and recalculate total_amount and change
         $subtotal = $invoice->subtotal; // Retrieve the existing subtotal
-        $newDiscount = $request->input('discount'); // Get the new discount
 
         // Recalculate total_amount and change
         $totalAfterDiscount = $subtotal - $newDiscount;
@@ -124,80 +154,127 @@ class InvoiceController extends Controller
                 $product = $sale->product;
                 $product->quantity += $quantity;
                 $product->save();
-    
+
                 // Adjust the sale record
                 $sale->quantity -= $quantity;
                 $sale->total_price = $sale->quantity * $product->selling_price;
                 $sale->save();
-    
+
                 // If all products are returned, remove the sale record
                 if ($sale->quantity == 0) {
                     $sale->delete();
                 }
             }
         }
-    
+
         // Recalculate the subtotal
         $invoice->subtotal = $invoice->sales->sum('total_price');
-    
+
         // Recalculate the discount based on the new subtotal
         $invoice->discount = $this->calculateDiscount($invoice->subtotal);
-    
+
         // Update the total amount after applying the discount
         $invoice->total_amount = $invoice->subtotal - $invoice->discount;
-    
+
         $invoice->save();
-    
+
         return redirect()->route('invoices.show', $invoice->id)->with('success', 'تمت عملية الإرجاع بنجاح.');
     }
-    
-    
+
+
     public function addProduct(Request $request, Invoice $invoice)
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
         ]);
-    
+
         $product = Product::findOrFail($request->input('product_id'));
         $quantity = $request->input('quantity');
-    
-        // Check if the product already exists in the invoice
-        $existingSale = $invoice->sales()->where('product_id', $product->id)->first();
-    
-        if ($existingSale) {
-            // If the product exists, update the quantity and total price
-            $existingSale->quantity += $quantity;
-            $existingSale->total_price = $existingSale->quantity * $product->selling_price;
-            $existingSale->save();
-        } else {
-            // If the product doesn't exist, create a new sale entry
-            $sale = new Sales();
-            $sale->invoice_id = $invoice->id;
-            $sale->product_id = $product->id;
-            $sale->quantity = $quantity;
-            $sale->total_price = $quantity * $product->selling_price;
-            $sale->save();
+
+        // Check if there's enough stock
+        if ($product->quantity < $quantity) {
+            return redirect()->back()->withErrors([
+                'quantity' => 'الكمية المطلوبة (' . $quantity . ') غير متوفرة. الكمية المتاحة: ' . $product->quantity
+            ]);
         }
-    
-        // Update the product stock
-        $product->quantity -= $quantity;
-        $product->save();
-    
-        // Recalculate the subtotal
-        $invoice->subtotal = $invoice->sales->sum('total_price');
-    
-        // Recalculate the discount based on the new subtotal
-        $invoice->discount = $this->calculateDiscount($invoice->subtotal);
-    
-        // Update the total amount after applying the discount
-        $invoice->total_amount = $invoice->subtotal - $invoice->discount;
-    
-        $invoice->save();
-    
-        return redirect()->route('invoices.show', $invoice->id)->with('success', 'تمت إضافة المنتج إلى الفاتورة بنجاح.');
+
+        try {
+            \DB::beginTransaction();
+
+            // Check if the product already exists in the invoice
+            $existingSale = $invoice->sales()->where('product_id', $product->id)->first();
+
+            if ($existingSale) {
+                // If the product exists, update the quantity and total price
+                $existingSale->quantity += $quantity;
+                $existingSale->total_price = $existingSale->quantity * $product->selling_price;
+                $existingSale->save();
+            } else {
+                // If the product doesn't exist, create a new sale entry
+                $sale = new Sales();
+                $sale->invoice_id = $invoice->id;
+                $sale->product_id = $product->id;
+                $sale->quantity = $quantity;
+                $sale->total_price = $quantity * $product->selling_price;
+                $sale->save();
+            }
+
+            // Handle FIFO inventory deduction
+            $remainingQuantity = $quantity;
+            $purchaseProducts = PurchaseProduct::where('product_id', $product->id)
+                ->where('remaining_quantity', '>', 0)
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            foreach ($purchaseProducts as $purchaseProduct) {
+                if ($remainingQuantity <= 0) break;
+
+                $deductQuantity = min($remainingQuantity, $purchaseProduct->remaining_quantity);
+                $purchaseProduct->remaining_quantity -= $deductQuantity;
+                $purchaseProduct->save();
+
+                $remainingQuantity -= $deductQuantity;
+            }
+
+            // If there's still remaining quantity that couldn't be matched to purchase batches
+            if ($remainingQuantity > 0) {
+                \DB::rollBack();
+                return redirect()->back()->withErrors([
+                    'quantity' => 'لا يمكن ربط الكمية بدفعات الشراء. تحقق من سجلات المخزون.'
+                ]);
+            }
+
+            // Update the product stock
+            $product->quantity -= $quantity;
+            $product->save();
+
+            // Recalculate the subtotal
+            $invoice->subtotal = $invoice->sales->sum('total_price');
+
+            // Keep the existing discount (don't recalculate)
+            // $invoice->discount = $this->calculateDiscount($invoice->subtotal);
+
+            // Update the total amount after applying the existing discount
+            $invoice->total_amount = $invoice->subtotal - $invoice->discount;
+
+            // Recalculate change based on paid amount
+            $invoice->change = $invoice->total_amount - $invoice->paid_amount;
+
+            $invoice->save();
+
+            \DB::commit();
+
+            return redirect()->route('invoices.show', $invoice->id)->with('success', 'تمت إضافة المنتج إلى الفاتورة بنجاح.');
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return redirect()->back()->withErrors([
+                'error' => 'حدث خطأ أثناء إضافة المنتج: ' . $e->getMessage()
+            ]);
+        }
     }
-    
+
     public function destroy(Invoice $invoice)
     {
         foreach ($invoice->sales as $sale) {
@@ -205,17 +282,17 @@ class InvoiceController extends Controller
             $product = $sale->product;
             $product->quantity += $sale->quantity;
             $product->save();
-    
+
             // Delete the sale record
             $sale->delete();
         }
-    
+
         // Delete the invoice
         $invoice->delete();
-    
+
         return redirect()->route('invoices.index')->with('success', 'تم حذف الفاتورة وإرجاع الكميات بنجاح.');
     }
-    
+
     private function calculateDiscount($subtotal)
     {
         if ($subtotal >= 6000) {
@@ -230,5 +307,5 @@ class InvoiceController extends Controller
             return 0;
         }
     }
-    
+
 }

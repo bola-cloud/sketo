@@ -97,6 +97,8 @@ trait LaratrustUserTrait
      */
     public function roles()
     {
-        return $this->belongsToMany(Config::get('laratrust.models.role'));
+        return $this->belongsToMany(Config::get('laratrust.models.role'))
+                    ->withPivot('user_type')
+                    ->wherePivot('user_type', get_class($this));
     }
 }

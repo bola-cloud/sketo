@@ -35,7 +35,7 @@
   <!-- END Custom CSS-->
    <style>
     body.vertical-layout.vertical-menu-modern.menu-expanded .main-menu .navigation li.has-sub > a:not(.mm-next):after {
-  
+
     font-family: 'LineAwesome';
     font-size: 1rem;
     display: none;
@@ -117,109 +117,121 @@ data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
       <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
         @php
             $user = auth()->user();
-            $permissions = $user->roles()->with('permissions')->get()->pluck('permissions.*.name')->flatten()->unique();
-        @endphp
-    
-        @if($user->hasRole('admin') || $permissions->contains('عرض لوحة التحكم'))
+            // Check if user has admin role
+            $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super-admin'));
+        @endphp        @if($isAdmin)
             <li class="{{ Route::currentRouteName() == 'dashboard' ? 'active':'' }} nav-item">
                 <a href="{{route('dashboard')}}"><i class="la la-home"></i><span class="menu-title" data-i18n="">لوحة التحكم</span></a>
             </li>
         @endif
-    
-        @if($user->hasRole('admin') || $permissions->contains('عرض الفئات'))
-            <li class=" nav-item"><a href="#"><i class="la la-envelope"></i><span class="menu-title" data-i18n="nav.dash.main">فئة المنتجات</a>
+
+        @if($isAdmin)
+            <li class=" nav-item"><a href="#"><i class="la la-envelope"></i><span class="menu-title" data-i18n="nav.dash.main">المنتجات</a>
                 <ul class="menu-content">
-                    @if($user->hasRole('admin') || $permissions->contains('عرض الفئات'))
+                    @if($isAdmin)
                         <li class="{{ Route::currentRouteName() == 'categories.index' ? 'active':'' }} ">
                             <a class="menu-item" href="{{route('categories.index')}}" data-i18n="nav.dash.ecommerce"> عرض فئات المنتجات </a>
                         </li>
                     @endif
-                    @if($user->hasRole('admin') || $permissions->contains('إنشاء الفئات'))
+                    @if($isAdmin)
                         <li class="{{ Route::currentRouteName() == 'categories.create' ? 'active':'' }} ">
                             <a class="menu-item" href="{{route('categories.create')}}" data-i18n="nav.dash.crypto">اضافة فئة منتج</a>
                         </li>
                     @endif
-                </ul>
-            </li>
-        @endif
-    
-        @if($user->hasRole('admin') || $permissions->contains('عرض المنتجات'))
-            <li class=" nav-item"><a href="#"><i class="la la-envelope"></i><span class="menu-title" data-i18n="nav.dash.main">المنتجات</a>
-                <ul class="menu-content">
-                    @if($user->hasRole('admin') || $permissions->contains('عرض المنتجات'))
+                    @if($isAdmin)
+                        <li class="{{ Route::currentRouteName() == 'brands.index' ? 'active':'' }} ">
+                            <a class="menu-item" href="{{route('brands.index')}}" data-i18n="nav.dash.ecommerce"> عرض الماركات </a>
+                        </li>
+                    @endif
+                    @if($isAdmin)
+                        <li class="{{ Route::currentRouteName() == 'brands.create' ? 'active':'' }} ">
+                            <a class="menu-item" href="{{route('brands.create')}}" data-i18n="nav.dash.crypto">اضافة ماركة</a>
+                        </li>
+                    @endif
+                    @if($isAdmin)
                         <li class="{{ Route::currentRouteName() == 'products.index' ? 'active':'' }} ">
                             <a class="menu-item" href="{{route('products.index')}}" data-i18n="nav.dash.ecommerce"> عرض المنتجات </a>
                         </li>
                     @endif
-                    @if($user->hasRole('admin') || $permissions->contains('إنشاء المنتجات'))
+                    @if($isAdmin)
                         <li class="{{ Route::currentRouteName() == 'products.create' ? 'active':'' }} ">
                             <a class="menu-item" href="{{route('products.create')}}" data-i18n="nav.dash.crypto">اضافة منتج</a>
                         </li>
                     @endif
-                    @if($user->hasRole('admin') || $permissions->contains('عرض تقارير المنتجات'))
+                    @if($isAdmin)
                         <li class="{{ Route::currentRouteName() == 'quantity.updates' ? 'active':'' }} ">
                             <a class="menu-item" href="{{route('quantity.updates')}}" data-i18n="nav.dash.crypto"> تقارير المنتجات </a>
                         </li>
                     @endif
+                    @if($isAdmin)
+                        <li class="{{ Route::currentRouteName() == 'product.transactions' ? 'active':'' }} ">
+                            <a class="menu-item" href="{{route('product.transactions')}}" data-i18n="nav.dash.crypto"> ادارة كمية المنتجات </a>
+                        </li>
+                    @endif
                 </ul>
             </li>
         @endif
-    
-        @if($user->hasRole('admin') || $permissions->contains('عرض عربة التسوق'))
+
+        @if($isAdmin)
             <li class=" nav-item"><a href="#"><i class="la la-envelope"></i><span class="menu-title" data-i18n="nav.dash.main"> الكاشير </a>
                 <ul class="menu-content">
-                    @if($user->hasRole('admin') || $permissions->contains('عرض عربة التسوق'))
+                    @if($isAdmin)
                         <li class="{{ Route::currentRouteName() == 'cashier.viewCart' ? 'active':'' }} ">
                             <a class="menu-item" href="{{route('cashier.viewCart')}}" data-i18n="nav.dash.ecommerce">  اضافة فاتورة </a>
                         </li>
                     @endif
-                    @if($user->hasRole('admin') || $permissions->contains('إدارة الفواتير'))
+                    @if($isAdmin)
                         <li class="{{ Route::currentRouteName() == 'invoices.index' ? 'active':'' }} ">
                             <a class="menu-item" href="{{route('invoices.index')}}" data-i18n="nav.dash.crypto"> عرض فواتير البيع </a>
                         </li>
                     @endif
-                    @if($user->hasRole('admin') || $permissions->contains('إنشاء الفواتير'))
+                    @if($isAdmin)
                         <li class="{{ Route::currentRouteName() == 'clients.index' ? 'active':'' }} ">
                             <a class="menu-item" href="{{route('clients.index')}}" data-i18n="nav.dash.ecommerce">  ادارة العملاء </a>
                         </li>
                     @endif
+                    @if($isAdmin)
+                        <li class="{{ Route::currentRouteName() == 'customer-returns.index' ? 'active':'' }} ">
+                            <a class="menu-item" href="{{route('customer-returns.index')}}" data-i18n="nav.dash.crypto"> مرتجعات العملاء </a>
+                        </li>
+                    @endif
                 </ul>
             </li>
         @endif
-    
-        @if($user->hasRole('admin') || $permissions->contains('عرض الفواتير'))
+
+        @if($isAdmin)
             <li class=" nav-item"><a href="#"><i class="la la-envelope"></i><span class="menu-title" data-i18n="nav.dash.main"> فواتير الشراء </a>
                 <ul class="menu-content">
-                    @if($user->hasRole('admin') || $permissions->contains('إنشاء الفواتير'))
+                    @if($isAdmin)
                         <li class="{{ Route::currentRouteName() == 'purchases.create' ? 'active':'' }} ">
                             <a class="menu-item" href="{{route('purchases.create')}}" data-i18n="nav.dash.ecommerce">  اضافة فاتورة </a>
                         </li>
                     @endif
-                    @if($user->hasRole('admin') || $permissions->contains('إنشاء المنتجات'))
-                        <li class="{{ Route::currentRouteName() == 'products.create' ? 'active':'' }} ">
-                            <a class="menu-item" href="{{route('products.create')}}" data-i18n="nav.dash.crypto">اضافة منتج</a>
-                        </li>
-                    @endif
-                    @if($user->hasRole('admin') || $permissions->contains('عرض الفواتير'))
+                    @if($isAdmin)
                         <li class="{{ Route::currentRouteName() == 'purchases.index' ? 'active':'' }} ">
                             <a class="menu-item" href="{{route('purchases.index')}}" data-i18n="nav.dash.crypto"> عرض فواتير الشراء </a>
                         </li>
                     @endif
-                    @if(auth()->user()->hasRole('admin') )
+                    @if($isAdmin)
                         <li class="{{ Route::currentRouteName() == 'reports.productTransfers' ? 'active':'' }} ">
                             <a class="menu-item" href="{{route('reports.productTransfers')}}" data-i18n="nav.dash.ecommerce"> تقرير نقل المنتجات </a>
                         </li>
                     @endif
-                    @if($user->hasRole('admin') || $permissions->contains('إنشاء الفواتير'))
+                    @if($isAdmin)
                         <li class="{{ Route::currentRouteName() == 'suppliers.index' ? 'active':'' }} ">
                             <a class="menu-item" href="{{route('suppliers.index')}}" data-i18n="nav.dash.ecommerce">  ادارة الموردين </a>
+                        </li>
+                    @endif
+                    @if($isAdmin)
+                        <li class="{{ Route::currentRouteName() == 'supplier-returns.index' ? 'active':'' }} ">
+                            <a class="menu-item" href="{{route('supplier-returns.index')}}" data-i18n="nav.dash.crypto"> مرتجعات الموردين </a>
                         </li>
                     @endif
                 </ul>
             </li>
         @endif
-    
-        @if($user->hasRole('admin') || $permissions->contains('عرض لوحة التحكم'))
+
+        @if($isAdmin)
             <li class=" nav-item"><a href="#"><i class="la la-envelope"></i><span class="menu-title" data-i18n="nav.dash.main"> تقارير المبيعات </a>
                 <ul class="menu-content">
                     <li class="{{ Route::currentRouteName() == 'reports.daily' ? 'active':'' }} ">
@@ -234,8 +246,8 @@ data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
                 </ul>
             </li>
         @endif
-    
-        @if($user->hasRole('admin'))
+
+        @if($isAdmin)
             <li class=" nav-item"><a href="#"><i class="la la-envelope"></i><span class="menu-title" data-i18n="nav.dash.main"> الاذونات </a>
                 <ul class="menu-content">
                     <li class="{{ Route::currentRouteName() == 'roles.create' ? 'active':'' }} ">
@@ -260,10 +272,12 @@ data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
             </li>
         @endif
 
-        <li class="{{ Route::currentRouteName() == 'treasury' ? 'active':'' }} ">
-          <a class="menu-item" href="{{route('treasury')}}" data-i18n="nav.dash.crypto"> الخزينة </a>
-        </li>
-        
+        @if($isAdmin)
+            <li class="{{ Route::currentRouteName() == 'treasury' ? 'active':'' }} ">
+              <a class="menu-item" href="{{route('treasury')}}" data-i18n="nav.dash.crypto"> الخزينة </a>
+            </li>
+        @endif
+
       </ul>
     </div>
 </div>
@@ -282,8 +296,12 @@ data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
   <!-- ////////////////////////////////////////////////////////////////////////////-->
   <footer class="footer footer-static footer-light navbar-border navbar-shadow">
     <p class="clearfix blue-grey lighten-2 text-sm-center mb-0 px-2">
-      <span class="float-md-left d-block d-md-inline-block">Copyright &copy; ENG / GEORGE SAMY IBRAHIEM . </span>
-      <span class="float-md-right d-block d-md-inline-blockd-none d-lg-block">01554923541
+        <span class="float-md-left d-block d-md-inline-block">Copyright &copy;
+            <a href="https://wa.me/201555622169" target="_blank" style="color: #25D366; text-decoration: none;">
+                <strong>Eng: Bola Eshaq</strong>
+            </a>
+        </span>
+      <span class="float-md-right d-block d-md-inline-blockd-none d-lg-block">01555622169
       <i class="fas fa-phone pink"></i>
       </p>
   </footer>
@@ -319,8 +337,8 @@ data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
 
   </script>
   <!-- BEGIN PAGE LEVEL JS-->
- <script src="{{asset('app-assets/js/scripts/pages/dashboard-ecommerce.js')}}" type="text/javascript"></script> 
-   
+ <script src="{{asset('app-assets/js/scripts/pages/dashboard-ecommerce.js')}}" type="text/javascript"></script>
+
   <!-- END PAGE LEVEL JS-->
   @stack('scripts')
 </body>

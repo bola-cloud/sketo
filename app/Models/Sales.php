@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Sales extends Model
 {
     use HasFactory;
-    protected $fillable = ['product_id', 'quantity', 'total_price','invoice_id'];
+    protected $fillable = ['product_id', 'quantity', 'total_price','invoice_id', 'purchase_product_id'];
 
     public function product()
     {
@@ -18,6 +18,11 @@ class Sales extends Model
     public function invoice()
     {
         return $this->belongsTo(Invoice::class);
+    }
+
+    public function purchaseProduct()
+    {
+        return $this->belongsTo(PurchaseProduct::class, 'purchase_product_id');
     }
 
 }

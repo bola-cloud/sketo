@@ -41,4 +41,21 @@ class Invoice extends Model
     {
         return $this->belongsTo(Client::class);
     }
+
+    public function returns()
+    {
+        return $this->hasMany(CustomerReturn::class);
+    }
+
+    // Method to get total return amount
+    public function getTotalReturnsAttribute()
+    {
+        return $this->returns()->sum('return_amount');
+    }
+
+    // Method to check if invoice has returns
+    public function hasReturns()
+    {
+        return $this->returns()->exists();
+    }
 }
