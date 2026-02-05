@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\CustomerReturn;
+use App\Models\SupplierReturn;
+use App\Observers\CustomerReturnObserver;
+use App\Observers\SupplierReturnObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        CustomerReturn::observe(CustomerReturnObserver::class);
+        SupplierReturn::observe(SupplierReturnObserver::class);
     }
 }

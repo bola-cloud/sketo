@@ -21,7 +21,7 @@ class PurchasesController extends Controller
     {
         $products = Product::all();
         $suppliers = Supplier::all();  // Fetch all suppliers to display in the Select2 dropdown
-        return view('admin.purchases.create', compact('products','suppliers'));
+        return view('admin.purchases.create', compact('products', 'suppliers'));
     }
 
     public function store(Request $request)
@@ -83,7 +83,7 @@ class PurchasesController extends Controller
             $totalPaid = $purchase->installments()->sum('amount_paid');
             $purchase->update([
                 'paid_amount' => $totalPaid,
-                'change' => $totalPaid - $purchase->total_amount,
+                'change' => $purchase->total_amount - $totalPaid,
             ]);
 
             return redirect()->route('purchases.index')->with('success', 'تم إنشاء الفاتورة وإضافة الدفعة بنجاح.');
@@ -100,9 +100,9 @@ class PurchasesController extends Controller
         // Search by invoice number or description
         if ($request->filled('search')) {
             $search = $request->input('search');
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('invoice_number', 'like', "%$search%")
-                  ->orWhere('description', 'like', "%$search%") ;
+                    ->orWhere('description', 'like', "%$search%");
             });
         }
 
@@ -151,7 +151,9 @@ class PurchasesController extends Controller
                     ->sum('transferred_quantity');
 
                 // Calculate remaining quantity for this specific purchase batch
-                $remainingQuantity = $purchaseProduct->quantity - $soldQuantityFromThisBatch - $transferredQuantityFromThisBatch;
+                // Note: $purchaseProduct->quantity is already decremented when products are transferred in transferProduct()
+                $remainingQuantity = $purchaseProduct->quantity - $soldQuantityFromThisBatch;
+
 
                 // Check if this product has been transferred
                 $hasTransfers = DB::table('product_transfers')
@@ -358,27 +360,27 @@ class PurchasesController extends Controller
                 'product_id' => $product->id, // Original product
                 'new_product_id' => $newProduct->id, // New transferred product
                 'transferred_quantity' => $validatedData['transfer_quantity'],
+                'quantity_before_transfer' => $remainingQuantity, // Store quantity before transfer
                 'sold_quantity_old_purchase' => $soldQuantityFromThisBatch,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
+
             // Step 9: Update total amounts for both purchases
-            // Calculate total based on sold quantities for old purchase
+            // Calculate total based on all items currently in the old purchase
             $oldPurchaseTotal = 0;
-            foreach ($purchase->products as $product) {
-                $purchaseProduct = DB::table('purchase_products')
+            foreach ($purchase->products as $p) {
+                $pProd = DB::table('purchase_products')
                     ->where('purchase_id', $purchase->id)
-                    ->where('product_id', $product->id)
+                    ->where('product_id', $p->id)
                     ->first();
 
-                if ($purchaseProduct) {
-                    $soldQuantity = DB::table('sales')
-                        ->where('purchase_product_id', $purchaseProduct->id)
-                        ->sum('quantity');
-                    $oldPurchaseTotal += $soldQuantity * $purchaseProduct->cost_price;
+                if ($pProd) {
+                    $oldPurchaseTotal += $pProd->quantity * $pProd->cost_price;
                 }
             }
+
 
             $newPurchaseTotal = $newPurchase->products()->sum(DB::raw('purchase_products.quantity * purchase_products.cost_price'));
 
@@ -483,7 +485,7 @@ class PurchasesController extends Controller
     {
         $purchase = Purchase::findOrFail($purchaseId);
 
-        // Calculate total based on sold quantities
+        // Calculate total based on all quantities currently in the purchase
         $newTotal = 0;
         foreach ($purchase->products as $product) {
             $purchaseProduct = DB::table('purchase_products')
@@ -492,12 +494,10 @@ class PurchasesController extends Controller
                 ->first();
 
             if ($purchaseProduct) {
-                $soldQuantity = DB::table('sales')
-                    ->where('purchase_product_id', $purchaseProduct->id)
-                    ->sum('quantity');
-                $newTotal += $soldQuantity * $purchaseProduct->cost_price;
+                $newTotal += $purchaseProduct->quantity * $purchaseProduct->cost_price;
             }
         }
+
 
         $purchase->update([
             'total_amount' => $newTotal,

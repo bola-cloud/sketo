@@ -94,7 +94,7 @@
                     <tr>
                         <td>{{ $purchase->invoice_number }}</td>
                         <td>
-                            <input type="number" name="purchase_quantities[{{ $purchase->pivot->id }}]" class="form-control" value="{{ $purchase->pivot->quantity }}">
+                            <input type="number" name="purchase_quantities[{{ $purchase->pivot->id }}]" class="form-control" value="{{ $purchase->pivot->quantity }}" disabled>
                         </td>
                         <td>{{ $purchase->total_amount }}</td>
                     </tr>
