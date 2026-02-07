@@ -238,11 +238,15 @@
                 url: "{{ route('suppliers.store') }}",
                 type: "POST",
                 data: $(this).serialize(),
+                beforeSend: function() {
+                    $('#createSupplierForm button[type="submit"]').attr('disabled', true).html('<i class="la la-spinner la-spin"></i> جاري الحفظ...');
+                },
                 success: function (response) {
                     $('#createSupplierModal').modal('hide');
                     location.reload();
                 },
                 error: function (xhr) {
+                    $('#createSupplierForm button[type="submit"]').attr('disabled', false).html('حفظ المورد');
                     alert('فشل في إضافة المورد.');
                 }
             });
@@ -275,62 +279,6 @@
                 success: function (response) {
                     $('#editSupplierModal').modal('hide');
                     location.reload();
-                },
-                error: function (xhr) {
-                    alert('فشل في تحديث بيانات المورد.');
-                }
-            });
-        });
-    </script>
-@endpush
-
-
-@push('scripts')
-    <script>
-        // Create Supplier
-        $('#createSupplierForm').on('submit', function (e) {
-            e.preventDefault();
-            $.ajax({
-                url: "{{ route('suppliers.store') }}",
-                type: "POST",
-                data: $(this).serialize(),
-                success: function (response) {
-                    $('#createSupplierModal').modal('hide');
-                    location.reload(); // You can refresh the page or dynamically update the table
-                },
-                error: function (xhr) {
-                    alert('فشل في إضافة المورد.');
-                }
-            });
-        });
-
-        // Edit Supplier - Show existing supplier data in the modal
-        function editSupplier(id) {
-            $.ajax({
-                url: "/suppliers/" + id + "/edit",
-                type: "GET",
-                success: function (response) {
-                    $('#edit_supplier_id').val(response.id);
-                    $('#edit_name').val(response.name);
-                    $('#edit_phone').val(response.phone);
-                },
-                error: function (xhr) {
-                    alert('فشل في جلب بيانات المورد.');
-                }
-            });
-        }
-
-        // Update Supplier
-        $('#editSupplierForm').on('submit', function (e) {
-            e.preventDefault();
-            var supplierId = $('#edit_supplier_id').val();
-            $.ajax({
-                url: "/suppliers/" + supplierId,
-                type: "POST",
-                data: $(this).serialize(),
-                success: function (response) {
-                    $('#editSupplierModal').modal('hide');
-                    location.reload(); // Reload the page or update the table dynamically
                 },
                 error: function (xhr) {
                     alert('فشل في تحديث بيانات المورد.');
