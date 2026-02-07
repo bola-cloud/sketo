@@ -267,14 +267,42 @@ body.menu-collapsed .navbar-header {
         margin-right: 0 !important;
     }
 
-    .main-menu {
+    .main-menu,
+    body.menu-expanded .main-menu {
         width: 260px !important;
-        right: -260px;
+        right: -260px !important;
+        left: auto !important;
         z-index: 1050 !important;
     }
 
     body.menu-open .main-menu {
         right: 0 !important;
+        left: auto !important;
+    }
+
+    /* Backdrop for mobile menu */
+    body.menu-open::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1049;
+        backdrop-filter: blur(2px);
+    }
+
+    /* User requested fix for overlay menu */
+    .vertical-overlay-menu.menu-open .main-menu {
+        opacity: 1 !important;
+        -webkit-transition: width .25s, opacity .25s, -webkit-transform .25s;
+        -moz-transition: width .25s, opacity .25s, -moz-transform .25s;
+        -o-transition: width .25s, opacity .25s, -o-transform .25s;
+        transition: width .25s, opacity .25s, transform .25s;
+        right: 0 !important;
+        /* Ensure it sticks to right */
+        left: auto !important;
     }
 }
 
@@ -509,4 +537,14 @@ body.vertical-layout.vertical-menu-modern.menu-expanded .main-menu .navigation l
     color: var(--sketo-primary) !important;
     letter-spacing: 1.5px;
     opacity: 0.8;
+}
+.vertical-overlay-menu.menu-open .main-menu {
+    opacity: 1;
+    /* -webkit-transform: translate3d(-260px, 0, 0); */
+    -moz-transform: translate3d(0px, 0, 0) !important;
+    transform: translate3d(0px, 0, 0) !important;
+    -webkit-transition: width .25s, opacity .25s, -webkit-transform .25s;
+    -moz-transition: width .25s,opacity .25s,-moz-transform .25s;
+    -o-transition: width .25s,opacity .25s,-o-transform .25s;
+    transition: width .25s, opacity .25s, transform .25s;
 }

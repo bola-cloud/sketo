@@ -195,10 +195,10 @@
                                 </li>
                             @endif
                             <!-- @if($isAdmin)
-                                                                            <li class="{{ Route::currentRouteName() == 'quantity.updates' ? 'active':'' }} ">
-                                                                                <a class="menu-item" href="{{route('quantity.updates')}}" data-i18n="nav.dash.crypto"> تقارير المنتجات </a>
-                                                                            </li>
-                                                                        @endif -->
+                                                                                    <li class="{{ Route::currentRouteName() == 'quantity.updates' ? 'active':'' }} ">
+                                                                                        <a class="menu-item" href="{{route('quantity.updates')}}" data-i18n="nav.dash.crypto"> تقارير المنتجات </a>
+                                                                                    </li>
+                                                                                @endif -->
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'product.transactions' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('product.transactions')}}" data-i18n="nav.dash.crypto">
@@ -425,6 +425,24 @@
 
         // Fail-safe: Hide after 4 seconds regardless of load state
         setTimeout(hideSpinner, 4000);
+
+        // Mobile Sidebar Close Logic
+        document.addEventListener('click', function (event) {
+            var menu = document.querySelector('.main-menu');
+            var body = document.body;
+
+            if (body.classList.contains('menu-open')) {
+                // Check if click is inside menu or on any toggle button
+                if (menu.contains(event.target) || event.target.closest('.menu-toggle')) {
+                    return;
+                }
+
+                // Clicked outside - Close Menu
+                var mainToggle = document.querySelector('.nav-link.menu-toggle');
+                if (mainToggle) mainToggle.click();
+                else body.classList.remove('menu-open');
+            }
+        });
     </script>
 
     <!-- BEGIN PAGE LEVEL JS-->
