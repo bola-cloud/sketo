@@ -8,6 +8,7 @@ use App\Models\Sales;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\SalesInstallment;
+use App\Models\Shift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
@@ -92,6 +93,11 @@ class CashierController extends Controller
 
     public function viewCart()
     {
+        $activeShift = Shift::where('user_id', auth()->id())->where('status', 'open')->first();
+        if (!$activeShift) {
+            return redirect()->route('shifts.index')->with('info', 'يرجى فتح وردية عمل أولاً قبل استخدام الكاشير.');
+        }
+
         $cart = session()->get('cart', []);
         $subtotal = 0;
 
@@ -100,7 +106,7 @@ class CashierController extends Controller
             $subtotal += $details['price'] * $details['quantity'];
         }
         $clients = Client::all();  // Fetch all suppliers to display in the Select2 dropdown
-        return view('admin.cashier.cart', compact('cart', 'subtotal','clients'));
+        return view('admin.cashier.cart', compact('cart', 'subtotal', 'clients'));
     }
 
     public function removeFromCart(Request $request)
@@ -118,6 +124,11 @@ class CashierController extends Controller
 
     public function checkout(Request $request)
     {
+        $activeShift = Shift::where('user_id', auth()->id())->where('status', 'open')->first();
+        if (!$activeShift) {
+            return redirect()->route('shifts.index')->with('info', 'يرجى فتح وردية عمل أولاً قبل استخدام الكاشير.');
+        }
+
         $cart = session()->get('cart', []);
         $subtotal = 0;
 
@@ -135,7 +146,7 @@ class CashierController extends Controller
             'buyer_phone' => 'nullable|string|max:15',
             'apply_discount_hidden' => 'nullable|numeric|min:0',
             'paid_amount' => 'required|numeric|min:0',
-            'client_id'=>'nullable',
+            'client_id' => 'nullable',
         ], [
             'paid_amount.required' => 'يرجى إدخال المبلغ المدفوع.',
             'paid_amount.numeric' => 'المبلغ المدفوع يجب أن يكون رقماً.',
@@ -152,8 +163,8 @@ class CashierController extends Controller
         // Check validation
         if ($validator->fails()) {
             return redirect()->route('cashier.viewCart')
-                             ->withErrors($validator)
-                             ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         DB::beginTransaction();
@@ -192,7 +203,8 @@ class CashierController extends Controller
                 $remainingToSell = $details['quantity'];
 
                 foreach ($purchaseProducts as $purchaseProduct) {
-                    if ($remainingToSell <= 0) break;
+                    if ($remainingToSell <= 0)
+                        break;
 
                     // Calculate how much of this batch has already been sold
                     $soldFromThisBatch = DB::table('sales')
@@ -287,7 +299,7 @@ class CashierController extends Controller
             ->orWhere('barcode', 'LIKE', "%{$query}%")
             ->where('quantity', '>', 0)
             ->get();
-        $results = $products->map(function($product) {
+        $results = $products->map(function ($product) {
             return [
                 'barcode' => $product->barcode,
                 'name' => $product->name,

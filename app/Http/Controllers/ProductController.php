@@ -13,8 +13,16 @@ use Illuminate\Support\Facades\DB;
 use AgeekDev\Barcode\Facades\Barcode;
 use AgeekDev\Barcode\Enums\Type;
 use Storage;
+use Milon\Barcode\DNS1D;
+use App\Exports\ProductsExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 class ProductController extends Controller
 {
+    public function export()
+    {
+        return Excel::download(new ProductsExport, 'products_' . now()->format('Y-m-d_H-i') . '.xlsx');
+    }
 
     public function index(Request $request)
     {
@@ -23,7 +31,7 @@ class ProductController extends Controller
         // Filter by search term
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('barcode', 'like', '%' . $request->search . '%');
+                ->orWhere('barcode', 'like', '%' . $request->search . '%');
         }
 
         // Filter by category
@@ -46,10 +54,10 @@ class ProductController extends Controller
 
     public function printSelectedBarcodes(Request $request)
     {
-        $selectedProducts = Product::whereIn('id', $request->input('selected_products'))->get();
+        $products = Product::whereIn('id', $request->input('selected_products'))->get();
 
         // Return a view for printing barcodes
-        return view('admin.product.print_barcodes', compact('selectedProducts'));
+        return view('admin.product.print_barcodes', compact('products'));
     }
 
 
@@ -59,7 +67,7 @@ class ProductController extends Controller
         $purchases = Purchase::where('type', 'product')->get();
         $categories = Category::all(); // Assuming you have categories to be selected
         $brands = Brand::all(); // Get all brands
-        $products=Product::all();
+        $products = Product::all();
         return view('admin.product.create', compact('purchases', 'categories', 'brands', 'products'));
     }
 
@@ -512,7 +520,8 @@ class ProductController extends Controller
         // Save the barcode image to the specified path
         \Storage::disk('public')->put($barcodePath, base64_decode($barcodeImage));
 
-        return view('admin.product.print-barcode', compact('product', 'barcodePath'));
+        $products = collect([$product]);
+        return view('admin.product.print-barcode', compact('product', 'products', 'barcodePath'));
     }
 
 
@@ -575,7 +584,8 @@ class ProductController extends Controller
     public function printBarcodes($id)
     {
         $product = Product::findOrFail($id);
-        return view('admin.product.print_barcodes', compact('product'));
+        $products = collect([$product]);
+        return view('admin.product.print_barcodes', compact('product', 'products'));
     }
 
     public function recalculateAllProductQuantities()

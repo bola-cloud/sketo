@@ -31,26 +31,28 @@ Route::middleware([
     // })->name('dashboard');
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
-    Route::get('/', [App\Http\Controllers\DashboardController::class ,'index'])->name('dashboard');
+    Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     Route::resource('products', App\Http\Controllers\ProductController::class);
+    Route::get('products-export', [App\Http\Controllers\ProductController::class, 'export'])->name('products.export');
     Route::get('products/search', [App\Http\Controllers\ProductController::class, 'show'])->name('get.search');
     Route::post('products/search', [App\Http\Controllers\ProductController::class, 'search'])->name('products.search');
     Route::get('products/{product}/print-barcode', [App\Http\Controllers\ProductController::class, 'printBarcode'])->name('products.printBarcode');
     Route::post('/products/print-selected-barcodes', [App\Http\Controllers\ProductController::class, 'printSelectedBarcodes'])->name('products.printSelectedBarcodes');
-    Route::get('/products/print/barcodes/{id}',[App\Http\Controllers\ProductController::class, 'printBarcodes'])->name('products.printBarcodes');
+    Route::get('/products/print/barcodes/{id}', [App\Http\Controllers\ProductController::class, 'printBarcodes'])->name('products.printBarcodes');
     Route::get('/all-products/recalculate/quantities', [App\Http\Controllers\ProductController::class, 'recalculateAllProductQuantities'])->name('products.recalculateQuantities');
 
-   Route::get('/cashier/search-product', [CashierController::class, 'searchProductByName'])->name('cashier.searchProductByName');
+    Route::get('/cashier/search-product', [CashierController::class, 'searchProductByName'])->name('cashier.searchProductByName');
 
     Route::get('quantity-updates', [App\Http\Controllers\ProductController::class, 'quantityUpdates'])->name('quantity.updates');
     Route::post('cashier/add-to-cart', [App\Http\Controllers\CashierController::class, 'addToCart'])->name('cashier.addToCart');
     Route::post('/cashier/updateCartQuantity', [App\Http\Controllers\CashierController::class, 'updateCartQuantity'])->name('cashier.updateCartQuantity');
     Route::get('cashier/cart', [App\Http\Controllers\CashierController::class, 'viewCart'])->name('cashier.viewCart');
-//   Route::post('cashier/search-product-by-name', [App\Http\Controllers\CashierController::class, 'searchProductByName'])->name('cashier.searchProductByName');
+    //   Route::post('cashier/search-product-by-name', [App\Http\Controllers\CashierController::class, 'searchProductByName'])->name('cashier.searchProductByName');
     Route::post('cashier/remove-from-cart', [App\Http\Controllers\CashierController::class, 'removeFromCart'])->name('cashier.removeFromCart');
     Route::post('cashier/checkout', [App\Http\Controllers\CashierController::class, 'checkout'])->name('cashier.checkout');
     Route::get('cashier/invoice/{id}', [App\Http\Controllers\CashierController::class, 'printInvoice'])->name('cashier.printInvoice');
     Route::get('invoices', [App\Http\Controllers\InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('invoices-export', [App\Http\Controllers\InvoiceController::class, 'export'])->name('invoices.export');
     Route::get('invoices/search', [App\Http\Controllers\InvoiceController::class, 'search'])->name('invoices.search');
     Route::get('invoices/{invoice}', [App\Http\Controllers\InvoiceController::class, 'show'])->name('invoices.show');
     Route::get('invoices/{invoice}/details', [App\Http\Controllers\InvoiceController::class, 'getDetails']);
@@ -59,8 +61,10 @@ Route::middleware([
     Route::delete('/invoices/{invoice}', [App\Http\Controllers\InvoiceController::class, 'destroy'])->name('invoices.destroy');
     Route::resource('categories', App\Http\Controllers\CategoryController::class);
     Route::resource('brands', App\Http\Controllers\BrandController::class);
+    Route::resource('shifts', App\Http\Controllers\ShiftController::class);
     Route::prefix('purchases')->name('purchases.')->group(function () {
         Route::get('/', [PurchasesController::class, 'index'])->name('index');
+        Route::get('/export', [PurchasesController::class, 'export'])->name('export');
         Route::get('/create', [PurchasesController::class, 'create'])->name('create');
         Route::post('/', [PurchasesController::class, 'store'])->name('store');
         Route::get('/{purchase}', [PurchasesController::class, 'show'])->name('show');
@@ -69,6 +73,16 @@ Route::middleware([
     Route::get('/reports/daily', [App\Http\Controllers\ReportController::class, 'dailyReport'])->name('reports.daily');
     Route::get('/reports/monthly', [App\Http\Controllers\ReportController::class, 'monthlyReport'])->name('reports.monthly');
     Route::get('/report/date/range', [App\Http\Controllers\ReportController::class, 'dateRangeReport'])->name('reports.dateRange');
+
+    // Statistics Detail Routes
+    Route::prefix('reports/statistics')->name('reports.statistics.')->group(function () {
+        Route::get('/products-sold', [App\Http\Controllers\ReportController::class, 'productsSoldDetails'])->name('products_sold');
+        Route::get('/revenue', [App\Http\Controllers\ReportController::class, 'revenueDetails'])->name('revenue');
+        Route::get('/inventory', [App\Http\Controllers\ReportController::class, 'inventoryDetails'])->name('inventory');
+        Route::get('/purchases', [App\Http\Controllers\ReportController::class, 'purchasesDetails'])->name('purchases');
+        Route::get('/profit', [App\Http\Controllers\ReportController::class, 'profitDetails'])->name('profit');
+        Route::get('/cash-flow', [App\Http\Controllers\ReportController::class, 'cashFlowDetails'])->name('cash_flow');
+    });
     Route::get('/purchases/{purchase}/transfer-product/{product}', [App\Http\Controllers\PurchasesController::class, 'transferProductForm'])->name('purchases.transferProduct');
     Route::post('/purchases/{purchase}/transfer-product/{product}', [App\Http\Controllers\PurchasesController::class, 'transferProduct'])->name('purchases.transferProduct.store');
     Route::get('/purchases/{purchase}/transfer-history/{product}', [App\Http\Controllers\PurchasesController::class, 'getTransferHistory'])->name('purchases.transferHistory');

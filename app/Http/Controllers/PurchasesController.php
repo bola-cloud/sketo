@@ -14,9 +14,16 @@ use AgeekDev\Barcode\Facades\Barcode;
 use AgeekDev\Barcode\Enums\Type;
 use Illuminate\Validation\Rule;
 use Storage;
+use App\Exports\PurchasesExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PurchasesController extends Controller
 {
+    public function export()
+    {
+        return Excel::download(new PurchasesExport, 'purchases_' . now()->format('Y-m-d_H-i') . '.xlsx');
+    }
+
     public function create()
     {
         $products = Product::all();

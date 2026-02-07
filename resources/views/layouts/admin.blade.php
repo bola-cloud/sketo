@@ -80,8 +80,8 @@
                     <li class="nav-item d-none d-md-block"><a class="nav-link modern-nav-toggle pr-0"
                             data-toggle="collapse"><i class="toggle-icon ft-toggle-right font-medium-3 text-white"
                                 data-ticon="ft-toggle-right"></i>
-                                <!-- <span class="badge badge-soft-success ml-2 py-1 px-2" style="font-size: 0.6rem; vertical-align: middle; box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);">LIVE</span> -->
-                            </a></li>
+                            <!-- <span class="badge badge-soft-success ml-2 py-1 px-2" style="font-size: 0.6rem; vertical-align: middle; box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);">LIVE</span> -->
+                        </a></li>
 
                     <li class="nav-item d-md-none">
                         <a class="nav-link open-navbar-container" data-toggle="collapse" data-target="#navbar-mobile"><i
@@ -148,6 +148,10 @@
                         <a href="{{route('dashboard')}}"><i class="la la-home"></i><span class="menu-title"
                                 data-i18n="">لوحة التحكم</span></a>
                     </li>
+                    <li class="{{ Request::is('shifts*') ? 'active' : '' }} nav-item">
+                        <a href="{{route('shifts.index')}}"><i class="la la-clock-o"></i><span class="menu-title"
+                                data-i18n="">إدارة الورديات</span></a>
+                    </li>
                 @endif
 
                 @if($isAdmin)
@@ -191,10 +195,10 @@
                                 </li>
                             @endif
                             <!-- @if($isAdmin)
-                                                                        <li class="{{ Route::currentRouteName() == 'quantity.updates' ? 'active':'' }} ">
-                                                                            <a class="menu-item" href="{{route('quantity.updates')}}" data-i18n="nav.dash.crypto"> تقارير المنتجات </a>
-                                                                        </li>
-                                                                    @endif -->
+                                                                            <li class="{{ Route::currentRouteName() == 'quantity.updates' ? 'active':'' }} ">
+                                                                                <a class="menu-item" href="{{route('quantity.updates')}}" data-i18n="nav.dash.crypto"> تقارير المنتجات </a>
+                                                                            </li>
+                                                                        @endif -->
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'product.transactions' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('product.transactions')}}" data-i18n="nav.dash.crypto">

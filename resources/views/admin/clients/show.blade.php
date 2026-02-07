@@ -1,45 +1,173 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container">
-    <h1>عرض تفاصيل العميل</h1>
+    <div class="content-header row">
+        <div class="content-header-left col-md-6 col-12 mb-2">
+            <h3 class="content-header-title">تفاصيل العميل: {{ $client->name }}</h3>
+            <div class="row breadcrumbs-top">
+                <div class="breadcrumb-wrapper col-12">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('clients.index') }}">العملاء</a></li>
+                        <li class="breadcrumb-item active">تفاصيل</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="content-header-right col-md-6 col-12 mb-2 text-right">
+            <a href="{{ route('clients.index') }}" class="btn btn-light round shadow-sm px-2">
+                <i class="la la-arrow-right"></i> عودة للقائمة
+            </a>
+        </div>
+    </div>
 
-    <p><strong>الاسم:</strong> {{ $client->name }}</p>
-    <p><strong>الهاتف:</strong> {{ $client->phone }}</p>
+    <div class="content-body">
+        <div class="row">
+            <!-- Client Stats -->
+            <div class="col-xl-4 col-lg-6 col-12">
+                <div class="card pull-up border-0 shadow-sm mb-2"
+                    style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 20px;">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="media-body text-left">
+                                    <h3 class="primary text-bold-700">{{ $totalInvoices }} <small class="text-muted"
+                                            style="font-size: 0.8rem;">ج.م</small></h3>
+                                    <span class="text-bold-600 text-muted small uppercase">إجمالي الفواتير</span>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="la la-file-text primary font-large-2 float-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-lg-6 col-12">
+                <div class="card pull-up border-0 shadow-sm mb-2"
+                    style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 20px;">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="media-body text-left">
+                                    <h3 class="success text-bold-700">{{ $totalPaidAmount }} <small class="text-muted"
+                                            style="font-size: 0.8rem;">ج.م</small></h3>
+                                    <span class="text-bold-600 text-muted small uppercase">إجمالي المدفوعات</span>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="la la-check-circle success font-large-2 float-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-lg-6 col-12">
+                <div class="card pull-up border-0 shadow-sm mb-2"
+                    style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 20px;">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="media-body text-left">
+                                    <h3 class="danger text-bold-700">{{ $totalChange }} <small class="text-muted"
+                                            style="font-size: 0.8rem;">ج.م</small></h3>
+                                    <span class="text-bold-600 text-muted small uppercase">إجمالي المتبقي</span>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="la la-money danger font-large-2 float-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <h3>فواتير العميل</h3>
+            <!-- Invoices Table -->
+            <div class="col-12">
+                <div class="card pull-up border-0 shadow-sm"
+                    style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 20px;">
+                    <div class="card-header bg-transparent border-0 pb-0">
+                        <h4 class="card-title text-bold-700"><i class="la la-history"></i> سجل الفواتير</h4>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-premium mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>رقم الفاتورة</th>
+                                            <th>إجمالي الفاتورة</th>
+                                            <th>المدفوع</th>
+                                            <th>المتبقي</th>
+                                            <th class="text-right">الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($client->invoices as $invoice)
+                                            <tr>
+                                                <td><span class="text-bold-600">{{ $loop->iteration }}</span></td>
+                                                <td><span
+                                                        class="badge badge-soft-primary round px-1">{{ $invoice->invoice_code }}</span>
+                                                </td>
+                                                <td><span
+                                                        class="text-bold-700 text-dark">{{ number_format($invoice->total_amount, 2) }}</span>
+                                                    <small class="text-muted">ج.م</small></td>
+                                                <td><span
+                                                        class="success text-bold-600">{{ number_format($invoice->paid_amount, 2) }}</span>
+                                                    <small class="text-muted">ج.م</small></td>
+                                                <td>
+                                                    <span
+                                                        class="{{ $invoice->change > 0 ? 'danger' : 'success' }} text-bold-600">
+                                                        {{ number_format($invoice->change, 2) }}
+                                                    </span>
+                                                    <small class="text-muted">ج.م</small>
+                                                </td>
+                                                <td class="text-right">
+                                                    <a href="{{ route('invoices.show', $invoice->id) }}"
+                                                        class="btn btn-sm btn-soft-info round px-1">
+                                                        <i class="la la-file-text"></i> عرض التفاصيل
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <p><strong>إجمالي الفواتير:</strong> {{ $totalInvoices }} جنيه</p>
-    <p><strong>إجمالي المدفوعات:</strong> {{ $totalPaidAmount }} جنيه</p>
-    <p><strong>إجمالي الباقي:</strong> {{ $totalChange }} جنيه</p>
+    <style>
+        .badge-soft-primary {
+            color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.1);
+        }
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>رقم الفاتورة</th>
-                <th>إجمالي الفاتورة</th>
-                <th>المدفوع</th>
-                <th>الباقي</th>
-                <th>الإجراءات</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($client->invoices as $invoice)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $invoice->invoice_code }}</td>
-                    <td>{{ $invoice->total_amount }} جنيه</td>
-                    <td>{{ $invoice->paid_amount }} جنيه</td>
-                    <td>{{ $invoice->change }} جنيه</td>
-                    <td>
-                        <a href="{{ route('invoices.show', $invoice->id) }}" class="btn btn-info">عرض التفاصيل</a>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+        .btn-soft-info {
+            color: #0891b2;
+            background-color: rgba(6, 182, 212, 0.1);
+            border: none;
+        }
 
-    <a href="{{ route('clients.index') }}" class="btn btn-secondary">عودة إلى قائمة العملاء</a>
-</div>
+        .btn-soft-info:hover {
+            background-color: #0891b2;
+            color: white !important;
+        }
+
+        .table-premium th {
+            font-weight: 700;
+            color: #1e293b;
+            border-top: none;
+        }
+
+        .table-premium td {
+            vertical-align: middle;
+            padding: 1rem 0.75rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+    </style>
 @endsection

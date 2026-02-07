@@ -1,64 +1,162 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid">
-    <h1>قائمة الماركات</h1>
-    @if(auth()->user()->hasRole('admin') || auth()->user()->can('create-categories'))
-        <a href="{{ route('brands.create') }}" class="btn btn-primary mb-3">إضافة ماركة جديدة</a>
-    @endif
-
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
+    <div class="content-header row">
+        <div class="content-header-left col-md-6 col-12 mb-2">
+            <h3 class="content-header-title">إدارة الماركات التجارية</h3>
+            <div class="row breadcrumbs-top">
+                <div class="breadcrumb-wrapper col-12">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
+                        <li class="breadcrumb-item active">الماركات</li>
+                    </ol>
+                </div>
+            </div>
         </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+        <div class="content-header-right col-md-6 col-12">
+            <div class="btn-group float-md-right">
+                @if(auth()->user()->hasRole('admin') || auth()->user()->can('create-categories'))
+                    <a href="{{ route('brands.create') }}" class="btn btn-primary round px-2 shadow">
+                        <i class="la la-plus"></i> إضافة ماركة جديدة
+                    </a>
+                @endif
+            </div>
         </div>
-    @endif
-
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>الرقم</th>
-                <th>اسم الماركة</th>
-                <th>الوصف</th>
-                <th>عدد المنتجات</th>
-                <th>الإجراءات</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($brands as $key=>$brand)
-                <tr>
-                    <td>{{ $key+1 }}</td>
-                    <td>{{ $brand->name }}</td>
-                    <td>{{ $brand->description ?: 'لا يوجد وصف' }}</td>
-                    <td>{{ $brand->products_count }} منتج</td>
-                    <td>
-                        @if(auth()->user()->hasRole('admin') || auth()->user()->can('create-categories'))
-                            <a href="{{ route('brands.show', $brand->id) }}" class="btn btn-info btn-sm">عرض</a>
-                            <a href="{{ route('brands.edit', $brand->id) }}" class="btn btn-warning btn-sm">تعديل</a>
-                            <form action="{{ route('brands.destroy', $brand->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('هل أنت متأكد؟')">حذف</button>
-                            </form>
-                        @endif
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-
-    <!-- Pagination -->
-    <div class="d-flex justify-content-center">
-        {{ $brands->links() }}
     </div>
-</div>
+
+    <div class="content-body">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible mb-2" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <strong>تم بنجاح!</strong> {{ session('success') }}
+            </div>
+        @endif
+
+        <div class="card pull-up border-0 shadow-sm" style="background: rgba(255, 255, 255, 0.95); border-radius: 20px;">
+            <div class="card-content">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-premium mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th style="width: 80px;">#</th>
+                                    <th>الماركة</th>
+                                    <th>الوصف</th>
+                                    <th>عدد المنتجات</th>
+                                    <th class="text-right">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($brands as $key => $brand)
+                                    <tr>
+                                        <td class="text-bold-600">{{ $key + 1 }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar bg-soft-info mr-2">
+                                                    <i class="la la-tag info"></i>
+                                                </div>
+                                                <span class="text-bold-600">{{ $brand->name }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="text-muted small">{{ $brand->description ?: 'لا يوجد وصف' }}</td>
+                                        <td>
+                                            <span class="badge badge-soft-info">{{ $brand->products_count }} منتج</span>
+                                        </td>
+                                        <td class="text-right">
+                                            @if(auth()->user()->hasRole('admin') || auth()->user()->can('create-categories'))
+                                                <a href="{{ route('brands.show', $brand->id) }}"
+                                                    class="btn btn-sm btn-soft-primary mr-1">
+                                                    <i class="la la-eye"></i> عرض
+                                                </a>
+                                                <a href="{{ route('brands.edit', $brand->id) }}"
+                                                    class="btn btn-sm btn-soft-warning mr-1">
+                                                    <i class="la la-edit"></i> تعديل
+                                                </a>
+                                                <form action="{{ route('brands.destroy', $brand->id) }}" method="POST"
+                                                    style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-soft-danger"
+                                                        onclick="return confirm('هل أنت متأكد من حذف هذه الماركة؟')">
+                                                        <i class="la la-trash"></i> حذف
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    {{ $brands->links() }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .bg-soft-info {
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .bg-soft-primary {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .badge-soft-info {
+            color: #0891b2;
+            background: rgba(6, 182, 212, 0.1);
+            border: none;
+        }
+
+        .btn-soft-primary {
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+            border: none;
+        }
+
+        .btn-soft-primary:hover {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .btn-soft-warning {
+            color: #d97706;
+            background: rgba(217, 119, 6, 0.1);
+            border: none;
+        }
+
+        .btn-soft-warning:hover {
+            background: #d97706;
+            color: #fff;
+        }
+
+        .btn-soft-danger {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            border: none;
+        }
+
+        .btn-soft-danger:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .table-premium th {
+            font-weight: 700;
+            color: #1e293b;
+            border-top: none;
+            padding: 1.25rem 1rem;
+        }
+
+        .table-premium td {
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+            padding: 1rem;
+        }
+    </style>
 @endsection

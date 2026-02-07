@@ -102,7 +102,8 @@ class SupplierReturnController extends Controller
                 $returns = [];
 
                 foreach ($availableStock as $batch) {
-                    if ($remainingToReturn <= 0) break;
+                    if ($remainingToReturn <= 0)
+                        break;
 
                     $quantityFromThisBatch = min($remainingToReturn, $batch->remaining_quantity);
 
@@ -193,15 +194,30 @@ class SupplierReturnController extends Controller
      */
     public function destroy(SupplierReturn $supplierReturn)
     {
-        if ($supplierReturn->status === 'completed') {
-            // If completed, restore the quantity
-            $supplierReturn->product->increment('quantity', $supplierReturn->quantity_returned);
+        DB::beginTransaction();
+        try {
+            if ($supplierReturn->status === 'completed') {
+                // Restore the quantity to the product
+                $supplierReturn->product->increment('quantity', $supplierReturn->quantity_returned);
+
+                // Restore the quantity to the specific purchase batch
+                if ($supplierReturn->purchase_product_id) {
+                    DB::table('purchase_products')
+                        ->where('id', $supplierReturn->purchase_product_id)
+                        ->increment('remaining_quantity', $supplierReturn->quantity_returned);
+                }
+            }
+
+            $supplierReturn->delete();
+            DB::commit();
+
+            return redirect()->route('supplier-returns.index')
+                ->with('success', 'تم حذف المرتجع وإعادة الكمية للمخزون بنجاح.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('supplier-returns.index')
+                ->with('error', 'حدث خطأ أثناء حذف المرتجع: ' . $e->getMessage());
         }
-
-        $supplierReturn->delete();
-
-        return redirect()->route('supplier-returns.index')
-            ->with('success', 'Supplier return deleted successfully.');
     }
 
     /**
@@ -209,11 +225,13 @@ class SupplierReturnController extends Controller
      */
     public function getProductsBySupplier($supplierId)
     {
-        $products = Product::whereHas('purchases', function($query) use ($supplierId) {
+        $products = Product::whereHas('purchases', function ($query) use ($supplierId) {
             $query->where('supplier_id', $supplierId);
-        })->with(['purchases' => function($query) use ($supplierId) {
-            $query->where('supplier_id', $supplierId);
-        }])->get();
+        })->with([
+                    'purchases' => function ($query) use ($supplierId) {
+                        $query->where('supplier_id', $supplierId);
+                    }
+                ])->get();
 
         return response()->json($products);
     }
@@ -239,7 +257,7 @@ class SupplierReturnController extends Controller
         $product = Product::findOrFail($productId);
         $stockBatches = $product->getStockFromSupplier($supplierId);
 
-        $batchesData = $stockBatches->map(function($batch) {
+        $batchesData = $stockBatches->map(function ($batch) {
             $purchaseDate = $batch->created_at;
             if (is_numeric($purchaseDate)) {
                 $purchaseDate = date('Y-m-d', $purchaseDate);

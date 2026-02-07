@@ -108,111 +108,123 @@
     @if($user->hasRole('admin'))
         <div class="row">
             <div class="col-xl-3 col-lg-6 col-12">
-                <div class="card pull-up">
-                    <div class="card-content">
-                        <div class="card-body">
-                            <div class="media d-flex">
-                                <div class="media-body text-left">
-                                    <h3 class="info" id="productsSold">{{ $productsSold }}</h3>
-                                    <h6>المنتجات المباعة</h6>
-                                </div>
-                                <div>
-                                    <i class="icon-basket-loaded info font-large-2 float-left"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-lg-6 col-12">
-                <div class="card pull-up">
-                    <div class="card-content">
-                        <div class="card-body">
-                            <div class="media d-flex">
-                                <div class="media-body text-left">
-                                    <h3 class="warning" id="totalRevenue">{{ $totalRevenue }} ج.م</h3>
-                                    <h6>إجمالي الإيرادات</h6>
-                                </div>
-                                <div>
-                                    <i class="icon-pie-chart warning font-large-2 float-left"></i>
+                <a href="{{ route('reports.statistics.products_sold') }}" id="linkProductsSold">
+                    <div class="card pull-up">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="media d-flex">
+                                    <div class="media-body text-left">
+                                        <h3 class="info" id="productsSold">{{ $productsSold }}</h3>
+                                        <h6>المنتجات المباعة</h6>
+                                    </div>
+                                    <div>
+                                        <i class="icon-basket-loaded info font-large-2 float-left"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-xl-3 col-lg-6 col-12">
-                <div class="card pull-up">
-                    <div class="card-content">
-                        <div class="card-body">
-                            <div class="media d-flex">
-                                <div class="media-body text-left">
-                                    <h3 class="success" id="totalUnsoldProducts">{{ $totalUnsoldProducts }}</h6>
+                <a href="{{ route('reports.statistics.revenue') }}" id="linkRevenue">
+                    <div class="card pull-up">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="media d-flex">
+                                    <div class="media-body text-left">
+                                        <h3 class="warning" id="totalRevenue">{{ $totalRevenue }} ج.م</h3>
+                                        <h6>إجمالي الإيرادات</h6>
+                                    </div>
+                                    <div>
+                                        <i class="icon-pie-chart warning font-large-2 float-left"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-xl-3 col-lg-6 col-12">
+                <a href="{{ route('reports.statistics.inventory') }}" id="linkInventory">
+                    <div class="card pull-up">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="media d-flex">
+                                    <div class="media-body text-left">
+                                        <h3 class="success" id="totalUnsoldProducts">{{ $totalUnsoldProducts }}</h3>
                                         <h6>المنتجات غير المباعة</h6>
-                                </div>
-                                <div>
-                                    <i class="icon-handbag success font-large-2 float-left"></i>
+                                    </div>
+                                    <div>
+                                        <i class="icon-handbag success font-large-2 float-left"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-xl-3 col-lg-6 col-12">
-                <div class="card pull-up">
-                    <div class="card-content">
-                        <div class="card-body">
-                            <div class="media d-flex">
-                                <div class="media-body text-left">
-                                    <h3 class="danger" id="totalPurchases"> {{ $totalPurchases }} ج.م </h3>
-                                    <h6>إجمالي المشتريات</h6>
-                                </div>
-                                <div>
-                                    <i class="icon-wallet danger font-large-2 float-left"></i>
+                <a href="{{ route('reports.statistics.purchases') }}" id="linkPurchases">
+                    <div class="card pull-up">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="media d-flex">
+                                    <div class="media-body text-left">
+                                        <h3 class="danger" id="totalPurchases"> {{ $totalPurchases }} ج.م </h3>
+                                        <h6>إجمالي المشتريات</h6>
+                                    </div>
+                                    <div>
+                                        <i class="icon-wallet danger font-large-2 float-left"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-xl-3 col-lg-6 col-12">
-                <div class="card pull-up">
-                    <div class="card-content">
-                        <div class="card-body">
-                            <div class="media d-flex">
-                                <div class="media-body text-left">
-                                    <h3 class="primary" id="totalProfit"> {{ $totalProfit }} ج.م</h3>
-                                    <h6>إجمالي الأرباح</h6>
-                                </div>
-                                <div>
-                                    <i class="icon-graph primary font-large-2 float-left"></i>
+                <a href="{{ route('reports.statistics.profit') }}" id="linkProfit">
+                    <div class="card pull-up">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="media d-flex">
+                                    <div class="media-body text-left">
+                                        <h3 class="primary" id="totalProfit"> {{ $totalProfit }} ج.م</h3>
+                                        <h6>إجمالي الأرباح</h6>
+                                    </div>
+                                    <div>
+                                        <i class="icon-graph primary font-large-2 float-left"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-xl-3 col-lg-6 col-12">
-                <div class="card pull-up">
-                    <div class="card-content">
-                        <div class="card-body">
-                            <div class="media d-flex">
-                                <div class="media-body text-left">
-                                    <h3 class="primary" id="availableMoney">{{ $availableMoney }} ج.م</h3>
-                                    <h6>المبلغ المتوفر</h6>
-                                </div>
-                                <div>
-                                    <i class="icon-wallet primary font-large-2 float-left"></i>
+                <a href="{{ route('reports.statistics.cash_flow') }}" id="linkCashFlow">
+                    <div class="card pull-up">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="media d-flex">
+                                    <div class="media-body text-left">
+                                        <h3 class="primary" id="availableMoney">{{ $availableMoney }} ج.م</h3>
+                                        <h6>المبلغ المتوفر</h6>
+                                    </div>
+                                    <div>
+                                        <i class="icon-wallet primary font-large-2 float-left"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
         </div>
@@ -304,6 +316,9 @@
                 var startDate = $('#start_date').val();
                 var endDate = $('#end_date').val();
 
+                // Update detail links
+                updateDetailLinks(startDate, endDate);
+
                 $.ajax({
                     url: "{{ route('dashboard') }}",
                     type: "GET",
@@ -319,6 +334,21 @@
                         console.error("Response Text: " + xhr.responseText);
                     }
                 });
+            }
+
+            function updateDetailLinks(start, end) {
+                var queryParams = '';
+                if (start && end) {
+                    queryParams = '?start_date=' + start + '&end_date=' + end;
+                }
+
+                $('#linkProductsSold').attr('href', "{{ route('reports.statistics.products_sold') }}" + queryParams);
+                $('#linkRevenue').attr('href', "{{ route('reports.statistics.revenue') }}" + queryParams);
+                // Inventory doesn't strictly need date filter but we can pass it for consistency
+                $('#linkInventory').attr('href', "{{ route('reports.statistics.inventory') }}" + queryParams);
+                $('#linkPurchases').attr('href', "{{ route('reports.statistics.purchases') }}" + queryParams);
+                $('#linkProfit').attr('href', "{{ route('reports.statistics.profit') }}" + queryParams);
+                $('#linkCashFlow').attr('href', "{{ route('reports.statistics.cash_flow') }}" + queryParams);
             }
 
             function updateDashboard(data) {

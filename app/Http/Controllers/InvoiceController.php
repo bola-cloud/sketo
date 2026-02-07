@@ -8,9 +8,17 @@ use App\Models\Product;
 use App\Models\Sales;
 use App\Models\PurchaseProduct;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use App\Exports\InvoicesExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InvoiceController extends Controller
 {
+    public function export()
+    {
+        return Excel::download(new InvoicesExport, 'invoices_' . now()->format('Y-m-d_H-i') . '.xlsx');
+    }
+
     public function index(Request $request)
     {
         $invoices = Invoice::with('client')->paginate(20); // Get all invoices
@@ -26,10 +34,10 @@ class InvoiceController extends Controller
         $invoices = Invoice::query();
 
         if ($query) {
-            $invoices->where(function($q) use ($query) {
+            $invoices->where(function ($q) use ($query) {
                 $q->where('buyer_name', 'like', "%{$query}%")
-                  ->orWhere('buyer_phone', 'like', "%{$query}%")
-                  ->orWhere('invoice_code', 'like', "%{$query}%");
+                    ->orWhere('buyer_phone', 'like', "%{$query}%")
+                    ->orWhere('invoice_code', 'like', "%{$query}%");
             });
         }
 
@@ -69,7 +77,7 @@ class InvoiceController extends Controller
 
         // Redirect back to the invoice with a success message
         return redirect()->route('invoices.show', $invoice->id)
-                        ->with('success', 'تم تحديث المبلغ المدفوع والتغيير بنجاح.');
+            ->with('success', 'تم تحديث المبلغ المدفوع والتغيير بنجاح.');
     }
 
     public function show(Invoice $invoice)
@@ -141,7 +149,7 @@ class InvoiceController extends Controller
 
         // Redirect back to the invoice with a success message
         return redirect()->route('invoices.show', $invoice->id)
-                        ->with('success', 'تم تحديث الخصم والإجمالي بنجاح.');
+            ->with('success', 'تم تحديث الخصم والإجمالي بنجاح.');
     }
 
     public function returnProducts(Request $request, Invoice $invoice)
@@ -154,6 +162,13 @@ class InvoiceController extends Controller
                 $product = $sale->product;
                 $product->quantity += $quantity;
                 $product->save();
+
+                // Restore quantity to the specific purchase batch
+                if ($sale->purchase_product_id) {
+                    \DB::table('purchase_products')
+                        ->where('id', $sale->purchase_product_id)
+                        ->increment('remaining_quantity', $quantity);
+                }
 
                 // Adjust the sale record
                 $sale->quantity -= $quantity;
@@ -228,7 +243,8 @@ class InvoiceController extends Controller
                 ->get();
 
             foreach ($purchaseProducts as $purchaseProduct) {
-                if ($remainingQuantity <= 0) break;
+                if ($remainingQuantity <= 0)
+                    break;
 
                 $deductQuantity = min($remainingQuantity, $purchaseProduct->remaining_quantity);
                 $purchaseProduct->remaining_quantity -= $deductQuantity;
@@ -282,6 +298,13 @@ class InvoiceController extends Controller
             $product = $sale->product;
             $product->quantity += $sale->quantity;
             $product->save();
+
+            // Restore quantity to the specific purchase batch
+            if ($sale->purchase_product_id) {
+                \DB::table('purchase_products')
+                    ->where('id', $sale->purchase_product_id)
+                    ->increment('remaining_quantity', $sale->quantity);
+            }
 
             // Delete the sale record
             $sale->delete();

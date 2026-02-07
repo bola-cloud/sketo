@@ -1,124 +1,258 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid">
-    <h1 class="text-center mb-3">جميع الفواتير</h1>
-
-    <form id="search-form" class="mb-4" action="{{ route('invoices.search') }}" method="GET">
-        @csrf
-        <div class="row">
-            <div class="col-md-4">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" id="search-query" name="query" placeholder="البحث عن طريق اسم المشتري، الهاتف أو كود الفاتورة" value="{{ request('query') }}">
+    <div class="content-header row">
+        <div class="content-header-left col-md-6 col-12 mb-2">
+            <h3 class="content-header-title">سجل فواتير المبيعات</h3>
+            <div class="row breadcrumbs-top">
+                <div class="breadcrumb-wrapper col-12">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
+                        <li class="breadcrumb-item active">الفواتير</li>
+                    </ol>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="input-group mb-3">
-                    <input type="date" class="form-control" id="date_from" name="date_from" placeholder="من تاريخ" value="{{ request('date_from') }}">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="input-group mb-3">
-                    <input type="date" class="form-control" id="date_to" name="date_to" placeholder="إلى تاريخ" value="{{ request('date_to') }}">
-                </div>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary">بحث</button>
-            </div>
         </div>
-    </form>
-
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <table class="table table-bordered" id="invoice-table">
-        <thead>
-            <tr>
-                <th>كود الفاتورة</th>
-                <th>اسم المشتري</th>
-                <th>اسم البائع</th>
-                <th>تاريخ الإنشاء</th>
-                <th>الحالة</th>
-                <th>الاقساط</th>
-                <th>إجراءات</th>
-                <th>حذف</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($invoices as $invoice)
-                @php
-                    $returnsCount = $invoice->returns()->count();
-                    $hasUnpaidAmount = $invoice->total_amount > $invoice->paid_amount;
-                @endphp
-                <tr>
-                    <td>
-                        {{ $invoice->invoice_code }}
-                        @if($returnsCount > 0)
-                            <span class="badge badge-warning" title="يحتوي على {{ $returnsCount }} عملية إرجاع">
-                                <i class="fa fa-undo"></i> {{ $returnsCount }}
-                            </span>
-                        @endif
-                    </td>
-                    <td>{{ $invoice->client ? $invoice->client->name : 'لا يوجد عميل' }}</td>
-                    <td>{{ $invoice->user->name }}</td>
-                    <td>{{ $invoice->created_at->format('Y-m-d') }}</td>
-                    <td>
-                        @if($hasUnpaidAmount)
-                            <span class="badge badge-danger">غير مكتمل السداد</span>
-                        @else
-                            <span class="badge badge-success">مدفوع</span>
-                        @endif
-
-                        @if($returnsCount > 0)
-                            <br><small class="text-warning">
-                                <i class="fa fa-exclamation-triangle"></i> يحتوي على مرتجعات
-                            </small>
-                        @endif
-                    </td>
-                    <td>
-                        <!-- Installment button -->
-                        @if($hasUnpaidAmount)
-                            <a href="{{ route('sales.installments.index', $invoice->id) }}" class="btn btn-info btn-sm">عرض الأقساط</a>
-                        @else
-                            <span class="text-muted">مكتمل</span>
-                        @endif
-                    </td>
-                    <td>
-                        <a href="{{ route('invoices.show', ['invoice' => $invoice->id]) }}" class="btn btn-secondary btn-sm">عرض التفاصيل</a>
-                        <a class="btn btn-primary btn-sm" href="{{ route('cashier.printInvoice', $invoice->id) }}">طباعة الفاتورة</a>
-                        @if($returnsCount > 0)
-                            <br><a href="{{ route('customer-returns.index') }}?invoice_code={{ $invoice->invoice_code }}" class="btn btn-warning btn-sm mt-1">
-                                <i class="fa fa-eye"></i> المرتجعات ({{ $returnsCount }})
-                            </a>
-                        @endif
-                    </td>
-                    <td>
-                        <form action="{{ route('invoices.destroy', $invoice->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('هل أنت متأكد من حذف الفاتورة؟ سيتم إرجاع الكميات إلى المخزون.')">حذف</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-    <div class="row">
-        <div class="col-md-12 d-flex justify-content-center">
-            {{ $invoices->onEachSide(1)->links('pagination::bootstrap-4') }}
+        <div class="content-header-right col-md-6 col-12">
+            <div class="btn-group float-md-right">
+                <a href="{{ route('invoices.export') }}" class="btn btn-success round px-2 shadow">
+                    <i class="la la-file-excel-o"></i> تصدير إكسل
+                </a>
+            </div>
         </div>
     </div>
-</div>
 
-<script src="{{ asset('assets/js/jquery.js') }}"></script>
+    <div class="content-body">
+        <!-- Search Filters -->
+        <div class="card pull-up border-0 shadow-sm mb-2"
+            style="background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border-radius: 20px;">
+            <div class="card-content">
+                <div class="card-body">
+                    <form id="search-form" action="{{ route('invoices.search') }}" method="GET">
+                        @csrf
+                        <div class="row items-align-center">
+                            <div class="col-md-4">
+                                <div class="form-group mb-1">
+                                    <label class="text-bold-600 small">البحث العام</label>
+                                    <div class="position-relative has-icon-left">
+                                        <input type="text" class="form-control round border-primary" name="query"
+                                            placeholder="اسم المشتري، الهاتف أو كود الفاتورة..."
+                                            value="{{ request('query') }}">
+                                        <div class="form-control-position">
+                                            <i class="la la-search primary"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group mb-1">
+                                    <label class="text-bold-600 small">من تاريخ</label>
+                                    <input type="date" class="form-control round border-primary" name="date_from"
+                                        value="{{ request('date_from') }}">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group mb-1">
+                                    <label class="text-bold-600 small">إلى تاريخ</label>
+                                    <input type="date" class="form-control round border-primary" name="date_to"
+                                        value="{{ request('date_to') }}">
+                                </div>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <div class="form-group mb-1 w-100">
+                                    <button type="submit" class="btn btn-primary round btn-block shadow-sm">
+                                        <i class="la la-filter"></i> تصفية
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible mb-2" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <strong>تم بنجاح!</strong> {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible mb-2" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <strong>خطأ!</strong> {{ session('error') }}
+            </div>
+        @endif
+
+        <!-- Invoices Table -->
+        <div class="card pull-up border-0 shadow-sm"
+            style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 20px;">
+            <div class="card-content">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-premium mb-0" id="invoice-table">
+                            <thead>
+                                <tr>
+                                    <th>كود الفاتورة</th>
+                                    <th>العميل</th>
+                                    <th>البائع</th>
+                                    <th>التاريخ</th>
+                                    <th>الحالة</th>
+                                    <th>الأقساط</th>
+                                    <th class="text-right">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($invoices as $invoice)
+                                    @php
+                                        $returnsCount = $invoice->returns()->count();
+                                        $hasUnpaidAmount = $invoice->total_amount > $invoice->paid_amount;
+                                    @endphp
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span
+                                                    class="badge badge-soft-primary round-lg px-1 text-bold-700">{{ $invoice->invoice_code }}</span>
+                                                @if($returnsCount > 0)
+                                                    <span class="badge badge-warning round ml-1"
+                                                        title="يحتوي على {{ $returnsCount }} عملية إرجاع">
+                                                        <i class="la la-undo"></i>
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span
+                                                class="text-bold-700 text-dark">{{ $invoice->client ? $invoice->client->name : 'لا يوجد عميل' }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small"><i class="la la-user"></i>
+                                                {{ $invoice->user->name }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small"><i class="la la-calendar"></i>
+                                                {{ $invoice->created_at->format('Y-m-d') }}</span>
+                                        </td>
+                                        <td>
+                                            @if($hasUnpaidAmount)
+                                                <span class="badge badge-soft-danger round px-1">غير مكتمل</span>
+                                            @else
+                                                <span class="badge badge-soft-success round px-1">مدفوع بالكامل</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($hasUnpaidAmount)
+                                                <a href="{{ route('sales.installments.index', $invoice->id) }}"
+                                                    class="btn btn-sm btn-soft-info round px-1">
+                                                    <i class="la la-list"></i> الأقساط
+                                                </a>
+                                            @else
+                                                <span class="text-muted small">---</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-right">
+                                            <div class="btn-group">
+                                                <a href="{{ route('invoices.show', ['invoice' => $invoice->id]) }}"
+                                                    class="btn btn-sm btn-soft-info round mr-1 px-1">
+                                                    <i class="la la-eye"></i> عرض
+                                                </a>
+                                                <a class="btn btn-sm btn-soft-primary round mr-1 px-1"
+                                                    href="{{ route('cashier.printInvoice', $invoice->id) }}">
+                                                    <i class="la la-print"></i> طباعة
+                                                </a>
+                                                <form action="{{ route('invoices.destroy', $invoice->id) }}" method="POST"
+                                                    style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-soft-danger round px-1"
+                                                        onclick="return confirm('هل أنت متأكد من حذف الفاتورة؟ سيتم إرجاع الكميات إلى المخزون.')">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-center mt-2">
+                        {{ $invoices->onEachSide(1)->links('pagination::bootstrap-4') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .round-lg {
+            border-radius: 10px !important;
+        }
+
+        .badge-soft-primary {
+            color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        .badge-soft-success {
+            color: #10b981;
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+
+        .badge-soft-danger {
+            color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        .btn-soft-info {
+            color: #0891b2;
+            background-color: rgba(6, 182, 212, 0.1);
+            border: none;
+        }
+
+        .btn-soft-primary {
+            color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.1);
+            border: none;
+        }
+
+        .btn-soft-danger {
+            color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+            border: none;
+        }
+
+        .btn-soft-info:hover {
+            background-color: #0891b2;
+            color: white !important;
+        }
+
+        .btn-soft-primary:hover {
+            background-color: #3b82f6;
+            color: white !important;
+        }
+
+        .btn-soft-danger:hover {
+            background-color: #ef4444;
+            color: white !important;
+        }
+
+        .table-premium th {
+            font-weight: 700;
+            color: #1e293b;
+            border-top: none;
+        }
+
+        .table-premium td {
+            vertical-align: middle;
+            padding: 1rem 0.75rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+    </style>
 @endsection

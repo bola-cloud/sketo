@@ -1,33 +1,66 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container">
-    <h1>إضافة ماركة جديدة</h1>
-
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+    <div class="content-header row">
+        <div class="content-header-left col-md-6 col-12 mb-2">
+            <h3 class="content-header-title">إضافة ماركة جديدة</h3>
+            <div class="row breadcrumbs-top">
+                <div class="breadcrumb-wrapper col-12">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('brands.index') }}">الماركات</a></li>
+                        <li class="breadcrumb-item active">إضافة</li>
+                    </ol>
+                </div>
+            </div>
         </div>
-    @endif
+    </div>
 
-    <form action="{{ route('brands.store') }}" method="POST">
-        @csrf
-        <div class="form-group">
-            <label for="name">اسم الماركة</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" required>
+    <div class="content-body">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-12">
+                <div class="card pull-up border-0 shadow-sm"
+                    style="background: rgba(255, 255, 255, 0.95); border-radius: 20px;">
+                    <div class="card-content">
+                        <div class="card-body">
+                            @if ($errors->any())
+                                <div class="alert alert-danger mb-2">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            <form action="{{ route('brands.store') }}" method="POST">
+                                @csrf
+                                <div class="form-group mb-2">
+                                    <label for="name" class="text-bold-600">اسم الماركة <span
+                                            class="danger">*</span></label>
+                                    <input type="text" class="form-control round border-primary" id="name" name="name"
+                                        value="{{ old('name') }}" placeholder="أدخل اسم الماركة..." required>
+                                </div>
+
+                                <div class="form-group mb-2">
+                                    <label for="description" class="text-bold-600">الوصف (اختياري)</label>
+                                    <textarea class="form-control round border-primary" id="description" name="description"
+                                        rows="3" placeholder="أدخل وصفاً للماركة...">{{ old('description') }}</textarea>
+                                </div>
+
+                                <div class="form-actions text-center mt-4">
+                                    <button type="submit" class="btn btn-primary round px-4 shadow">
+                                        <i class="la la-check"></i> حفظ الماركة
+                                    </button>
+                                    <a href="{{ route('brands.index') }}" class="btn btn-light round px-4 ml-1">
+                                        إلغاء
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="form-group">
-            <label for="description">الوصف (اختياري)</label>
-            <textarea class="form-control" id="description" name="description" rows="3">{{ old('description') }}</textarea>
-        </div>
-
-        <button type="submit" class="btn btn-primary">إضافة الماركة</button>
-        <a href="{{ route('brands.index') }}" class="btn btn-secondary">إلغاء</a>
-    </form>
-</div>
+    </div>
 @endsection
