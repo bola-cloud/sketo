@@ -284,7 +284,6 @@
     </script>
 @endpush
 
-@endsection
 
 @push('scripts')
     <script>
