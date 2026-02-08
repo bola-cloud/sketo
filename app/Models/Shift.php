@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Shift extends Model
 {
     use HasFactory;
+    use \App\Traits\BelongsToVendor;
 
     protected $fillable = [
+        'vendor_id',
         'user_id',
         'start_time',
         'end_time',

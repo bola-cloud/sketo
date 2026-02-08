@@ -101,13 +101,16 @@
                     <ul class="nav navbar-nav float-right">
                         <li class="dropdown dropdown-user nav-item d-flex align-items-center mr-3 me-3">
                             <div class="d-flex align-items-center">
-                                <a href="{{route('cashier.viewCart')}}" class="btn btn-primary"> {{ __('app.sidebar.cashier') }} </a>
+                                <a href="{{route('cashier.viewCart')}}" class="btn btn-primary">
+                                    {{ __('app.sidebar.cashier') }} </a>
                             </div>
                         </li>
                         <li class="dropdown dropdown-language nav-item">
-                            <a class="dropdown-toggle nav-link" id="dropdown-flag" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a class="dropdown-toggle nav-link" id="dropdown-flag" href="#" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
                                 <i class="la la-globe"></i>
-                                <span class="selected-language">{{ App::getLocale() == 'ar' ? 'العربية' : 'English' }}</span>
+                                <span
+                                    class="selected-language">{{ App::getLocale() == 'ar' ? 'العربية' : 'English' }}</span>
                             </a>
                             <div class="dropdown-menu" aria-labelledby="dropdown-flag">
                                 <a class="dropdown-item" href="{{ route('language.switch', 'ar') }}">
@@ -115,7 +118,7 @@
                                 </a>
                                 <a class="dropdown-item" href="{{ route('language.switch', 'en') }}">
                                     <i class="la la-flag"></i> English
-           </a>
+                                </a>
                             </div>
                         </li>
                         <li class="dropdown dropdown-user nav-item">
@@ -156,8 +159,23 @@
                 @php
                     $user = auth()->user();
                     // Check if user has admin role
-                    $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super-admin'));
-                @endphp @if($isAdmin)
+                    $isSuperAdmin = $user && $user->hasRole('super_admin');
+                    $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('owner') || $isSuperAdmin);
+                @endphp
+
+                @if($isSuperAdmin)
+                    <li class=" nav-item"><a href="#"><i class="la la-server"></i><span
+                                class="menu-title">{{ __('app.sidebar.platform_management') }}</span></a>
+                        <ul class="menu-content">
+                            <li class="{{ Request::is('super-admin/vendors*') ? 'active' : '' }} ">
+                                <a class="menu-item" href="{{route('super-admin.vendors.index')}}">
+                                    <i class="la la-industry"></i> {{ __('app.sidebar.vendors') }} </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
+
+                @if($isAdmin)
                     <li class="{{ Route::currentRouteName() == 'dashboard' ? 'active' : '' }} nav-item">
                         <a href="{{route('dashboard')}}"><i class="la la-home"></i><span class="menu-title"
                                 data-i18n="">{{ __('app.sidebar.dashboard') }}</span></a>
@@ -209,10 +227,10 @@
                                 </li>
                             @endif
                             <!-- @if($isAdmin)
-                                                                                        <li class="{{ Route::currentRouteName() == 'quantity.updates' ? 'active':'' }} ">
-                                                                                            <a class="menu-item" href="{{route('quantity.updates')}}" data-i18n="nav.dash.crypto"> {{ __('app.sidebar.product_quantities') }} </a>
-                                                                                        </li>
-                                                                                    @endif -->
+                                                                                            <li class="{{ Route::currentRouteName() == 'quantity.updates' ? 'active':'' }} ">
+                                                                                                <a class="menu-item" href="{{route('quantity.updates')}}" data-i18n="nav.dash.crypto"> {{ __('app.sidebar.product_quantities') }} </a>
+                                                                                            </li>
+                                                                                        @endif -->
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'product.transactions' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('product.transactions')}}" data-i18n="nav.dash.crypto">
@@ -274,7 +292,8 @@
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'reports.productTransfers' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('reports.productTransfers')}}"
-                                        data-i18n="nav.dash.ecommerce"><i class="la la-truck"></i> {{ __('app.sidebar.product_transfer_report') }} </a>
+                                        data-i18n="nav.dash.ecommerce"><i class="la la-truck"></i>
+                                        {{ __('app.sidebar.product_transfer_report') }} </a>
                                 </li>
                             @endif
                             @if($isAdmin)
@@ -340,7 +359,7 @@
                             <li class="{{ Route::currentRouteName() == 'users.create' ? 'active' : '' }} ">
                                 <a class="menu-item" href="{{route('users.create')}}" data-i18n="nav.dash.ecommerce">
                                     <i class="la la-user-plus"></i> {{ __('app.sidebar.add_user') }} </a>
-                                </li>
+                            </li>
                         </ul>
                     </li>
                 @endif

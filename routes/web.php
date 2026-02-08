@@ -21,6 +21,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('permissions', App\Http\Controllers\PermissionController::class);
 });
 
+// Super Admin Routes
+Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
+    Route::get('/vendors', [App\Http\Controllers\SuperAdmin\VendorController::class, 'index'])->name('vendors.index');
+    Route::get('/vendors/{vendor}', [App\Http\Controllers\SuperAdmin\VendorController::class, 'show'])->name('vendors.show');
+    Route::post('/vendors/{vendor}/update-subscription', [App\Http\Controllers\SuperAdmin\VendorController::class, 'updateSubscription'])->name('vendors.updateSubscription');
+    Route::post('/vendors/{vendor}/toggle-status', [App\Http\Controllers\SuperAdmin\VendorController::class, 'toggleStatus'])->name('vendors.toggleStatus');
+});
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

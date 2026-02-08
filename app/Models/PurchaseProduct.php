@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class PurchaseProduct extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Traits\BelongsToVendor;
 
-    protected $fillable = ['purchase_id', 'product_id', 'quantity', 'cost_price', 'remaining_quantity'];
+    protected $fillable = ['vendor_id', 'purchase_id', 'product_id', 'quantity', 'cost_price', 'remaining_quantity'];
 
     protected $casts = [
         'cost_price' => 'decimal:2',

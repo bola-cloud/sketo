@@ -15,6 +15,7 @@ class User extends Authenticatable
 {
     use HasApiTokens;
     use HasFactory;
+    use \App\Traits\BelongsToVendor;
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
@@ -26,6 +27,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'vendor_id',
         'name',
         'email',
         'password',

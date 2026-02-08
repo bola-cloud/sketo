@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class QuantityUpdates extends Model
 {
     use HasFactory;
+    use \App\Traits\BelongsToVendor;
 
-    protected $fillable = ['product_id', 'old_quantity', 'new_quantity','user_id','action'];
+    protected $fillable = ['vendor_id', 'product_id', 'old_quantity', 'new_quantity', 'user_id', 'action'];
 
     public function product()
     {

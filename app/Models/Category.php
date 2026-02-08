@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     use HasFactory;
+    use \App\Traits\BelongsToVendor;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['vendor_id', 'name'];
 
     public function products()
     {

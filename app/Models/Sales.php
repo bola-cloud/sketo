@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sales extends Model
 {
-    use HasFactory;
-    protected $fillable = ['product_id', 'quantity', 'total_price','invoice_id', 'purchase_product_id'];
+    use HasFactory, \App\Traits\BelongsToVendor;
+    protected $fillable = ['vendor_id', 'product_id', 'quantity', 'total_price', 'invoice_id', 'purchase_product_id'];
 
     public function product()
     {

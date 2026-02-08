@@ -4,6 +4,8 @@ return [
     'sidebar' => [
         'dashboard' => 'Dashboard',
         'shift_management' => 'Shift Management',
+        'platform_management' => 'Platform Management',
+        'vendors' => 'Vendors & Subscriptions',
         'products' => 'Products',
         'view_categories' => 'View Categories',
         'add_category' => 'Add Category',

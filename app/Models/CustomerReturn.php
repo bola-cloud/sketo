@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class CustomerReturn extends Model
 {
     use HasFactory;
+    use \App\Traits\BelongsToVendor;
 
     protected $fillable = [
+        'vendor_id',
         'invoice_id',
         'product_id',
         'quantity_returned',

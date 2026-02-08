@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class SalesInstallment extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Traits\BelongsToVendor;
 
     protected $fillable = [
+        'vendor_id',
         'invoice_id',
         'amount_paid',
         'date_paid',

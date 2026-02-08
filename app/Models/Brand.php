@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Brand extends Model
 {
     use HasFactory;
+    use \App\Traits\BelongsToVendor;
 
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['vendor_id', 'name', 'description'];
 
     public function products()
     {

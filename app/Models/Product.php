@@ -9,8 +9,9 @@ use Illuminate\Support\Facades\DB;
 class Product extends Model
 {
     use HasFactory;
+    use \App\Traits\BelongsToVendor;
 
-    protected $fillable = ['name', 'category_id', 'brand_id', 'cost_price', 'selling_price', 'quantity', 'barcode', 'barcode_path' , 'color','threshold','image'];
+    protected $fillable = ['vendor_id', 'name', 'category_id', 'brand_id', 'cost_price', 'selling_price', 'quantity', 'barcode', 'barcode_path', 'color', 'threshold', 'image'];
 
     public function sales()
     {
@@ -30,8 +31,8 @@ class Product extends Model
     public function purchases()
     {
         return $this->belongsToMany(Purchase::class, 'purchase_products')
-                    ->withPivot('quantity', 'cost_price','id')
-                    ->withTimestamps();
+            ->withPivot('quantity', 'cost_price', 'id')
+            ->withTimestamps();
     }
 
     // In app/Models/Product.php
@@ -57,7 +58,7 @@ class Product extends Model
             ->with(['purchase.supplier'])
             ->where('remaining_quantity', '>', 0)
             ->get()
-            ->groupBy(function($item) {
+            ->groupBy(function ($item) {
                 return $item->purchase->supplier_id;
             });
     }
@@ -71,7 +72,7 @@ class Product extends Model
             ->orderBy('created_at', 'asc');
 
         if ($quantity) {
-            return $query->get()->filter(function($item) use ($quantity) {
+            return $query->get()->filter(function ($item) use ($quantity) {
                 return $item->remaining_quantity >= $quantity;
             });
         }
@@ -89,7 +90,7 @@ class Product extends Model
     public function getStockFromSupplier($supplierId)
     {
         return $this->purchaseProducts()
-            ->whereHas('purchase', function($query) use ($supplierId) {
+            ->whereHas('purchase', function ($query) use ($supplierId) {
                 $query->where('supplier_id', $supplierId);
             })
             ->where('remaining_quantity', '>', 0)

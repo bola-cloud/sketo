@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class ProductTransfer extends Model
 {
     use HasFactory;
+    use \App\Traits\BelongsToVendor;
 
     protected $fillable = [
+        'vendor_id',
         'old_purchase_id',
         'new_purchase_id',
         'product_id',

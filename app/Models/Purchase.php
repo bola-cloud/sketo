@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Purchase extends Model
 {
     use HasFactory;
-    protected $fillable = ['invoice_number', 'type', 'total_amount', 'description','paid_amount','change','supplier_id'];
+    use \App\Traits\BelongsToVendor;
+    protected $fillable = ['vendor_id', 'invoice_number', 'type', 'total_amount', 'description', 'paid_amount', 'change', 'supplier_id'];
 
     public function products()
     {
         return $this->belongsToMany(Product::class, 'purchase_products')
-                    ->withPivot('quantity', 'cost_price', 'remaining_quantity', 'id')
-                    ->withTimestamps();
+            ->withPivot('quantity', 'cost_price', 'remaining_quantity', 'id')
+            ->withTimestamps();
     }
 
     // In app/Models/Purchase.php
@@ -48,6 +49,6 @@ class Purchase extends Model
 
     public function supplier()
     {
-        return $this->belongsTo(Supplier::class,'supplier_id');
+        return $this->belongsTo(Supplier::class, 'supplier_id');
     }
 }

@@ -4,6 +4,8 @@ return [
     'sidebar' => [
         'dashboard' => 'لوحة التحكم',
         'shift_management' => 'إدارة الورديات',
+        'platform_management' => 'إدارة المنصة',
+        'vendors' => 'المتاجر والاشتراكات',
         'products' => 'المنتجات',
         'view_categories' => 'عرض فئات المنتجات',
         'add_category' => 'اضافة فئة منتج',
