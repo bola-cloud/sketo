@@ -3,12 +3,13 @@
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
-            <h3 class="content-header-title">إدارة الماركات التجارية</h3>
+            <h3 class="content-header-title">{{ __('app.brands.title') }}</h3>
             <div class="row breadcrumbs-top">
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
-                        <li class="breadcrumb-item active">الماركات</li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('app.sidebar.dashboard') }}</a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ __('app.brands.all_brands') }}</li>
                     </ol>
                 </div>
             </div>
@@ -17,7 +18,7 @@
             <div class="btn-group float-md-right">
                 @if(auth()->user()->hasRole('admin') || auth()->user()->can('create-categories'))
                     <a href="{{ route('brands.create') }}" class="btn btn-primary round px-2 shadow">
-                        <i class="la la-plus"></i> إضافة ماركة جديدة
+                        <i class="la la-plus"></i> {{ __('app.brands.add_new') }}
                     </a>
                 @endif
             </div>
@@ -30,7 +31,7 @@
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <strong>تم بنجاح!</strong> {{ session('success') }}
+                <strong>{{ __('app.common.success') }}!</strong> {{ session('success') }}
             </div>
         @endif
 
@@ -42,10 +43,10 @@
                             <thead class="bg-light">
                                 <tr>
                                     <th style="width: 80px;">#</th>
-                                    <th>الماركة</th>
-                                    <th>الوصف</th>
-                                    <th>عدد المنتجات</th>
-                                    <th class="text-right">الإجراءات</th>
+                                    <th>{{ __('app.brands.name') }}</th>
+                                    <th>{{ __('app.brands.description') }}</th>
+                                    <th>{{ __('app.brands.products_count') }}</th>
+                                    <th class="text-right">{{ __('app.brands.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -60,27 +61,29 @@
                                                 <span class="text-bold-600">{{ $brand->name }}</span>
                                             </div>
                                         </td>
-                                        <td class="text-muted small">{{ $brand->description ?: 'لا يوجد وصف' }}</td>
+                                        <td class="text-muted small">
+                                            {{ $brand->description ?: __('app.brands.no_description') }}</td>
                                         <td>
-                                            <span class="badge badge-soft-info">{{ $brand->products_count }} منتج</span>
+                                            <span class="badge badge-soft-info">{{ $brand->products_count }}
+                                                {{ __('app.brands.product') }}</span>
                                         </td>
                                         <td class="text-right">
                                             @if(auth()->user()->hasRole('admin') || auth()->user()->can('create-categories'))
                                                 <a href="{{ route('brands.show', $brand->id) }}"
                                                     class="btn btn-sm btn-soft-primary mr-1">
-                                                    <i class="la la-eye"></i> عرض
+                                                    <i class="la la-eye"></i> {{ __('app.common.view') }}
                                                 </a>
                                                 <a href="{{ route('brands.edit', $brand->id) }}"
                                                     class="btn btn-sm btn-soft-warning mr-1">
-                                                    <i class="la la-edit"></i> تعديل
+                                                    <i class="la la-edit"></i> {{ __('app.common.edit') }}
                                                 </a>
                                                 <form action="{{ route('brands.destroy', $brand->id) }}" method="POST"
                                                     style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-soft-danger"
-                                                        onclick="return confirm('هل أنت متأكد من حذف هذه الماركة؟')">
-                                                        <i class="la la-trash"></i> حذف
+                                                        onclick="return confirm('{{ __('app.brands.delete_confirm') }}')">
+                                                        <i class="la la-trash"></i> {{ __('app.common.delete') }}
                                                     </button>
                                                 </form>
                                             @endif

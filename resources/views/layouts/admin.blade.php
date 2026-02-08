@@ -101,7 +101,21 @@
                     <ul class="nav navbar-nav float-right">
                         <li class="dropdown dropdown-user nav-item d-flex align-items-center mr-3 me-3">
                             <div class="d-flex align-items-center">
-                                <a href="{{route('cashier.viewCart')}}" class="btn btn-primary"> الكاشير </a>
+                                <a href="{{route('cashier.viewCart')}}" class="btn btn-primary"> {{ __('app.sidebar.cashier') }} </a>
+                            </div>
+                        </li>
+                        <li class="dropdown dropdown-language nav-item">
+                            <a class="dropdown-toggle nav-link" id="dropdown-flag" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="la la-globe"></i>
+                                <span class="selected-language">{{ App::getLocale() == 'ar' ? 'العربية' : 'English' }}</span>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdown-flag">
+                                <a class="dropdown-item" href="{{ route('language.switch', 'ar') }}">
+                                    <i class="la la-flag"></i> العربية
+                                </a>
+                                <a class="dropdown-item" href="{{ route('language.switch', 'en') }}">
+                                    <i class="la la-flag"></i> English
+           </a>
                             </div>
                         </li>
                         <li class="dropdown dropdown-user nav-item">
@@ -146,63 +160,63 @@
                 @endphp @if($isAdmin)
                     <li class="{{ Route::currentRouteName() == 'dashboard' ? 'active' : '' }} nav-item">
                         <a href="{{route('dashboard')}}"><i class="la la-home"></i><span class="menu-title"
-                                data-i18n="">لوحة التحكم</span></a>
+                                data-i18n="">{{ __('app.sidebar.dashboard') }}</span></a>
                     </li>
                     <li class="{{ Request::is('shifts*') ? 'active' : '' }} nav-item">
                         <a href="{{route('shifts.index')}}"><i class="la la-clock-o"></i><span class="menu-title"
-                                data-i18n="">إدارة الورديات</span></a>
+                                data-i18n="">{{ __('app.sidebar.shift_management') }}</span></a>
                     </li>
                 @endif
 
                 @if($isAdmin)
                     <li class=" nav-item"><a href="#"><i class="la la-cube"></i><span class="menu-title"
-                                data-i18n="nav.dash.main">المنتجات</a>
+                                data-i18n="nav.dash.main">{{ __('app.sidebar.products') }}</span></a>
                         <ul class="menu-content">
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'categories.index' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('categories.index')}}" data-i18n="nav.dash.ecommerce">
-                                        <i class="la la-list"></i> عرض فئات المنتجات </a>
+                                        <i class="la la-list"></i> {{ __('app.sidebar.view_categories') }} </a>
                                 </li>
                             @endif
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'categories.create' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('categories.create')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-plus"></i> اضافة فئة منتج</a>
+                                        <i class="la la-plus"></i> {{ __('app.sidebar.add_category') }}</a>
                                 </li>
                             @endif
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'brands.index' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('brands.index')}}" data-i18n="nav.dash.ecommerce">
-                                        <i class="la la-certificate"></i> عرض الماركات </a>
+                                        <i class="la la-certificate"></i> {{ __('app.sidebar.view_brands') }} </a>
                                 </li>
                             @endif
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'brands.create' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('brands.create')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-plus-circle"></i> اضافة ماركة</a>
+                                        <i class="la la-plus-circle"></i> {{ __('app.sidebar.add_brand') }}</a>
                                 </li>
                             @endif
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'products.index' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('products.index')}}" data-i18n="nav.dash.ecommerce">
-                                        <i class="la la-cubes"></i> عرض المنتجات </a>
+                                        <i class="la la-cubes"></i> {{ __('app.sidebar.view_products') }} </a>
                                 </li>
                             @endif
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'products.create' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('products.create')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-plus"></i> اضافة منتج</a>
+                                        <i class="la la-plus"></i> {{ __('app.sidebar.add_product') }}</a>
                                 </li>
                             @endif
                             <!-- @if($isAdmin)
-                                                                                    <li class="{{ Route::currentRouteName() == 'quantity.updates' ? 'active':'' }} ">
-                                                                                        <a class="menu-item" href="{{route('quantity.updates')}}" data-i18n="nav.dash.crypto"> تقارير المنتجات </a>
-                                                                                    </li>
-                                                                                @endif -->
+                                                                                        <li class="{{ Route::currentRouteName() == 'quantity.updates' ? 'active':'' }} ">
+                                                                                            <a class="menu-item" href="{{route('quantity.updates')}}" data-i18n="nav.dash.crypto"> {{ __('app.sidebar.product_quantities') }} </a>
+                                                                                        </li>
+                                                                                    @endif -->
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'product.transactions' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('product.transactions')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-exchange"></i> ادارة كمية المنتجات </a>
+                                        <i class="la la-exchange"></i> {{ __('app.sidebar.product_transfer_report') }} </a>
                                 </li>
                             @endif
                         </ul>
@@ -211,30 +225,30 @@
 
                 @if($isAdmin)
                     <li class=" nav-item"><a href="#"><i class="la la-calculator"></i><span class="menu-title"
-                                data-i18n="nav.dash.main"> الكاشير </a>
+                                data-i18n="nav.dash.main"> {{ __('app.sidebar.cashier') }} </a>
                         <ul class="menu-content">
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'cashier.viewCart' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('cashier.viewCart')}}" data-i18n="nav.dash.ecommerce">
-                                        <i class="la la-shopping-basket"></i> اضافة فاتورة </a>
+                                        <i class="la la-shopping-basket"></i> {{ __('app.sidebar.add_invoice') }} </a>
                                 </li>
                             @endif
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'invoices.index' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('invoices.index')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-file-text"></i> عرض فواتير البيع </a>
+                                        <i class="la la-file-text"></i> {{ __('app.sidebar.view_invoices') }} </a>
                                 </li>
                             @endif
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'clients.index' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('clients.index')}}" data-i18n="nav.dash.ecommerce">
-                                        <i class="la la-users"></i> ادارة العملاء </a>
+                                        <i class="la la-users"></i> {{ __('app.sidebar.manage_clients') }} </a>
                                 </li>
                             @endif
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'customer-returns.index' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('customer-returns.index')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-reply"></i> مرتجعات العملاء </a>
+                                        <i class="la la-reply"></i> {{ __('app.sidebar.customer_returns') }} </a>
                                 </li>
                             @endif
                         </ul>
@@ -243,36 +257,36 @@
 
                 @if($isAdmin)
                     <li class=" nav-item"><a href="#"><i class="la la-shopping-cart"></i><span class="menu-title"
-                                data-i18n="nav.dash.main"> فواتير الشراء </a>
+                                data-i18n="nav.dash.main"> {{ __('app.sidebar.purchase_invoices') }} </a>
                         <ul class="menu-content">
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'purchases.create' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('purchases.create')}}" data-i18n="nav.dash.ecommerce">
-                                        <i class="la la-plus-square"></i> اضافة فاتورة </a>
+                                        <i class="la la-plus-square"></i> {{ __('app.sidebar.add_purchase_invoice') }} </a>
                                 </li>
                             @endif
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'purchases.index' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('purchases.index')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-file-invoice"></i> عرض فواتير الشراء </a>
+                                        <i class="la la-file-invoice"></i> {{ __('app.sidebar.view_purchase_invoices') }} </a>
                                 </li>
                             @endif
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'reports.productTransfers' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('reports.productTransfers')}}"
-                                        data-i18n="nav.dash.ecommerce"><i class="la la-truck"></i> تقرير نقل المنتجات </a>
+                                        data-i18n="nav.dash.ecommerce"><i class="la la-truck"></i> {{ __('app.sidebar.product_transfer_report') }} </a>
                                 </li>
                             @endif
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'suppliers.index' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('suppliers.index')}}" data-i18n="nav.dash.ecommerce">
-                                        <i class="la la-briefcase"></i> ادارة الموردين </a>
+                                        <i class="la la-briefcase"></i> {{ __('app.sidebar.manage_suppliers') }} </a>
                                 </li>
                             @endif
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'supplier-returns.index' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('supplier-returns.index')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-undo"></i> مرتجعات الموردين </a>
+                                        <i class="la la-undo"></i> {{ __('app.sidebar.supplier_returns') }} </a>
                                 </li>
                             @endif
                         </ul>
@@ -281,19 +295,19 @@
 
                 @if($isAdmin)
                     <li class=" nav-item"><a href="#"><i class="la la-bar-chart"></i><span class="menu-title"
-                                data-i18n="nav.dash.main"> تقارير المبيعات </a>
+                                data-i18n="nav.dash.main"> {{ __('app.sidebar.sales_reports') }} </a>
                         <ul class="menu-content">
                             <li class="{{ Route::currentRouteName() == 'reports.daily' ? 'active' : '' }} ">
                                 <a class="menu-item" href="{{route('reports.daily')}}" data-i18n="nav.dash.ecommerce">
-                                    <i class="la la-calendar-check-o"></i> التقارير اليومية للمبيعات </a>
+                                    <i class="la la-calendar-check-o"></i> {{ __('app.sidebar.daily_reports') }} </a>
                             </li>
                             <li class="{{ Route::currentRouteName() == 'reports.monthly' ? 'active' : '' }} ">
                                 <a class="menu-item" href="{{route('reports.monthly')}}" data-i18n="nav.dash.crypto">
-                                    <i class="la la-calendar-plus-o"></i> التقارير الشهرية للمبيعات </a>
+                                    <i class="la la-calendar-plus-o"></i> {{ __('app.sidebar.monthly_reports') }} </a>
                             </li>
                             <li class="{{ Route::currentRouteName() == 'reports.dateRange' ? 'active' : '' }} ">
                                 <a class="menu-item" href="{{route('reports.dateRange')}}" data-i18n="nav.dash.crypto">
-                                    <i class="la la-calendar"></i> تقارير المبيعات بالتاريخ</a>
+                                    <i class="la la-calendar"></i> {{ __('app.sidebar.date_range_reports') }}</a>
                             </li>
                         </ul>
                     </li>
@@ -301,32 +315,32 @@
 
                 @if($isAdmin)
                     <li class=" nav-item"><a href="#"><i class="la la-key"></i><span class="menu-title"
-                                data-i18n="nav.dash.main"> الاذونات </a>
+                                data-i18n="nav.dash.main"> {{ __('app.sidebar.permissions') }} </a>
                         <ul class="menu-content">
                             <li class="{{ Route::currentRouteName() == 'roles.create' ? 'active' : '' }} ">
                                 <a class="menu-item" href="{{route('roles.create')}}" data-i18n="nav.dash.ecommerce">
-                                    <i class="la la-user-plus"></i> اضافة ادوار </a>
+                                    <i class="la la-user-plus"></i> {{ __('app.sidebar.add_roles') }} </a>
                             </li>
                             <li class="{{ Route::currentRouteName() == 'roles.index' ? 'active' : '' }} ">
                                 <a class="menu-item" href="{{route('roles.index')}}" data-i18n="nav.dash.crypto">
-                                    <i class="la la-users"></i> عرض الادوار </a>
+                                    <i class="la la-users"></i> {{ __('app.sidebar.view_roles') }} </a>
                             </li>
                             <li class="{{ Route::currentRouteName() == 'permissions.create' ? 'active' : '' }} ">
                                 <a class="menu-item" href="{{route('permissions.create')}}" data-i18n="nav.dash.ecommerce">
-                                    <i class="la la-toggle-on"></i> اضافة صلاحية </a>
+                                    <i class="la la-toggle-on"></i> {{ __('app.sidebar.add_permission') }} </a>
                             </li>
                             <li class="{{ Route::currentRouteName() == 'permissions.index' ? 'active' : '' }} ">
                                 <a class="menu-item" href="{{route('permissions.index')}}" data-i18n="nav.dash.crypto">
-                                    <i class="la la-check-square"></i> عرض الصلاحيات </a>
+                                    <i class="la la-check-square"></i> {{ __('app.sidebar.view_permissions') }} </a>
                             </li>
                             <li class="{{ Route::currentRouteName() == 'role_user.index' ? 'active' : '' }} ">
                                 <a class="menu-item" href="{{route('role_user.index')}}" data-i18n="nav.dash.crypto">
-                                    <i class="la la-user-secret"></i> ادوار المستخدمين </a>
+                                    <i class="la la-user-secret"></i> {{ __('app.sidebar.user_roles') }} </a>
                             </li>
                             <li class="{{ Route::currentRouteName() == 'users.create' ? 'active' : '' }} ">
                                 <a class="menu-item" href="{{route('users.create')}}" data-i18n="nav.dash.ecommerce">
-                                    <i class="la la-user-plus"></i> اضافة مستخدم </a>
-                            </li>
+                                    <i class="la la-user-plus"></i> {{ __('app.sidebar.add_user') }} </a>
+                                </li>
                         </ul>
                     </li>
                 @endif
@@ -334,7 +348,7 @@
                 @if($isAdmin)
                     <li class="{{ Route::currentRouteName() == 'treasury' ? 'active' : '' }} nav-item">
                         <a href="{{route('treasury')}}"><i class="la la-bank"></i><span class="menu-title"
-                                data-i18n="nav.dash.crypto"> الخزينة</span></a>
+                                data-i18n="nav.dash.crypto"> {{ __('app.sidebar.treasury') }}</span></a>
                     </li>
                 @endif
 
@@ -346,11 +360,11 @@
                     class="sidebar-user-avatar">
                 <div class="sidebar-user-info">
                     <span class="sidebar-user-name">{{Auth::user()->name}}</span>
-                    <span class="sidebar-user-role">مشرف النظام</span>
+                    <span class="sidebar-user-role">Admins</span>
                 </div>
                 <a href="{{ route('logout') }}"
                     onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();"
-                    class="ml-auto text-muted hover-primary" title="تسجيل الخروج">
+                    class="ml-auto text-muted hover-primary" title="{{ __('app.common.logout') }}">
                     <i class="ft-power"></i>
                 </a>
                 <form id="logout-form-sidebar" action="{{ route('logout') }}" method="POST" style="display: none;">

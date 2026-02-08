@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Barcode Generation and Printing</title>    
+    <title>Barcode Generation and Printing</title>
     <style>
         :root {
             --width: 38mm;
             --height: 25mm;
         }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -17,6 +19,7 @@
             flex-wrap: wrap;
             background-color: #f0f0f0;
         }
+
         .barcode_content {
             width: var(--width);
             height: var(--height);
@@ -28,8 +31,10 @@
             align-items: center;
             flex-direction: column;
         }
+
         img {
-            width: calc(var(--width) - 5mm); /* Ensure the barcode fits within the container */
+            width: calc(var(--width) - 5mm);
+            /* Ensure the barcode fits within the container */
             height: auto;
         }
 
@@ -40,32 +45,37 @@
                 box-sizing: border-box;
                 size: var(--width) var(--height);
             }
+
             body {
                 margin: 0;
                 padding: 0;
                 background-color: white;
             }
+
             .barcode_content {
                 border: none;
                 margin: 0;
             }
+
             p {
-    font-size: 8px;
-}
+                font-size: 8px;
+            }
         }
+
         p.code_price {
-    font-size: 12px;
-}
-        
+            font-size: 12px;
+        }
     </style>
 </head>
+
 <body>
     <div id="BarCodeArea">
         <!-- Loop through products from the controller -->
         @foreach($products as $product)
             <div class="barcode_content">
-                <p >style</p>
-                <p class="code_price"> price: {{$product->selling_price}} L.E </p> <!-- Display product name -->
+                <!-- <p >style</p> -->
+                <p class="code_price"> price: {{$product->selling_price}} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                </p> <!-- Display product name -->
                 <img id="barcode-{{ $product->id }}" /> <!-- Barcode image for each product -->
             </div>
         @endforeach
@@ -100,4 +110,5 @@
         }
     </script>
 </body>
+
 </html>

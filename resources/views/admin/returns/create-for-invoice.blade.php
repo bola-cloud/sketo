@@ -5,10 +5,10 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h4 class="card-title">إرجاع منتجات - فاتورة رقم: {{ $invoice->invoice_code }}</h4>
+                <h4 class="card-title">{{ __('app.returns.return_for_invoice') }} {{ $invoice->invoice_code }}</h4>
                 <div class="heading-elements">
                     <a href="{{ route('invoices.show', $invoice) }}" class="btn btn-secondary">
-                        <i class="fa fa-arrow-right"></i> العودة للفاتورة
+                        <i class="fa fa-arrow-right"></i> {{ __('app.common.back_to_invoice') }}
                     </a>
                 </div>
             </div>
@@ -20,12 +20,12 @@
                         <div class="col-md-6">
                             <div class="card bg-light">
                                 <div class="card-body">
-                                    <h5>تفاصيل الفاتورة</h5>
-                                    <p><strong>رقم الفاتورة:</strong> {{ $invoice->invoice_code }}</p>
-                                    <p><strong>اسم العميل:</strong> {{ $invoice->buyer_name }}</p>
-                                    <p><strong>رقم الهاتف:</strong> {{ $invoice->buyer_phone }}</p>
-                                    <p><strong>تاريخ الفاتورة:</strong> {{ $invoice->created_at->format('Y-m-d H:i') }}</p>
-                                    <p><strong>إجمالي الفاتورة:</strong> {{ number_format($invoice->total_amount, 2) }} ج.م</p>
+                                    <h5>{{ __('app.returns.invoice_details') }}</h5>
+                                    <p><strong>{{ __('app.reports.invoice_code') }}:</strong> {{ $invoice->invoice_code }}</p>
+                                    <p><strong>{{ __('app.clients.name') }}:</strong> {{ $invoice->buyer_name }}</p>
+                                    <p><strong>{{ __('app.clients.phone') }}:</strong> {{ $invoice->buyer_phone }}</p>
+                                    <p><strong>{{ __('app.returns.invoice_date') }}:</strong> {{ $invoice->created_at->format('Y-m-d H:i') }}</p>
+                                    <p><strong>{{ __('app.returns.invoice_total') }}:</strong> {{ number_format($invoice->total_amount, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -40,13 +40,13 @@
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
-                                            <th>المنتج</th>
-                                            <th>الكمية المباعة</th>
-                                            <th>المتاح للإرجاع</th>
-                                            <th>كمية الإرجاع</th>
-                                            <th>سبب الإرجاع</th>
-                                            <th>السعر الوحدة</th>
-                                            <th>مبلغ الإرجاع</th>
+                                            <th>{{ __('app.products.product') }}</th>
+                                            <th>{{ __('app.returns.qty_sold') }}</th>
+                                            <th>{{ __('app.returns.available_for_return') }}</th>
+                                            <th>{{ __('app.returns.return_qty') }}</th>
+                                            <th>{{ __('app.returns.return_reason') }}</th>
+                                            <th>{{ __('app.returns.unit_price') }}</th>
+                                            <th>{{ __('app.returns.return_amount') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -68,24 +68,24 @@
                                                 </td>
                                                 <td>
                                                     <select name="returns[{{ $index }}][reason]" class="form-control reason-select" disabled>
-                                                        <option value="">-- اختر السبب --</option>
-                                                        <option value="عيب في المنتج">عيب في المنتج</option>
-                                                        <option value="منتج غير مطابق للمواصفات">منتج غير مطابق للمواصفات</option>
-                                                        <option value="منتج منتهي الصلاحية">منتج منتهي الصلاحية</option>
-                                                        <option value="طلب العميل">طلب العميل</option>
-                                                        <option value="خطأ في الفاتورة">خطأ في الفاتورة</option>
-                                                        <option value="أخرى">أخرى</option>
+                                                        <option value="">{{ __('app.returns.select_reason') }}</option>
+                                                        <option value="عيب في المنتج">{{ __('app.returns.reason_defect') }}</option>
+                                                        <option value="منتج غير مطابق للمواصفات">{{ __('app.returns.reason_not_match') }}</option>
+                                                        <option value="منتج منتهي الصلاحية">{{ __('app.returns.reason_expired') }}</option>
+                                                        <option value="طلب العميل">{{ __('app.returns.reason_customer_request') }}</option>
+                                                        <option value="خطأ في الفاتورة">{{ __('app.returns.reason_invoice_error') }}</option>
+                                                        <option value="أخرى">{{ __('app.returns.reason_other') }}</option>
                                                     </select>
                                                 </td>
-                                                <td>{{ number_format($item->total_price / $item->quantity, 2) }} ج.م</td>
-                                                <td class="return-amount">0.00 ج.م</td>
+                                                <td>{{ number_format($item->total_price / $item->quantity, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                                <td class="return-amount">0.00 {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <th colspan="6">إجمالي مبلغ الإرجاع:</th>
-                                            <th id="total-return-amount">0.00 ج.م</th>
+                                            <th colspan="6">{{ __('app.returns.total_return_amount') }}</th>
+                                            <th id="total-return-amount">0.00 {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</th>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -101,17 +101,17 @@
 
                             <div class="form-actions">
                                 <button type="submit" class="btn btn-success" id="submit-btn" disabled>
-                                    <i class="fa fa-check"></i> تأكيد الإرجاع
+                                    <i class="fa fa-check"></i> {{ __('app.returns.confirm_return') }}
                                 </button>
                                 <a href="{{ route('invoices.show', $invoice) }}" class="btn btn-secondary">
-                                    <i class="fa fa-times"></i> إلغاء
+                                    <i class="fa fa-times"></i> {{ __('app.common.cancel') }}
                                 </a>
                             </div>
                         </form>
                     @else
                         <div class="alert alert-info">
-                            <h4>لا توجد منتجات متاحة للإرجاع</h4>
-                            <p>جميع المنتجات في هذه الفاتورة تم إرجاعها بالفعل أو لا تحتوي على كميات قابلة للإرجاع.</p>
+                            <h4>{{ __('app.returns.no_items_available') }}</h4>
+                            <p>{{ __('app.returns.no_items_msg') }}</p>
                         </div>
                     @endif
                 </div>
@@ -128,7 +128,7 @@ function calculateReturnAmount(input) {
     const returnAmount = quantity * price;
 
     // Update return amount for this row
-    row.querySelector('.return-amount').textContent = returnAmount.toFixed(2) + ' ج.م';
+    row.querySelector('.return-amount').textContent = returnAmount.toFixed(2) + ' {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}';
 
     // Enable/disable reason select
     const reasonSelect = row.querySelector('.reason-select');
@@ -156,7 +156,7 @@ function calculateTotalReturnAmount() {
         total += quantity * price;
     });
 
-    document.getElementById('total-return-amount').textContent = total.toFixed(2) + ' ج.م';
+    document.getElementById('total-return-amount').textContent = total.toFixed(2) + ' {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}';
 }
 
 function updateSubmitButton() {

@@ -129,7 +129,7 @@
         <div class="brand-logo-container">
             <img src="{{asset('logo.png')}}" alt="Sketo Logo" class="brand-logo">
             <h2 class="brand-text">SKETO</h2>
-            <p class="text-muted">تسجيل الدخول للوحة التحكم</p>
+            <p class="text-muted">{{ __('app.login.dashboard_login') }}</p>
         </div>
 
         @if ($errors->any())
@@ -152,7 +152,7 @@
             @csrf
 
             <div class="form-group mb-3">
-                <label for="email">البريد الإلكتروني</label>
+                <label for="email">{{ __('app.login.email') }}</label>
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="la la-user"></i></span>
@@ -163,7 +163,7 @@
             </div>
 
             <div class="form-group mb-4">
-                <label for="password">كلمة المرور</label>
+                <label for="password">{{ __('app.login.password') }}</label>
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="la la-lock"></i></span>
@@ -176,16 +176,17 @@
             <div class="form-group d-flex justify-content-between align-items-center mb-4">
                 <div class="custom-control custom-checkbox">
                     <input type="checkbox" class="custom-control-input" id="remember_me" name="remember">
-                    <label class="custom-control-label text-muted" for="remember_me">تذكرني</label>
+                    <label class="custom-control-label text-muted"
+                        for="remember_me">{{ __('app.login.remember_me') }}</label>
                 </div>
                 @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" class="text-primary text-sm font-weight-bold">نسيت كلمة
-                        المرور؟</a>
+                    <a href="{{ route('password.request') }}"
+                        class="text-primary text-sm font-weight-bold">{{ __('app.login.forgot_password') }}</a>
                 @endif
             </div>
 
             <button type="submit" class="btn btn-login">
-                تسجيل الدخول <i class="la la-arrow-left mr-1"></i>
+                {{ __('app.login.login_btn') }} <i class="la la-arrow-left mr-1"></i>
             </button>
         </form>
 

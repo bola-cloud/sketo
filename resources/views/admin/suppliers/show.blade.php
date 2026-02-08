@@ -3,20 +3,22 @@
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
-            <h3 class="content-header-title">تفاصيل المورد: {{ $supplier->name }}</h3>
+            <h3 class="content-header-title">{{ __('app.suppliers.details') }}: {{ $supplier->name }}</h3>
             <div class="row breadcrumbs-top">
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('suppliers.index') }}">الموردين</a></li>
-                        <li class="breadcrumb-item active">تفاصيل</li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('app.sidebar.dashboard') }}</a>
+                        </li>
+                        <li class="breadcrumb-item"><a
+                                href="{{ route('suppliers.index') }}">{{ __('app.suppliers.all_suppliers') }}</a></li>
+                        <li class="breadcrumb-item active">{{ __('app.common.details') }}</li>
                     </ol>
                 </div>
             </div>
         </div>
         <div class="content-header-right col-md-6 col-12 mb-2 text-right">
             <a href="{{ route('suppliers.index') }}" class="btn btn-light round shadow-sm px-2">
-                <i class="la la-arrow-right"></i> عودة للقائمة
+                <i class="la la-arrow-right"></i> {{ __('app.common.back') }}
             </a>
         </div>
     </div>
@@ -32,8 +34,11 @@
                             <div class="media d-flex">
                                 <div class="media-body text-left">
                                     <h3 class="primary text-bold-700">{{ number_format($totalPurchases, 2) }} <small
-                                            class="text-muted" style="font-size: 0.8rem;">ج.م</small></h3>
-                                    <span class="text-bold-600 text-muted small uppercase">إجمالي المشتريات</span>
+                                            class="text-muted"
+                                            style="font-size: 0.8rem;">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                    </h3>
+                                    <span
+                                        class="text-bold-600 text-muted small uppercase">{{ __('app.suppliers.total_purchases') }}</span>
                                 </div>
                                 <div class="align-self-center">
                                     <i class="la la-shopping-cart primary font-large-2 float-right"></i>
@@ -51,8 +56,11 @@
                             <div class="media d-flex">
                                 <div class="media-body text-left">
                                     <h3 class="success text-bold-700">{{ number_format($totalPaidAmount, 2) }} <small
-                                            class="text-muted" style="font-size: 0.8rem;">ج.م</small></h3>
-                                    <span class="text-bold-600 text-muted small uppercase">إجمالي المدفوعات</span>
+                                            class="text-muted"
+                                            style="font-size: 0.8rem;">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                    </h3>
+                                    <span
+                                        class="text-bold-600 text-muted small uppercase">{{ __('app.suppliers.total_paid') }}</span>
                                 </div>
                                 <div class="align-self-center">
                                     <i class="la la-check-circle success font-large-2 float-right"></i>
@@ -70,8 +78,11 @@
                             <div class="media d-flex">
                                 <div class="media-body text-left">
                                     <h3 class="danger text-bold-700">{{ number_format($totalChange, 2) }} <small
-                                            class="text-muted" style="font-size: 0.8rem;">ج.م</small></h3>
-                                    <span class="text-bold-600 text-muted small uppercase">إجمالي المتبقي</span>
+                                            class="text-muted"
+                                            style="font-size: 0.8rem;">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                    </h3>
+                                    <span
+                                        class="text-bold-600 text-muted small uppercase">{{ __('app.suppliers.total_due') }}</span>
                                 </div>
                                 <div class="align-self-center">
                                     <i class="la la-money danger font-large-2 float-right"></i>
@@ -87,7 +98,8 @@
                 <div class="card pull-up border-0 shadow-sm"
                     style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 20px;">
                     <div class="card-header bg-transparent border-0 pb-0">
-                        <h4 class="card-title text-bold-700"><i class="la la-history"></i> سجل فواتير المشتريات</h4>
+                        <h4 class="card-title text-bold-700"><i class="la la-history"></i>
+                            {{ __('app.suppliers.purchases_history') }}</h4>
                     </div>
                     <div class="card-content">
                         <div class="card-body">
@@ -96,11 +108,11 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>رقم الفاتورة</th>
-                                            <th>إجمالي الفاتورة</th>
-                                            <th>المدفوع</th>
-                                            <th>المتبقي</th>
-                                            <th class="text-right">الإجراءات</th>
+                                            <th>{{ __('app.suppliers.invoice_number') }}</th>
+                                            <th>{{ __('app.suppliers.invoice_total') }}</th>
+                                            <th>{{ __('app.suppliers.paid') }}</th>
+                                            <th>{{ __('app.suppliers.due') }}</th>
+                                            <th class="text-right">{{ __('app.suppliers.actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -112,21 +124,26 @@
                                                 </td>
                                                 <td><span
                                                         class="text-bold-700 text-dark">{{ number_format($purchase->total_amount, 2) }}</span>
-                                                    <small class="text-muted">ج.م</small></td>
+                                                    <small
+                                                        class="text-muted">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                                </td>
                                                 <td><span
                                                         class="success text-bold-600">{{ number_format($purchase->paid_amount, 2) }}</span>
-                                                    <small class="text-muted">ج.م</small></td>
+                                                    <small
+                                                        class="text-muted">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                                </td>
                                                 <td>
                                                     <span
                                                         class="{{ $purchase->change > 0 ? 'danger' : 'success' }} text-bold-600">
                                                         {{ number_format($purchase->change, 2) }}
                                                     </span>
-                                                    <small class="text-muted">ج.م</small>
+                                                    <small
+                                                        class="text-muted">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
                                                 </td>
                                                 <td class="text-right">
                                                     <a href="{{ route('purchases.show', $purchase->id) }}"
                                                         class="btn btn-sm btn-soft-info round px-1">
-                                                        <i class="la la-file-text"></i> عرض التفاصيل
+                                                        <i class="la la-file-text"></i> {{ __('app.suppliers.view_details') }}
                                                     </a>
                                                 </td>
                                             </tr>

@@ -3,12 +3,12 @@
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
-            <h3 class="content-header-title">سجل فواتير المبيعات</h3>
+            <h3 class="content-header-title">{{ __('app.invoices.title') }}</h3>
             <div class="row breadcrumbs-top">
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
-                        <li class="breadcrumb-item active">الفواتير</li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('app.sidebar.dashboard') }}</a></li>
+                        <li class="breadcrumb-item active">{{ __('app.invoices.all_invoices') }}</li>
                     </ol>
                 </div>
             </div>
@@ -16,7 +16,7 @@
         <div class="content-header-right col-md-6 col-12">
             <div class="btn-group float-md-right">
                 <a href="{{ route('invoices.export') }}" class="btn btn-success round px-2 shadow">
-                    <i class="la la-file-excel-o"></i> تصدير إكسل
+                    <i class="la la-file-excel-o"></i> {{ __('app.invoices.export_excel') }}
                 </a>
             </div>
         </div>
@@ -33,10 +33,10 @@
                         <div class="row items-align-center">
                             <div class="col-md-4">
                                 <div class="form-group mb-1">
-                                    <label class="text-bold-600 small">البحث العام</label>
+                                    <label class="text-bold-600 small">{{ __('app.invoices.search_general') }}</label>
                                     <div class="position-relative has-icon-left">
                                         <input type="text" class="form-control round border-primary" name="query"
-                                            placeholder="اسم المشتري، الهاتف أو كود الفاتورة..."
+                                            placeholder="{{ __('app.invoices.search_placeholder') }}"
                                             value="{{ request('query') }}">
                                         <div class="form-control-position">
                                             <i class="la la-search primary"></i>
@@ -46,14 +46,14 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group mb-1">
-                                    <label class="text-bold-600 small">من تاريخ</label>
+                                    <label class="text-bold-600 small">{{ __('app.invoices.date_from') }}</label>
                                     <input type="date" class="form-control round border-primary" name="date_from"
                                         value="{{ request('date_from') }}">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group mb-1">
-                                    <label class="text-bold-600 small">إلى تاريخ</label>
+                                    <label class="text-bold-600 small">{{ __('app.invoices.date_to') }}</label>
                                     <input type="date" class="form-control round border-primary" name="date_to"
                                         value="{{ request('date_to') }}">
                                 </div>
@@ -61,7 +61,7 @@
                             <div class="col-md-2 d-flex align-items-end">
                                 <div class="form-group mb-1 w-100">
                                     <button type="submit" class="btn btn-primary round btn-block shadow-sm">
-                                        <i class="la la-filter"></i> تصفية
+                                        <i class="la la-filter"></i> {{ __('app.invoices.filter') }}
                                     </button>
                                 </div>
                             </div>
@@ -76,7 +76,7 @@
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <strong>تم بنجاح!</strong> {{ session('success') }}
+                <strong>{{ __('app.common.success') }}!</strong> {{ session('success') }}
             </div>
         @endif
 
@@ -98,13 +98,13 @@
                         <table class="table table-premium mb-0" id="invoice-table">
                             <thead>
                                 <tr>
-                                    <th>كود الفاتورة</th>
-                                    <th>العميل</th>
-                                    <th>البائع</th>
-                                    <th>التاريخ</th>
-                                    <th>الحالة</th>
-                                    <th>الأقساط</th>
-                                    <th class="text-right">الإجراءات</th>
+                                    <th>{{ __('app.invoices.invoice_code') }}</th>
+                                    <th>{{ __('app.invoices.client') }}</th>
+                                    <th>{{ __('app.invoices.seller') }}</th>
+                                    <th>{{ __('app.invoices.date') }}</th>
+                                    <th>{{ __('app.invoices.status') }}</th>
+                                    <th>{{ __('app.invoices.installments') }}</th>
+                                    <th class="text-right">{{ __('app.invoices.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -120,7 +120,7 @@
                                                     class="badge badge-soft-primary round-lg px-1 text-bold-700">{{ $invoice->invoice_code }}</span>
                                                 @if($returnsCount > 0)
                                                     <span class="badge badge-warning round ml-1"
-                                                        title="يحتوي على {{ $returnsCount }} عملية إرجاع">
+                                                        title="{{ __('app.invoices.returns_count', ['count' => $returnsCount]) }}">
                                                         <i class="la la-undo"></i>
                                                     </span>
                                                 @endif
@@ -128,7 +128,7 @@
                                         </td>
                                         <td>
                                             <span
-                                                class="text-bold-700 text-dark">{{ $invoice->client ? $invoice->client->name : 'لا يوجد عميل' }}</span>
+                                                class="text-bold-700 text-dark">{{ $invoice->client ? $invoice->client->name : __('app.invoices.no_client') }}</span>
                                         </td>
                                         <td>
                                             <span class="text-muted small"><i class="la la-user"></i>
@@ -140,16 +140,16 @@
                                         </td>
                                         <td>
                                             @if($hasUnpaidAmount)
-                                                <span class="badge badge-soft-danger round px-1">غير مكتمل</span>
+                                                <span class="badge badge-soft-danger round px-1">{{ __('app.invoices.incomplete') }}</span>
                                             @else
-                                                <span class="badge badge-soft-success round px-1">مدفوع بالكامل</span>
+                                                <span class="badge badge-soft-success round px-1">{{ __('app.invoices.paid_full') }}</span>
                                             @endif
                                         </td>
                                         <td>
                                             @if($hasUnpaidAmount)
                                                 <a href="{{ route('sales.installments.index', $invoice->id) }}"
                                                     class="btn btn-sm btn-soft-info round px-1">
-                                                    <i class="la la-list"></i> الأقساط
+                                                    <i class="la la-list"></i> {{ __('app.invoices.view_installments') }}
                                                 </a>
                                             @else
                                                 <span class="text-muted small">---</span>
@@ -159,18 +159,18 @@
                                             <div class="btn-group">
                                                 <a href="{{ route('invoices.show', ['invoice' => $invoice->id]) }}"
                                                     class="btn btn-sm btn-soft-info round mr-1 px-1">
-                                                    <i class="la la-eye"></i> عرض
+                                                    <i class="la la-eye"></i> {{ __('app.invoices.view') }}
                                                 </a>
                                                 <a class="btn btn-sm btn-soft-primary round mr-1 px-1"
                                                     href="{{ route('cashier.printInvoice', $invoice->id) }}">
-                                                    <i class="la la-print"></i> طباعة
+                                                    <i class="la la-print"></i> {{ __('app.invoices.print') }}
                                                 </a>
                                                 <form action="{{ route('invoices.destroy', $invoice->id) }}" method="POST"
                                                     style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-soft-danger round px-1"
-                                                        onclick="return confirm('هل أنت متأكد من حذف الفاتورة؟ سيتم إرجاع الكميات إلى المخزون.')">
+                                                        onclick="return confirm('{{ __('app.invoices.delete_confirm') }}')">
                                                         <i class="la la-trash"></i>
                                                     </button>
                                                 </form>

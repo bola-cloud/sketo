@@ -3,12 +3,13 @@
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
-            <h3 class="content-header-title">إدارة العملاء</h3>
+            <h3 class="content-header-title">{{ __('app.clients.title') }}</h3>
             <div class="row breadcrumbs-top">
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
-                        <li class="breadcrumb-item active">العملاء</li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('app.sidebar.dashboard') }}</a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ __('app.clients.all_clients') }}</li>
                     </ol>
                 </div>
             </div>
@@ -16,7 +17,7 @@
         <div class="content-header-right col-md-6 col-12 mb-2 text-right">
             <button type="button" class="btn btn-primary round shadow-sm px-2" data-toggle="modal"
                 data-target="#createClientModal">
-                <i class="la la-plus"></i> إضافة عميل جديد
+                <i class="la la-plus"></i> {{ __('app.clients.add_new') }}
             </button>
         </div>
     </div>
@@ -27,7 +28,7 @@
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <strong>تم بنجاح!</strong> {{ session('success') }}
+                <strong>{{ __('app.common.success') }}!</strong> {{ session('success') }}
             </div>
         @endif
 
@@ -40,9 +41,9 @@
                             <thead>
                                 <tr>
                                     <th style="width: 80px;">#</th>
-                                    <th>اسم العميل</th>
-                                    <th>رقم الهاتف</th>
-                                    <th class="text-right" style="width: 250px;">الإجراءات</th>
+                                    <th>{{ __('app.clients.name') }}</th>
+                                    <th>{{ __('app.clients.phone') }}</th>
+                                    <th class="text-right" style="width: 250px;">{{ __('app.clients.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody id="clientTable">
@@ -68,20 +69,20 @@
                                             <div class="btn-group">
                                                 <a href="{{ route('clients.show', $client->id) }}"
                                                     class="btn btn-sm btn-soft-info round mr-1 px-1">
-                                                    <i class="la la-eye"></i> عرض
+                                                    <i class="la la-eye"></i> {{ __('app.common.view') }}
                                                 </a>
                                                 <button class="btn btn-sm btn-soft-warning round mr-1 px-1"
                                                     onclick="editClient({{ $client->id }})" data-toggle="modal"
                                                     data-target="#editClientModal">
-                                                    <i class="la la-edit"></i> تعديل
+                                                    <i class="la la-edit"></i> {{ __('app.common.edit') }}
                                                 </button>
                                                 <form action="{{ route('clients.destroy', $client->id) }}" method="POST"
                                                     style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-soft-danger round px-1"
-                                                        onclick="return confirm('هل أنت متأكد من الحذف؟')">
-                                                        <i class="la la-trash"></i> حذف
+                                                        onclick="return confirm('{{ __('app.clients.delete_confirm') }}')">
+                                                        <i class="la la-trash"></i> {{ __('app.common.delete') }}
                                                     </button>
                                                 </form>
                                             </div>
@@ -103,7 +104,7 @@
             <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
                 <div class="modal-header bg-primary text-white" style="border-radius: 20px 20px 0 0;">
                     <h5 class="modal-title font-weight-bold white" id="createClientModalLabel"><i
-                            class="la la-plus-circle"></i> إضافة عميل جديد</h5>
+                            class="la la-plus-circle"></i> {{ __('app.clients.add_new') }}</h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -112,19 +113,23 @@
                     @csrf
                     <div class="modal-body p-2">
                         <div class="form-group mb-2">
-                            <label for="name" class="text-bold-600">اسم العميل <span class="danger">*</span></label>
+                            <label for="name" class="text-bold-600">{{ __('app.clients.name') }} <span
+                                    class="danger">*</span></label>
                             <input type="text" class="form-control round border-primary" id="name" name="name"
-                                placeholder="أدخل اسم العميل الكامل..." required>
+                                placeholder="{{ __('app.clients.enter_name') }}" required>
                         </div>
                         <div class="form-group mb-0">
-                            <label for="phone" class="text-bold-600">رقم الهاتف <span class="danger">*</span></label>
+                            <label for="phone" class="text-bold-600">{{ __('app.clients.phone') }} <span
+                                    class="danger">*</span></label>
                             <input type="text" class="form-control round border-primary" id="phone" name="phone"
                                 placeholder="01XXXXXXXXX" required>
                         </div>
                     </div>
                     <div class="modal-footer border-0 justify-content-center pb-2">
-                        <button type="button" class="btn btn-light round px-2" data-dismiss="modal">إلغاء</button>
-                        <button type="submit" class="btn btn-primary round px-2 shadow">حفظ العميل</button>
+                        <button type="button" class="btn btn-light round px-2"
+                            data-dismiss="modal">{{ __('app.clients.cancel') }}</button>
+                        <button type="submit"
+                            class="btn btn-primary round px-2 shadow">{{ __('app.clients.save') }}</button>
                     </div>
                 </form>
             </div>
@@ -138,7 +143,7 @@
             <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
                 <div class="modal-header bg-warning text-white" style="border-radius: 20px 20px 0 0;">
                     <h5 class="modal-title font-weight-bold white" id="editClientModalLabel"><i class="la la-edit"></i>
-                        تعديل بيانات العميل</h5>
+                        {{ __('app.clients.edit') }}</h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -149,19 +154,23 @@
                     <div class="modal-body p-2">
                         <input type="hidden" id="edit_client_id" name="client_id">
                         <div class="form-group mb-2">
-                            <label for="edit_name" class="text-bold-600">اسم العميل <span class="danger">*</span></label>
+                            <label for="edit_name" class="text-bold-600">{{ __('app.clients.name') }} <span
+                                    class="danger">*</span></label>
                             <input type="text" class="form-control round border-warning" id="edit_name" name="name"
                                 required>
                         </div>
                         <div class="form-group mb-0">
-                            <label for="edit_phone" class="text-bold-600">رقم الهاتف <span class="danger">*</span></label>
+                            <label for="edit_phone" class="text-bold-600">{{ __('app.clients.phone') }} <span
+                                    class="danger">*</span></label>
                             <input type="text" class="form-control round border-warning" id="edit_phone" name="phone"
                                 required>
                         </div>
                     </div>
                     <div class="modal-footer border-0 justify-content-center pb-2">
-                        <button type="button" class="btn btn-light round px-2" data-dismiss="modal">إلغاء</button>
-                        <button type="submit" class="btn btn-warning round px-2 shadow text-white">تحديث البيانات</button>
+                        <button type="button" class="btn btn-light round px-2"
+                            data-dismiss="modal">{{ __('app.clients.cancel') }}</button>
+                        <button type="submit"
+                            class="btn btn-warning round px-2 shadow text-white">{{ __('app.clients.update') }}</button>
                     </div>
                 </form>
             </div>
@@ -243,7 +252,7 @@
                     location.reload();
                 },
                 error: function (xhr) {
-                    alert('فشل في إضافة العميل.');
+                    alert("{{ __('app.clients.add_fail') }}");
                 }
             });
         });
@@ -259,7 +268,7 @@
                     $('#edit_phone').val(response.phone);
                 },
                 error: function (xhr) {
-                    alert('فشل في جلب بيانات العميل.');
+                    alert("{{ __('app.clients.fetch_fail') }}");
                 }
             });
         }
@@ -277,7 +286,7 @@
                     location.reload();
                 },
                 error: function (xhr) {
-                    alert('فشل في تحديث بيانات العميل.');
+                    alert("{{ __('app.clients.update_fail') }}");
                 }
             });
         });

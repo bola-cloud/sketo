@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="{{ App::getLocale() }}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيصال</title>
+    <title>{{ __('app.cashier.receipt_title') }}</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
             font-size: 12px;
             margin: 0;
-            direction: rtl;
+            direction:
+                {{ App::getLocale() == 'ar' ? 'rtl' : 'ltr' }}
+            ;
             color: #333;
             display: flex;
             height: 50vh;
@@ -24,7 +27,8 @@
         .receipt {
             width: 100%;
             box-sizing: border-box;
-            border: 1px solid #000; /* Changed to black */
+            border: 1px solid #000;
+            /* Changed to black */
             background-color: #fff;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -32,7 +36,8 @@
 
         .header {
             text-align: center;
-            border-bottom: 1px solid #000; /* Changed to black */
+            border-bottom: 1px solid #000;
+            /* Changed to black */
         }
 
         .header h1 {
@@ -72,8 +77,10 @@
             margin-bottom: 15px;
         }
 
-        .table th, .table td {
-            border: 1px solid #000; /* Changed to black */
+        .table th,
+        .table td {
+            border: 1px solid #000;
+            /* Changed to black */
             text-align: center;
         }
 
@@ -86,18 +93,24 @@
             margin-top: 10px;
         }
 
-        .totals th, .totals td {
-            text-align: right;
+        .totals th,
+        .totals td {
+            text-align:
+                {{ App::getLocale() == 'ar' ? 'right' : 'left' }}
+            ;
             font-size: 12px;
         }
 
-        .totals th, .totals td {
-            border-top: 1px solid #000; /* Changed to black */
+        .totals th,
+        .totals td {
+            border-top: 1px solid #000;
+            /* Changed to black */
         }
 
         .footer {
             text-align: center;
-            border-top: 1px solid #000; /* Changed to black */
+            border-top: 1px solid #000;
+            /* Changed to black */
             padding-top: 5px;
             font-size: 12px;
         }
@@ -130,7 +143,8 @@
             background-color: #6c757d;
         }
 
-        .btn-primary:hover, .btn-secondary:hover {
+        .btn-primary:hover,
+        .btn-secondary:hover {
             opacity: 0.9;
         }
 
@@ -145,22 +159,23 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div id="invoice-POS" class="receipt">
             <div id="top" class="header">
                 <h1>Sketo</h1>
-                <h1>فاتورة</h1>
-                <div class="date">التاريخ: {{$invoice->created_at}}</div>
+                <h1>{{ __('app.cashier.invoice') }}</h1>
+                <div class="date">{{ __('app.cashier.date') }}: {{$invoice->created_at}}</div>
                 <div class="invoice-code">INV-{{$invoice->invoice_code}}</div>
             </div>
 
             <div id="mid" class="details">
-                <p><span class="info-label">معلومات العميل:</span></p>
+                <p><span class="info-label">{{ __('app.cashier.client_info') }}:</span></p>
                 <p>
-                    <span class="info-label">اسم العميل:</span> {{$invoice->buyer_name}}<br>
-                    <span class="info-label">رقم العميل:</span> {{$invoice->buyer_phone}}<br>
-                    <span class="info-label">تاريخ الشراء:</span> {{$invoice->created_at}}<br>
+                    <span class="info-label">{{ __('app.cashier.client_name') }}:</span> {{$invoice->buyer_name}}<br>
+                    <span class="info-label">{{ __('app.cashier.client_phone') }}:</span> {{$invoice->buyer_phone}}<br>
+                    <span class="info-label">{{ __('app.cashier.purchase_date') }}:</span> {{$invoice->created_at}}<br>
                 </p>
             </div>
 
@@ -168,18 +183,19 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>المنتج</th>
-                            <th>الكمية</th>
-                            <th>الإجمالي الفرعي</th>
+                            <th>{{ __('app.cashier.product') }}</th>
+                            <th>{{ __('app.cashier.quantity') }}</th>
+                            <th>{{ __('app.cashier.subtotal') }}</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($invoice->sales as $sale)
-                        <tr class="service">
-                            <td>{{ $sale->product->name }}</td>
-                            <td>{{ $sale->quantity }}</td>
-                            <td>{{ $sale->product->selling_price * $sale->quantity }} ج.م</td>
-                        </tr>
+                            <tr class="service">
+                                <td>{{ $sale->product->name }}</td>
+                                <td>{{ $sale->quantity }}</td>
+                                <td>{{ $sale->product->selling_price * $sale->quantity }}
+                                    {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -187,41 +203,47 @@
                 <table class="totals">
                     <tr>
                         <td></td>
-                        <th>الإجمالي الفرعي:</th>
-                        <td><strong>{{ $invoice->subtotal }} ج.م</strong></td>
-                    </tr>
-                      <tr>
-                        <td></td>
-                        <th>الخصم:</th>
-                        <td><strong>{{ $invoice->discount }} ج.م</strong></td>
-                    </tr>  
-                    <tr>
-                        <td></td>
-                        <th>الإجمالي:</th>
-                        <td><strong>{{ $invoice->total_amount }} ج.م</strong></td>
+                        <th>{{ __('app.cashier.subtotal') }}:</th>
+                        <td><strong>{{ $invoice->subtotal }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</strong>
+                        </td>
                     </tr>
                     <tr>
                         <td></td>
-                        <th>المبلغ المدفوع:</th>
-                        <td><strong>{{ $invoice->paid_amount }} ج.م</strong></td>
+                        <th>{{ __('app.cashier.discount') }}:</th>
+                        <td><strong>{{ $invoice->discount }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</strong>
+                        </td>
                     </tr>
                     <tr>
                         <td></td>
-                        <th>المتبقي:</th>
-                        <td><strong>{{ $invoice->change }} ج.م</strong></td>
+                        <th>{{ __('app.cashier.total') }}:</th>
+                        <td><strong>{{ $invoice->total_amount }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <th>{{ __('app.cashier.paid_amount') }}:</th>
+                        <td><strong>{{ $invoice->paid_amount }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <th>{{ __('app.cashier.remaining') }}:</th>
+                        <td><strong>{{ $invoice->change }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</strong></td>
                     </tr>
                 </table>
             </div>
 
             <div class="footer">
-                <p>شكراً لتسوقكم معنا!</p>
+                <p>{{ __('app.cashier.thank_you') }}</p>
             </div>
         </div>
 
         <div class="row no-print text-center">
-            <button onclick="window.print()" class="btn btn-primary">طباعة الفاتورة</button>
-            <a href="{{ route('cashier.viewCart') }}" class="btn btn-secondary">عودة إلى الكاشير</a>
+            <button onclick="window.print()" class="btn btn-primary">{{ __('app.cashier.print_invoice') }}</button>
+            <a href="{{ route('cashier.viewCart') }}"
+                class="btn btn-secondary">{{ __('app.cashier.back_to_cashier') }}</a>
         </div>
     </div>
 </body>
+
 </html>

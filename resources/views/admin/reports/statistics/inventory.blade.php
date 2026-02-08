@@ -3,12 +3,13 @@
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
-            <h3 class="content-header-title">تقرير المخزون التفصيلي</h3>
+            <h3 class="content-header-title">{{ __('app.reports.inventory_title') }}</h3>
             <div class="row breadcrumbs-top">
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
-                        <li class="breadcrumb-item active">المخزون</li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('app.dashboard.title') }}</a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ __('app.products.inventory') }}</li>
                     </ol>
                 </div>
             </div>
@@ -24,7 +25,7 @@
                         <div class="media d-flex">
                             <div class="media-body text-left">
                                 <h3 class="primary">{{ number_format($products->total()) }}</h3>
-                                <h6 class="text-muted">إجمالي الأصناف</h6>
+                                <h6 class="text-muted">{{ __('app.reports.total_items') }}</h6>
                             </div>
                             <div>
                                 <i class="la la-cubes primary font-large-2"></i>
@@ -43,13 +44,13 @@
                         <table class="table table-premium mb-0">
                             <thead class="bg-light">
                                 <tr>
-                                    <th> المنتج</th>
-                                    <th>الفئة</th>
-                                    <th>الماركة</th>
-                                    <th>الكمية المتوفرة</th>
-                                    <th>سعر التكلفة</th>
-                                    <th>سعر البيع</th>
-                                    <th>الحد الأدنى</th>
+                                    <th> {{ __('app.cashier.product') }}</th>
+                                    <th>{{ __('app.products.category') }}</th>
+                                    <th>{{ __('app.products.brand') }}</th>
+                                    <th>{{ __('app.reports.quantity_available') }}</th>
+                                    <th>{{ __('app.products.cost_price') }}</th>
+                                    <th>{{ __('app.cashier.price') }}</th>
+                                    <th>{{ __('app.reports.min_threshold') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -71,14 +72,16 @@
                                                 {{ $product->quantity }}
                                             </span>
                                         </td>
-                                        <td>{{ number_format($product->cost_price, 2) }} ج.م</td>
-                                        <td class="text-bold-700 primary">{{ number_format($product->selling_price, 2) }} ج.م
+                                        <td>{{ number_format($product->cost_price, 2) }}
+                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                        <td class="text-bold-700 primary">{{ number_format($product->selling_price, 2) }}
+                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
                                         </td>
                                         <td>{{ $product->threshold }}</td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center py-5">لا توجد منتجات في المخزون</td>
+                                        <td colspan="7" class="text-center py-5">{{ __('app.reports.no_stock') }}</td>
                                     </tr>
                                 @endforelse
                             </tbody>

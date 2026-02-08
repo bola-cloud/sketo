@@ -3,12 +3,12 @@
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
-            <h3 class="content-header-title">إدارة الورديات</h3>
+            <h3 class="content-header-title">{{ __('app.shifts.title') }}</h3>
             <div class="row breadcrumbs-top">
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
-                        <li class="breadcrumb-item active">الورديات</li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('app.sidebar.dashboard') }}</a></li>
+                        <li class="breadcrumb-item active">{{ __('app.shifts.all_shifts') }}</li>
                     </ol>
                 </div>
             </div>
@@ -17,11 +17,11 @@
             <div class="btn-group float-md-right">
                 @if(!$activeShift)
                     <a href="{{ route('shifts.create') }}" class="btn btn-primary round px-2 shadow">
-                        <i class="la la-plus"></i> فتح وردية جديدة
+                        <i class="la la-plus"></i> {{ __('app.shifts.open_new_shift') }}
                     </a>
                 @else
                     <a href="{{ route('shifts.edit', $activeShift->id) }}" class="btn btn-danger round px-2 shadow">
-                        <i class="la la-power-off"></i> إغلاق الوردية الحالية
+                        <i class="la la-power-off"></i> {{ __('app.shifts.close_current_shift') }}
                     </a>
                 @endif
             </div>
@@ -38,10 +38,10 @@
                             <div class="card-body">
                                 <div class="media d-flex">
                                     <div class="media-body text-left">
-                                        <h3 class="white">الوردية الحالية مفتوحة</h3>
-                                        <span>بدأت في: {{ $activeShift->start_time }}</span>
+                                        <h3 class="white">{{ __('app.shifts.current_open_shift') }}</h3>
+                                        <span>{{ __('app.shifts.started_at') }} {{ $activeShift->start_time }}</span>
                                         <br>
-                                        <span>المبلغ المستلم: {{ number_format($activeShift->starting_cash, 2) }} ج.م</span>
+                                        <span>{{ __('app.shifts.starting_cash_label') }} {{ number_format($activeShift->starting_cash, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span>
                                     </div>
                                     <div class="align-self-center">
                                         <i class="la la-clock-o white font-large-2 float-right"></i>
@@ -62,14 +62,14 @@
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr class="text-center">
-                                    <th>الكاشير</th>
-                                    <th>وقت البدء</th>
-                                    <th>وقت الانتهاء</th>
-                                    <th>المبلغ المستلم</th>
-                                    <th>المبلغ المسلم</th>
-                                    <th>المبيعات</th>
-                                    <th>الحالة</th>
-                                    <th>الإجراءات</th>
+                                    <th>{{ __('app.shifts.cashier') }}</th>
+                                    <th>{{ __('app.shifts.start_time') }}</th>
+                                    <th>{{ __('app.shifts.end_time') }}</th>
+                                    <th>{{ __('app.shifts.starting_cash') }}</th>
+                                    <th>{{ __('app.shifts.ending_cash') }}</th>
+                                    <th>{{ __('app.shifts.sales') }}</th>
+                                    <th>{{ __('app.shifts.status') }}</th>
+                                    <th>{{ __('app.shifts.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -85,26 +85,26 @@
                                         </td>
                                         <td>{{ $shift->start_time }}</td>
                                         <td>{{ $shift->end_time ?? '-' }}</td>
-                                        <td class="text-success text-bold-600">{{ number_format($shift->starting_cash, 2) }} ج.م
+                                        <td class="text-success text-bold-600">{{ number_format($shift->starting_cash, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
                                         </td>
                                         <td class="text-danger text-bold-600">
-                                            {{ $shift->ending_cash ? number_format($shift->ending_cash, 2) . ' ج.م' : '-' }}
+                                            {{ $shift->ending_cash ? number_format($shift->ending_cash, 2) . (App::getLocale() == 'ar' ? ' ج.م' : ' EGP') : '-' }}
                                         </td>
                                         <td class="text-primary text-bold-600">
-                                            {{ $shift->total_sales ? number_format($shift->total_sales, 2) . ' ج.م' : '-' }}
+                                            {{ $shift->total_sales ? number_format($shift->total_sales, 2) . (App::getLocale() == 'ar' ? ' ج.م' : ' EGP') : '-' }}
                                         </td>
                                         <td>
                                             @if($shift->status == 'open')
-                                                <span class="badge badge-success badge-glow">مفتوحة</span>
+                                                <span class="badge badge-success badge-glow">{{ __('app.shifts.open') }}</span>
                                             @else
-                                                <span class="badge badge-secondary">مغلقة</span>
+                                                <span class="badge badge-secondary">{{ __('app.shifts.closed') }}</span>
                                             @endif
                                         </td>
                                         <td>
                                             @if($shift->status == 'open')
                                                 <a href="{{ route('shifts.edit', $shift->id) }}"
                                                     class="btn btn-sm btn-outline-danger round">
-                                                    إغلاق
+                                                    {{ __('app.shifts.close') }}
                                                 </a>
                                             @endif
                                         </td>

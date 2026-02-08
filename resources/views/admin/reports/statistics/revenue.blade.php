@@ -3,12 +3,13 @@
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
-            <h3 class="content-header-title">تفاصيل إجمالي الإيرادات</h3>
+            <h3 class="content-header-title">{{ __('app.reports.revenue_title') }}</h3>
             <div class="row breadcrumbs-top">
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
-                        <li class="breadcrumb-item active">الإيرادات</li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('app.dashboard.title') }}</a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ __('app.reports.revenue_title') }}</li>
                     </ol>
                 </div>
             </div>
@@ -24,16 +25,16 @@
                     <form action="{{ route('reports.statistics.revenue') }}" method="GET">
                         <div class="row align-items-end">
                             <div class="col-md-4 mb-2">
-                                <label class="text-muted small">تاريخ البداية</label>
+                                <label class="text-muted small">{{ __('app.reports.start_date') }}</label>
                                 <input type="date" name="start_date" class="form-control" value="{{ $startDate }}">
                             </div>
                             <div class="col-md-4 mb-2">
-                                <label class="text-muted small">تاريخ النهاية</label>
+                                <label class="text-muted small">{{ __('app.reports.end_date') }}</label>
                                 <input type="date" name="end_date" class="form-control" value="{{ $endDate }}">
                             </div>
                             <div class="col-md-4 mb-2">
                                 <button type="submit" class="btn btn-warning btn-block text-white">
-                                    <i class="la la-filter"></i> تصفية
+                                    <i class="la la-filter"></i> {{ __('app.reports.filter_btn') }}
                                 </button>
                             </div>
                         </div>
@@ -50,13 +51,13 @@
                         <table class="table table-premium mb-0">
                             <thead class="bg-light">
                                 <tr>
-                                    <th>التاريخ</th>
-                                    <th>رقم الفاتورة</th>
-                                    <th>العميل</th>
-                                    <th>المبلغ الإجمالي</th>
-                                    <th>المبلغ المدفوع</th>
-                                    <th>الخصم</th>
-                                    <th>الحالة</th>
+                                    <th>{{ __('app.common.date') }}</th>
+                                    <th>{{ __('app.reports.invoice_code') }}</th>
+                                    <th>{{ __('app.clients.client_name') }}</th>
+                                    <th>{{ __('app.reports.total_amount') }}</th>
+                                    <th>{{ __('app.reports.paid_amount') }}</th>
+                                    <th>{{ __('app.cashier.discount') }}</th>
+                                    <th>{{ __('app.common.status') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -68,21 +69,24 @@
                                                 #{{ $invoice->invoice_code }}
                                             </a>
                                         </td>
-                                        <td>{{ $invoice->client->name ?? 'عميل نقدي' }}</td>
-                                        <td>{{ number_format($invoice->total_amount, 2) }} ج.م</td>
-                                        <td class="text-bold-700 success">{{ number_format($invoice->paid_amount, 2) }} ج.م</td>
-                                        <td class="danger">{{ number_format($invoice->discount, 2) }} ج.م</td>
+                                        <td>{{ $invoice->client->name ?? __('app.reports.client_cash') }}</td>
+                                        <td>{{ number_format($invoice->total_amount, 2) }}
+                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                        <td class="text-bold-700 success">{{ number_format($invoice->paid_amount, 2) }}
+                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                        <td class="danger">{{ number_format($invoice->discount, 2) }}
+                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
                                         <td>
                                             @if($invoice->status == 'paid')
-                                                <span class="badge badge-soft-success">مدفوع بالكامل</span>
+                                                <span class="badge badge-soft-success">{{ __('app.reports.status_paid') }}</span>
                                             @else
-                                                <span class="badge badge-soft-warning">مدفوع جزئيا</span>
+                                                <span class="badge badge-soft-warning">{{ __('app.reports.status_partial') }}</span>
                                             @endif
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center py-5">لا توجد سجلات إيرادات متاحة</td>
+                                        <td colspan="7" class="text-center py-5">{{ __('app.reports.no_revenue') }}</td>
                                     </tr>
                                 @endforelse
                             </tbody>

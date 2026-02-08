@@ -3,12 +3,13 @@
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
-            <h3 class="content-header-title">إدارة الموردين</h3>
+            <h3 class="content-header-title">{{ __('app.suppliers.title') }}</h3>
             <div class="row breadcrumbs-top">
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
-                        <li class="breadcrumb-item active">الموردين</li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('app.sidebar.dashboard') }}</a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ __('app.suppliers.all_suppliers') }}</li>
                     </ol>
                 </div>
             </div>
@@ -16,7 +17,7 @@
         <div class="content-header-right col-md-6 col-12 mb-2 text-right">
             <button type="button" class="btn btn-primary round shadow-sm px-2" data-toggle="modal"
                 data-target="#createSupplierModal">
-                <i class="la la-plus"></i> إضافة مورد جديد
+                <i class="la la-plus"></i> {{ __('app.suppliers.add_new') }}
             </button>
         </div>
     </div>
@@ -27,7 +28,7 @@
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <strong>تم بنجاح!</strong> {{ session('success') }}
+                <strong>{{ __('app.common.success') }}!</strong> {{ session('success') }}
             </div>
         @endif
 
@@ -40,9 +41,9 @@
                             <thead>
                                 <tr>
                                     <th style="width: 80px;">#</th>
-                                    <th>اسم المورد</th>
-                                    <th>رقم الهاتف</th>
-                                    <th class="text-right" style="width: 250px;">الإجراءات</th>
+                                    <th>{{ __('app.suppliers.name') }}</th>
+                                    <th>{{ __('app.suppliers.phone') }}</th>
+                                    <th class="text-right" style="width: 250px;">{{ __('app.suppliers.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody id="supplierTable">
@@ -68,20 +69,20 @@
                                             <div class="btn-group">
                                                 <a href="{{ route('suppliers.show', $supplier->id) }}"
                                                     class="btn btn-sm btn-soft-info round mr-1 px-1">
-                                                    <i class="la la-eye"></i> عرض
+                                                    <i class="la la-eye"></i> {{ __('app.common.view') }}
                                                 </a>
                                                 <button class="btn btn-sm btn-soft-warning round mr-1 px-1"
                                                     onclick="editSupplier({{ $supplier->id }})" data-toggle="modal"
                                                     data-target="#editSupplierModal">
-                                                    <i class="la la-edit"></i> تعديل
+                                                    <i class="la la-edit"></i> {{ __('app.common.edit') }}
                                                 </button>
                                                 <form action="{{ route('suppliers.destroy', $supplier->id) }}" method="POST"
                                                     style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-soft-danger round px-1"
-                                                        onclick="return confirm('هل أنت متأكد من الحذف؟')">
-                                                        <i class="la la-trash"></i> حذف
+                                                        onclick="return confirm('{{ __('app.suppliers.delete_confirm') }}')">
+                                                        <i class="la la-trash"></i> {{ __('app.common.delete') }}
                                                     </button>
                                                 </form>
                                             </div>
@@ -103,7 +104,7 @@
             <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
                 <div class="modal-header bg-primary text-white" style="border-radius: 20px 20px 0 0;">
                     <h5 class="modal-title font-weight-bold white" id="createSupplierModalLabel"><i
-                            class="la la-plus-circle"></i> إضافة مورد جديد</h5>
+                            class="la la-plus-circle"></i> {{ __('app.suppliers.add_new') }}</h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -112,19 +113,23 @@
                     @csrf
                     <div class="modal-body p-2">
                         <div class="form-group mb-2">
-                            <label for="name" class="text-bold-600">اسم المورد <span class="danger">*</span></label>
+                            <label for="name" class="text-bold-600">{{ __('app.suppliers.name') }} <span
+                                    class="danger">*</span></label>
                             <input type="text" class="form-control round border-primary" id="name" name="name"
-                                placeholder="أدخل اسم المورد..." required>
+                                placeholder="{{ __('app.suppliers.enter_name') }}" required>
                         </div>
                         <div class="form-group mb-0">
-                            <label for="phone" class="text-bold-600">رقم الهاتف <span class="danger">*</span></label>
+                            <label for="phone" class="text-bold-600">{{ __('app.suppliers.phone') }} <span
+                                    class="danger">*</span></label>
                             <input type="text" class="form-control round border-primary" id="phone" name="phone"
                                 placeholder="01XXXXXXXXX" required>
                         </div>
                     </div>
                     <div class="modal-footer border-0 justify-content-center pb-2">
-                        <button type="button" class="btn btn-light round px-2" data-dismiss="modal">إلغاء</button>
-                        <button type="submit" class="btn btn-primary round px-2 shadow">حفظ المورد</button>
+                        <button type="button" class="btn btn-light round px-2"
+                            data-dismiss="modal">{{ __('app.suppliers.cancel') }}</button>
+                        <button type="submit"
+                            class="btn btn-primary round px-2 shadow">{{ __('app.suppliers.save') }}</button>
                     </div>
                 </form>
             </div>
@@ -138,7 +143,7 @@
             <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
                 <div class="modal-header bg-warning text-white" style="border-radius: 20px 20px 0 0;">
                     <h5 class="modal-title font-weight-bold white" id="editSupplierModalLabel"><i class="la la-edit"></i>
-                        تعديل بيانات المورد</h5>
+                        {{ __('app.suppliers.edit') }}</h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -149,19 +154,23 @@
                     <div class="modal-body p-2">
                         <input type="hidden" id="edit_supplier_id" name="supplier_id">
                         <div class="form-group mb-2">
-                            <label for="edit_name" class="text-bold-600">اسم المورد <span class="danger">*</span></label>
+                            <label for="edit_name" class="text-bold-600">{{ __('app.suppliers.name') }} <span
+                                    class="danger">*</span></label>
                             <input type="text" class="form-control round border-warning" id="edit_name" name="name"
                                 required>
                         </div>
                         <div class="form-group mb-0">
-                            <label for="edit_phone" class="text-bold-600">رقم الهاتف <span class="danger">*</span></label>
+                            <label for="edit_phone" class="text-bold-600">{{ __('app.suppliers.phone') }} <span
+                                    class="danger">*</span></label>
                             <input type="text" class="form-control round border-warning" id="edit_phone" name="phone"
                                 required>
                         </div>
                     </div>
                     <div class="modal-footer border-0 justify-content-center pb-2">
-                        <button type="button" class="btn btn-light round px-2" data-dismiss="modal">إلغاء</button>
-                        <button type="submit" class="btn btn-warning round px-2 shadow text-white">تحديث البيانات</button>
+                        <button type="button" class="btn btn-light round px-2"
+                            data-dismiss="modal">{{ __('app.suppliers.cancel') }}</button>
+                        <button type="submit"
+                            class="btn btn-warning round px-2 shadow text-white">{{ __('app.suppliers.update') }}</button>
                     </div>
                 </form>
             </div>
@@ -238,7 +247,7 @@
                 url: "{{ route('suppliers.store') }}",
                 type: "POST",
                 data: $(this).serialize(),
-                beforeSend: function() {
+                beforeSend: function () {
                     $('#createSupplierForm button[type="submit"]').attr('disabled', true).html('<i class="la la-spinner la-spin"></i> جاري الحفظ...');
                 },
                 success: function (response) {
@@ -246,8 +255,8 @@
                     location.reload();
                 },
                 error: function (xhr) {
-                    $('#createSupplierForm button[type="submit"]').attr('disabled', false).html('حفظ المورد');
-                    alert('فشل في إضافة المورد.');
+                    $('#createSupplierForm button[type="submit"]').attr('disabled', false).html("{{ __('app.suppliers.save') }}");
+                    alert("{{ __('app.suppliers.add_fail') }}");
                 }
             });
         });
@@ -263,7 +272,7 @@
                     $('#edit_phone').val(response.phone);
                 },
                 error: function (xhr) {
-                    alert('فشل في جلب بيانات المورد.');
+                    alert("{{ __('app.suppliers.fetch_fail') }}");
                 }
             });
         }
@@ -281,7 +290,7 @@
                     location.reload();
                 },
                 error: function (xhr) {
-                    alert('فشل في تحديث بيانات المورد.');
+                    alert("{{ __('app.suppliers.update_fail') }}");
                 }
             });
         });

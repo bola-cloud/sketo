@@ -3,12 +3,13 @@
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
-            <h3 class="content-header-title">إدارة فئات المنتجات</h3>
+            <h3 class="content-header-title">{{ __('app.categories.title') }}</h3>
             <div class="row breadcrumbs-top">
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
-                        <li class="breadcrumb-item active">الفئات</li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('app.sidebar.dashboard') }}</a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ __('app.categories.all_categories') }}</li>
                     </ol>
                 </div>
             </div>
@@ -17,7 +18,7 @@
             <div class="btn-group float-md-right">
                 @if(auth()->user()->hasRole('admin') || auth()->user()->can('create-categories'))
                     <a href="{{ route('categories.create') }}" class="btn btn-primary round px-2 shadow">
-                        <i class="la la-plus"></i> إضافة فئة جديدة
+                        <i class="la la-plus"></i> {{ __('app.categories.add_new') }}
                     </a>
                 @endif
             </div>
@@ -30,7 +31,7 @@
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <strong>تم بنجاح!</strong> {{ session('success') }}
+                <strong>{{ __('app.common.success') }}!</strong> {{ session('success') }}
             </div>
         @endif
 
@@ -42,8 +43,8 @@
                             <thead class="bg-light">
                                 <tr>
                                     <th style="width: 80px;">#</th>
-                                    <th>اسم الفئة</th>
-                                    <th class="text-right">الإجراءات</th>
+                                    <th>{{ __('app.categories.name') }}</th>
+                                    <th class="text-right">{{ __('app.categories.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -62,15 +63,15 @@
                                             @if(auth()->user()->hasRole('admin') || auth()->user()->can('create-categories'))
                                                 <a href="{{ route('categories.edit', $category->id) }}"
                                                     class="btn btn-sm btn-soft-warning mr-1">
-                                                    <i class="la la-edit"></i> تعديل
+                                                    <i class="la la-edit"></i> {{ __('app.common.edit') }}
                                                 </a>
                                                 <form action="{{ route('categories.destroy', $category->id) }}" method="POST"
                                                     style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-soft-danger"
-                                                        onclick="return confirm('هل أنت متأكد من حذف هذه الفئة؟')">
-                                                        <i class="la la-trash"></i> حذف
+                                                        onclick="return confirm('{{ __('app.categories.delete_confirm') }}')">
+                                                        <i class="la la-trash"></i> {{ __('app.common.delete') }}
                                                     </button>
                                                 </form>
                                             @endif

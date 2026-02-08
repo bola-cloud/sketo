@@ -3,12 +3,12 @@
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
-            <h3 class="content-header-title">سجل المشتريات والنفقات</h3>
+            <h3 class="content-header-title">{{ __('app.purchases.title') }}</h3>
             <div class="row breadcrumbs-top">
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
-                        <li class="breadcrumb-item active">المشتريات</li>
+                        <li class="breadcrumb-item active">{{ __('app.purchases.all') }}</li>
                     </ol>
                 </div>
             </div>
@@ -16,10 +16,10 @@
         <div class="content-header-right col-md-6 col-12">
             <div class="btn-group float-md-right">
                 <a href="{{ route('purchases.export') }}" class="btn btn-success round px-2 shadow mr-1">
-                    <i class="la la-file-excel-o"></i> تصدير إكسل
+                    <i class="la la-file-excel-o"></i> {{ __('app.purchases.export') }}
                 </a>
-                <a href="{{ route('purchases.create') }}" class="btn btn-primary round px-2 shadow">
-                    <i class="la la-plus"></i> إضافة فاتورة شراء جديدة
+                <a href="{{ route('purchases.create') }}" class="btn btn-primary btn-sm">
+                    <i class="la la-plus"></i> {{ __('app.purchases.add_new') }}
                 </a>
             </div>
         </div>
@@ -35,10 +35,10 @@
                         <div class="row items-align-center">
                             <div class="col-md-4">
                                 <div class="form-group mb-1">
-                                    <label class="text-bold-600 small">البحث العام</label>
+                                    <label class="text-bold-600 small">{{ __('app.purchases.general_search') }}</label>
                                     <div class="position-relative has-icon-left">
                                         <input type="text" name="search" class="form-control round border-primary"
-                                            value="{{ request('search') }}" placeholder="رقم الفاتورة, مورد, وصف...">
+                                            value="{{ request('search') }}" placeholder="{{ __('app.purchases.search_placeholder') }}">
                                         <div class="form-control-position">
                                             <i class="la la-search primary"></i>
                                         </div>
@@ -47,9 +47,9 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group mb-1">
-                                    <label class="text-bold-600 small">المورد</label>
+                                    <label class="text-bold-600 small">{{ __('app.purchases.supplier') }}</label>
                                     <select name="supplier_id" class="form-control round border-primary">
-                                        <option value="">كل الموردين</option>
+                                        <option value="">{{ __('app.purchases.all_suppliers') }}</option>
                                         @foreach($suppliers as $supplier)
                                             <option value="{{ $supplier->id }}" {{ request('supplier_id') == $supplier->id ? 'selected' : '' }}>{{ $supplier->name }}</option>
                                         @endforeach
@@ -58,20 +58,18 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group mb-1">
-                                    <label class="text-bold-600 small">نوع الفاتورة</label>
+                                    <label class="text-bold-600 small">{{ __('app.purchases.type') }}</label>
                                     <select name="type" class="form-control round border-primary">
-                                        <option value="">الكل</option>
-                                        <option value="product" {{ request('type') == 'product' ? 'selected' : '' }}>شراء
-                                            منتجات</option>
-                                        <option value="expense" {{ request('type') == 'expense' ? 'selected' : '' }}>نفقات
-                                        </option>
+                                        <option value="">{{ __('app.purchases.type_all') }}</option>
+                                        <option value="product" {{ request('type') == 'product' ? 'selected' : '' }}>{{ __('app.purchases.type_product') }}</option>
+                                        <option value="expense" {{ request('type') == 'expense' ? 'selected' : '' }}>{{ __('app.purchases.type_expense') }}</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
                                 <div class="form-group mb-1 w-100">
                                     <button type="submit" class="btn btn-primary round btn-block shadow-sm">
-                                        <i class="la la-filter"></i> تصفية
+                                        <i class="la la-filter"></i> {{ __('app.invoices.filter') }}
                                     </button>
                                 </div>
                             </div>
@@ -99,13 +97,13 @@
                         <table class="table table-premium mb-0">
                             <thead>
                                 <tr>
-                                    <th>رقم الفاتورة</th>
-                                    <th>المورد</th>
-                                    <th>النوع</th>
-                                    <th>المدفوع</th>
-                                    <th>المتبقي</th>
-                                    <th>الإجمالي</th>
-                                    <th class="text-right">الإجراءات</th>
+                                    <th>{{ __('app.purchases.invoice_number') }}</th>
+                                    <th>{{ __('app.purchases.supplier') }}</th>
+                                    <th>{{ __('app.purchases.type') }}</th>
+                                    <th>{{ __('app.invoices.paid_amount') }}</th>
+                                    <th>{{ __('app.invoices.remaining_amount') }}</th>
+                                    <th>{{ __('app.invoices.total') }}</th>
+                                    <th class="text-right">{{ __('app.invoices.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -121,10 +119,11 @@
                                                 class="text-bold-700 text-dark">{{ $purchase->supplier ? $purchase->supplier->name : 'لا يوجد مورد' }}</span>
                                         </td>
                                         <td>
-                                            <span
-                                                class="badge {{ $purchase->type == 'product' ? 'badge-soft-success' : 'badge-soft-warning' }} round px-1">
-                                                {{ $purchase->type == 'product' ? 'شراء منتجات' : 'نفقات' }}
-                                            </span>
+                                            @if ($purchase->type == 'product')
+                                                <span class="badge badge-soft-success round px-1">{{ __('app.purchases.type_product') }}</span>
+                                            @else
+                                                <span class="badge badge-soft-warning round px-1">{{ __('app.purchases.type_expense') }}</span>
+                                            @endif
                                         </td>
                                         <td><span
                                                 class="success text-bold-600">{{ number_format($purchase->paid_amount, 2) }}</span>
@@ -141,12 +140,12 @@
                                             <div class="btn-group">
                                                 <a href="{{ route('purchases.show', $purchase->id) }}"
                                                     class="btn btn-sm btn-soft-info round mr-1 px-1">
-                                                    <i class="la la-eye"></i> عرض
+                                                    <i class="la la-eye"></i> {{ __('app.invoices.view') }}
                                                 </a>
                                                 @if ($purchase->total_amount != $purchase->paid_amount)
                                                     <a href="{{ route('purchases.installments.create', ['purchase' => $purchase->id]) }}"
                                                         class="btn btn-sm btn-soft-primary round mr-1 px-1">
-                                                        <i class="la la-plus"></i> قسط
+                                                        <i class="la la-plus"></i> {{ __('app.purchases.installment') }}
                                                     </a>
                                                 @endif
                                                 @if($purchase->type == 'expense')
@@ -155,7 +154,7 @@
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-soft-danger round px-1"
-                                                            onclick="return confirm('هل أنت متأكد من الحذف؟');">
+                                                            onclick="return confirm('{{ __('app.invoices.delete_confirm') }}');">
                                                             <i class="la la-trash"></i>
                                                         </button>
                                                     </form>

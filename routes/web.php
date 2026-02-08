@@ -125,3 +125,13 @@ Route::middleware([
     Route::get('/supplier-returns/stock-batches/{product}/{supplier}', [App\Http\Controllers\SupplierReturnController::class, 'getStockBatches'])->name('supplier-returns.stockBatches');
     Route::get('/cashier/cart-content', [\App\Http\Controllers\CashierController::class, 'cartContent'])->name('cashier.cartContent');
 });
+
+Route::get('/language/{locale}', function ($locale) {
+    if (!in_array($locale, ['en', 'ar'])) {
+        abort(400);
+    }
+
+    session(['locale' => $locale]);
+
+    return redirect()->back();
+})->name('language.switch');

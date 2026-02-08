@@ -3,12 +3,13 @@
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
-            <h3 class="content-header-title">تفاصيل إجمالي المشتريات</h3>
+            <h3 class="content-header-title">{{ __('app.reports.purchases_title') }}</h3>
             <div class="row breadcrumbs-top">
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
-                        <li class="breadcrumb-item active">المشتريات</li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('app.dashboard.title') }}</a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ __('app.reports.purchases_title') }}</li>
                     </ol>
                 </div>
             </div>
@@ -24,16 +25,16 @@
                     <form action="{{ route('reports.statistics.purchases') }}" method="GET">
                         <div class="row align-items-end">
                             <div class="col-md-4 mb-2">
-                                <label class="text-muted small">تاريخ البداية</label>
+                                <label class="text-muted small">{{ __('app.reports.start_date') }}</label>
                                 <input type="date" name="start_date" class="form-control" value="{{ $startDate }}">
                             </div>
                             <div class="col-md-4 mb-2">
-                                <label class="text-muted small">تاريخ النهاية</label>
+                                <label class="text-muted small">{{ __('app.reports.end_date') }}</label>
                                 <input type="date" name="end_date" class="form-control" value="{{ $endDate }}">
                             </div>
                             <div class="col-md-4 mb-2">
                                 <button type="submit" class="btn btn-danger btn-block">
-                                    <i class="la la-filter"></i> تصفية
+                                    <i class="la la-filter"></i> {{ __('app.reports.filter_btn') }}
                                 </button>
                             </div>
                         </div>
@@ -50,12 +51,12 @@
                         <table class="table table-premium mb-0">
                             <thead class="bg-light">
                                 <tr>
-                                    <th>التاريخ</th>
-                                    <th>كود الشراء</th>
-                                    <th>المورد</th>
-                                    <th>المبلغ الإجمالي</th>
-                                    <th>المبلغ المدفوع</th>
-                                    <th>المبلغ المتبقي</th>
+                                    <th>{{ __('app.common.date') }}</th>
+                                    <th>{{ __('app.reports.purchase_code') }}</th>
+                                    <th>{{ __('app.suppliers.supplier_name') }}</th>
+                                    <th>{{ __('app.reports.total_amount') }}</th>
+                                    <th>{{ __('app.reports.paid_amount') }}</th>
+                                    <th>{{ __('app.reports.remaining_amount') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -67,15 +68,18 @@
                                                 #{{ $purchase->purchase_code }}
                                             </a>
                                         </td>
-                                        <td>{{ $purchase->supplier->name ?? 'غير محدد' }}</td>
-                                        <td class="text-bold-700 danger">{{ number_format($purchase->total_amount, 2) }} ج.م
+                                        <td>{{ $purchase->supplier->name ?? __('app.common.not_specified') }}</td>
+                                        <td class="text-bold-700 danger">{{ number_format($purchase->total_amount, 2) }}
+                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
                                         </td>
-                                        <td class="success">{{ number_format($purchase->paid_amount, 2) }} ج.م</td>
-                                        <td class="warning">{{ number_format($purchase->remaining_amount, 2) }} ج.م</td>
+                                        <td class="success">{{ number_format($purchase->paid_amount, 2) }}
+                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                        <td class="warning">{{ number_format($purchase->remaining_amount, 2) }}
+                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-5">لا توجد سجلات مشتريات متاحة</td>
+                                        <td colspan="6" class="text-center py-5">{{ __('app.reports.no_purchases') }}</td>
                                     </tr>
                                 @endforelse
                             </tbody>

@@ -115,7 +115,7 @@
                                 <div class="media d-flex">
                                     <div class="media-body text-left">
                                         <h3 class="info" id="productsSold">{{ $productsSold }}</h3>
-                                        <h6>المنتجات المباعة</h6>
+                                        <h6>{{ __('app.dashboard.products_sold') }}</h6>
                                     </div>
                                     <div>
                                         <i class="icon-basket-loaded info font-large-2 float-left"></i>
@@ -134,8 +134,8 @@
                             <div class="card-body">
                                 <div class="media d-flex">
                                     <div class="media-body text-left">
-                                        <h3 class="warning" id="totalRevenue">{{ $totalRevenue }} ج.م</h3>
-                                        <h6>إجمالي الإيرادات</h6>
+                                        <h3 class="warning" id="totalRevenue">{{ $totalRevenue }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</h3>
+                                        <h6>{{ __('app.dashboard.total_revenue') }}</h6>
                                     </div>
                                     <div>
                                         <i class="icon-pie-chart warning font-large-2 float-left"></i>
@@ -155,7 +155,7 @@
                                 <div class="media d-flex">
                                     <div class="media-body text-left">
                                         <h3 class="success" id="totalUnsoldProducts">{{ $totalUnsoldProducts }}</h3>
-                                        <h6>المنتجات غير المباعة</h6>
+                                        <h6>{{ __('app.dashboard.total_unsold_products') }}</h6>
                                     </div>
                                     <div>
                                         <i class="icon-handbag success font-large-2 float-left"></i>
@@ -174,8 +174,8 @@
                             <div class="card-body">
                                 <div class="media d-flex">
                                     <div class="media-body text-left">
-                                        <h3 class="danger" id="totalPurchases"> {{ $totalPurchases }} ج.م </h3>
-                                        <h6>إجمالي المشتريات</h6>
+                                        <h3 class="danger" id="totalPurchases"> {{ $totalPurchases }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }} </h3>
+                                        <h6>{{ __('app.dashboard.total_purchases') }}</h6>
                                     </div>
                                     <div>
                                         <i class="icon-wallet danger font-large-2 float-left"></i>
@@ -194,8 +194,8 @@
                             <div class="card-body">
                                 <div class="media d-flex">
                                     <div class="media-body text-left">
-                                        <h3 class="primary" id="totalProfit"> {{ $totalProfit }} ج.م</h3>
-                                        <h6>إجمالي الأرباح</h6>
+                                        <h3 class="primary" id="totalProfit"> {{ $totalProfit }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</h3>
+                                        <h6>{{ __('app.dashboard.total_profit') }}</h6>
                                     </div>
                                     <div>
                                         <i class="icon-graph primary font-large-2 float-left"></i>
@@ -214,8 +214,8 @@
                             <div class="card-body">
                                 <div class="media d-flex">
                                     <div class="media-body text-left">
-                                        <h3 class="primary" id="availableMoney">{{ $availableMoney }} ج.م</h3>
-                                        <h6>المبلغ المتوفر</h6>
+                                        <h3 class="primary" id="availableMoney">{{ $availableMoney }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</h3>
+                                        <h6>{{ __('app.dashboard.available_money') }}</h6>
                                     </div>
                                     <div>
                                         <i class="icon-wallet primary font-large-2 float-left"></i>
@@ -232,20 +232,20 @@
         <div class="row mt-4 mb-4">
             <div class="col-12">
                 <div class="card p-4 shadow-sm border-0" style="border-radius: 15px;">
-                    <h5 class="mb-3 text-bold-600"><i class="ft-calendar primary mr-1"></i> تصفية حسب التاريخ</h5>
+                    <h5 class="mb-3 text-bold-600"><i class="ft-calendar primary mr-1"></i> {{ __('app.dashboard.filter_by_date') }}</h5>
                     <div class="row">
                         <div class="col-md-6 mb-2">
                             <div class="form-group">
-                                <label for="start_date" class="text-muted small">تاريخ البداية</label>
+                                <label for="start_date" class="text-muted small">{{ __('app.dashboard.start_date') }}</label>
                                 <input type="text" id="start_date" name="start_date" class="form-control datepicker"
-                                    placeholder="اختر التاريخ...">
+                                    placeholder="{{ __('app.common.select_date') }}">
                             </div>
                         </div>
                         <div class="col-md-6 mb-2">
                             <div class="form-group">
-                                <label for="end_date" class="text-muted small">تاريخ النهاية</label>
+                                <label for="end_date" class="text-muted small">{{ __('app.dashboard.end_date') }}</label>
                                 <input type="text" id="end_date" name="end_date" class="form-control datepicker"
-                                    placeholder="اختر التاريخ...">
+                                    placeholder="{{ __('app.common.select_date') }}">
                             </div>
                         </div>
                     </div>
@@ -258,11 +258,10 @@
         <div class="alert alert-danger d-flex align-items-center p-3 mb-4 mt-3">
             <i class="ft-alert-triangle mr-3 font-large-1"></i>
             <div>
-                <h5 class="alert-heading text-bold-700 mb-1">تنبيه: منتجات قاربت على النفاد</h5>
+                <h5 class="alert-heading text-bold-700 mb-1">{{ __('app.dashboard.low_stock_alert') }}</h5>
                 <ul class="mb-0 list-unstyled">
                     @foreach($lowStockProducts as $product)
-                        <li><i class="ft-check-circle small mr-1"></i> المنتج <strong>{{ $product->name }}</strong> وصل إلى الحد
-                            الأدنى (الكمية: {{ $product->quantity }})</li>
+                        <li><i class="ft-check-circle small mr-1"></i>  {{ __('app.dashboard.product_reached_min', ['name' => $product->name, 'quantity' => $product->quantity]) }}</li>
                     @endforeach
                 </ul>
             </div>
@@ -303,6 +302,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> --}}
     <script src="{{asset('assets/js/flatpickr.js')}}"></script>
     <script src="{{asset('assets/js/jquery.js')}}"></script>
+    <script>
     <script>
         $(document).ready(function () {
             flatpickr('.datepicker', {
@@ -353,11 +353,11 @@
 
             function updateDashboard(data) {
                 $('#productsSold').text(data.productsSold);
-                $('#totalRevenue').text('ج.م ' + data.totalRevenue);
+                $('#totalRevenue').text('{{ App::getLocale() == "ar" ? "ج.م " : "" }}' + data.totalRevenue + '{{ App::getLocale() == "en" ? " EGP" : "" }}');
                 $('#totalUnsoldProducts').text(data.totalUnsoldProducts);
-                $('#totalPurchases').text('ج.م ' + data.totalPurchases);
-                $('#totalProfit').text('ج.م ' + data.totalProfit);
-                $('#availableMoney').text('ج.م ' + data.availableMoney); // Update available money
+                $('#totalPurchases').text('{{ App::getLocale() == "ar" ? "ج.م " : "" }}' + data.totalPurchases + '{{ App::getLocale() == "en" ? " EGP" : "" }}');
+                $('#totalProfit').text('{{ App::getLocale() == "ar" ? "ج.م " : "" }}' + data.totalProfit + '{{ App::getLocale() == "en" ? " EGP" : "" }}');
+                $('#availableMoney').text('{{ App::getLocale() == "ar" ? "ج.م " : "" }}' + data.availableMoney + '{{ App::getLocale() == "en" ? " EGP" : "" }}'); // Update available money
             }
 
 
@@ -371,7 +371,7 @@
                 labels: {!! json_encode($monthlyData->keys()) !!},
                 datasets: [
                     {
-                        label: 'المنتجات المباعة',
+                        label: '{{ __('app.dashboard.monthly_sales_label') }}',
                         data: {!! json_encode($monthlyData->pluck('total_sold')) !!},
                         borderColor: 'rgba(75, 192, 192, 1)',
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -388,13 +388,13 @@
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'الكمية'
+                            text: '{{ __('app.dashboard.quantity_label') }}'
                         }
                     },
                     x: {
                         title: {
                             display: true,
-                            text: 'الشهر'
+                            text: '{{ __('app.dashboard.month_label') }}'
                         }
                     }
                 }
@@ -408,7 +408,7 @@
                 labels: {!! json_encode($monthlyData->keys()) !!},
                 datasets: [
                     {
-                        label: 'الإيرادات الشهرية',
+                        label: '{{ __('app.dashboard.monthly_revenue_label') }}',
                         data: {!! json_encode($monthlyData->pluck('total_revenue')) !!},
                         borderColor: 'rgba(255, 99, 132, 1)',
                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -425,13 +425,13 @@
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'الإيرادات ($)'
+                            text: '{{ __('app.dashboard.revenue_label') }}'
                         }
                     },
                     x: {
                         title: {
                             display: true,
-                            text: 'الشهر'
+                            text: '{{ __('app.dashboard.month_label') }}'
                         }
                     }
                 }

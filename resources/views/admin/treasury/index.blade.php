@@ -1,162 +1,167 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container">
-    <h1 class="text-center mb-4">الخزينة ليوم واحد</h1>
+    <div class="container">
+        <h1 class="text-center mb-4">الخزينة ليوم واحد</h1>
 
-    <!-- Form to Select Date -->
-    <form action="{{ route('treasury') }}" method="GET" class="mb-4">
-        <div class="form-group row">
-            <label for="date" class="col-sm-2 col-form-label">اختر التاريخ</label>
-            <div class="col-sm-4">
-                <input type="date" id="date" name="date" class="form-control" value="{{ $date }}" required>
-            </div>
-            <div class="col-sm-2">
-                <button type="submit" class="btn btn-primary">عرض الخزينة</button>
-            </div>
-        </div>
-    </form>
-
-    <!-- Display Treasury Summary -->
-    <div class="card">
-        <div class="card-header">
-            <h3 class="text-center">الخزينة ليوم: {{ $date }}</h3>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <h4>إجمالي الأقساط من المبيعات: {{ number_format($salesInstallments, 2) }} ج.م</h4>
+        <!-- Form to Select Date -->
+        <form action="{{ route('treasury') }}" method="GET" class="mb-4">
+            <div class="form-group row">
+                <label for="date" class="col-sm-2 col-form-label">{{ __('app.treasury.select_date') }}</label>
+                <div class="col-sm-4">
+                    <input type="date" id="date" name="date" class="form-control" value="{{ $date }}" required>
                 </div>
-                <div class="col-md-6">
-                    <h4>إجمالي الأقساط من المشتريات: {{ number_format($purchaseInstallments, 2) }} ج.م</h4>
+                <div class="col-sm-2">
+                    <button type="submit" class="btn btn-primary">{{ __('app.treasury.show_treasury') }}</button>
                 </div>
             </div>
+        </form>
 
-            <hr>
+        <!-- Display Treasury Summary -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">{{ __('app.treasury.treasury_for_date') }} {{ $date }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>{{ __('app.treasury.total_sales_installments') }} {{ number_format($salesInstallments, 2) }}
+                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>{{ __('app.treasury.total_purchase_installments') }}
+                            {{ number_format($purchaseInstallments, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                        </h4>
+                    </div>
+                </div>
 
-            <h3 class="text-center">
-                الفرق بين المبيعات والمشتريات:
-                <strong>{{ number_format($difference, 2) }} ج.م</strong>
-            </h3>
+                <hr>
 
-            @if ($difference > 0)
-                <p class="text-center text-success">هناك فائض اليوم.</p>
-            @elseif ($difference < 0)
-                <p class="text-center text-danger">هناك عجز اليوم.</p>
-            @else
-                <p class="text-center text-warning">لا يوجد فرق بين المبيعات والمشتريات اليوم.</p>
-            @endif
+                <h3 class="text-center">
+                    {{ __('app.treasury.difference') }}
+                    <strong>{{ number_format($difference, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</strong>
+                </h3>
 
-            <hr>
+                @if ($difference > 0)
+                    <p class="text-center text-success">{{ __('app.treasury.surplus') }}</p>
+                @elseif ($difference < 0)
+                    <p class="text-center text-danger">{{ __('app.treasury.deficit') }}</p>
+                @else
+                    <p class="text-center text-warning">{{ __('app.treasury.no_difference') }}</p>
+                @endif
 
-            <!-- Details of Purchases (مصروفات) -->
-            <h4 class="mt-4">تفاصيل المصروفات (المشتريات):</h4>
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>رقم الفاتورة</th>
-                        <th>الوصف</th>
-                        <th>المورد</th>
-                        <th>المبلغ المدفوع</th>
-                        <th>إجمالي الفاتورة</th>
-                        <th>تاريخ الدفع</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($purchaseDetails as $installment)
+                <hr>
+
+                <!-- Details of Purchases (مصروفات) -->
+                <h4 class="mt-4">{{ __('app.treasury.purchase_details') }}</h4>
+                <table class="table table-bordered table-striped">
+                    <thead>
                         <tr>
-                            <td>{{ $installment->purchase->invoice_number ?? '-' }}</td>
-                            <td>{{ $installment->purchase->description ?? '-' }}</td>
-                            <td>{{ $installment->purchase->supplier->name ?? '-' }}</td>
-                            <td>{{ number_format($installment->amount_paid, 2) }}</td>
-                            <td>{{ number_format($installment->purchase->total_amount ?? 0, 2) }}</td>
-                            <td>{{ $installment->date_paid }}</td>
+                            <th>{{ __('app.purchases.invoice_number') }}</th>
+                            <th>{{ __('app.treasury.description') }}</th>
+                            <th>{{ __('app.suppliers.supplier') }}</th>
+                            <th>{{ __('app.treasury.amount_paid') }}</th>
+                            <th>{{ __('app.treasury.total_amount') }}</th>
+                            <th>{{ __('app.treasury.date_paid') }}</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($purchaseDetails as $installment)
+                            <tr>
+                                <td>{{ $installment->purchase->invoice_number ?? '-' }}</td>
+                                <td>{{ $installment->purchase->description ?? '-' }}</td>
+                                <td>{{ $installment->purchase->supplier->name ?? '-' }}</td>
+                                <td>{{ number_format($installment->amount_paid, 2) }}</td>
+                                <td>{{ number_format($installment->purchase->total_amount ?? 0, 2) }}</td>
+                                <td>{{ $installment->date_paid }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
 
-            <!-- Details of Sales (مصادر الدخل) -->
-            <h4 class="mt-4">تفاصيل مصادر الدخل (المبيعات):</h4>
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>رقم الفاتورة</th>
-                        <th>اسم العميل</th>
-                        <th>المبلغ المدفوع</th>
-                        <th>إجمالي الفاتورة</th>
-                        <th>تاريخ الدفع</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($salesDetails as $installment)
+                <!-- Details of Sales (مصادر الدخل) -->
+                <h4 class="mt-4">{{ __('app.treasury.sales_details') }}</h4>
+                <table class="table table-bordered table-striped">
+                    <thead>
                         <tr>
-                            <td>{{ $installment->invoice->invoice_code ?? '-' }}</td>
-                            <td>{{ $installment->invoice->client->name ?? '-' }}</td>
-                            <td>{{ number_format($installment->amount_paid, 2) }}</td>
-                            <td>{{ number_format($installment->invoice->total_amount ?? 0, 2) }}</td>
-                            <td>{{ $installment->date_paid }}</td>
+                            <th>{{ __('app.purchases.invoice_number') }}</th>
+                            <th>{{ __('app.clients.client_name') }}</th>
+                            <th>{{ __('app.treasury.amount_paid') }}</th>
+                            <th>{{ __('app.treasury.total_amount') }}</th>
+                            <th>{{ __('app.treasury.date_paid') }}</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($salesDetails as $installment)
+                            <tr>
+                                <td>{{ $installment->invoice->invoice_code ?? '-' }}</td>
+                                <td>{{ $installment->invoice->client->name ?? '-' }}</td>
+                                <td>{{ number_format($installment->amount_paid, 2) }}</td>
+                                <td>{{ number_format($installment->invoice->total_amount ?? 0, 2) }}</td>
+                                <td>{{ $installment->date_paid }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
 
-            <!-- Supplier Returns (مردودات الموردين) -->
-            <h4 class="mt-4">مردودات الموردين (تقلل المصروفات):</h4>
-            <h5>إجمالي مردودات الموردين: {{ number_format($supplierReturnsTotal, 2) }} ج.م</h5>
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>المورد</th>
-                        <th>رقم الفاتورة</th>
-                        <th>المنتج</th>
-                        <th>الكمية المرتجعة</th>
-                        <th>سعر الوحدة</th>
-                        <th>إجمالي القيمة</th>
-                        <th>تاريخ الإرجاع</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($supplierReturns as $return)
+                <!-- Supplier Returns (مردودات الموردين) -->
+                <h4 class="mt-4">{{ __('app.treasury.supplier_returns_header') }}</h4>
+                <h5>{{ __('app.treasury.total_supplier_returns') }} {{ number_format($supplierReturnsTotal, 2) }}
+                    {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</h5>
+                <table class="table table-bordered table-striped">
+                    <thead>
                         <tr>
-                            <td>{{ $return->supplier->name ?? '-' }}</td>
-                            <td>{{ $return->purchase->invoice_number ?? '-' }}</td>
-                            <td>{{ $return->product->name ?? '-' }}</td>
-                            <td>{{ $return->quantity_returned }}</td>
-                            <td>{{ number_format($return->cost_price, 2) }}</td>
-                            <td>{{ number_format($return->getTotalValueAttribute(), 2) }}</td>
-                            <td>{{ $return->returned_at }}</td>
+                            <th>{{ __('app.suppliers.supplier') }}</th>
+                            <th>{{ __('app.purchases.invoice_number') }}</th>
+                            <th>{{ __('app.products.product') }}</th>
+                            <th>{{ __('app.supplier_returns.quantity_returned') }}</th>
+                            <th>{{ __('app.treasury.unit_price') }}</th>
+                            <th>{{ __('app.supplier_returns.total_value') }}</th>
+                            <th>{{ __('app.supplier_returns.return_date') }}</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($supplierReturns as $return)
+                            <tr>
+                                <td>{{ $return->supplier->name ?? '-' }}</td>
+                                <td>{{ $return->purchase->invoice_number ?? '-' }}</td>
+                                <td>{{ $return->product->name ?? '-' }}</td>
+                                <td>{{ $return->quantity_returned }}</td>
+                                <td>{{ number_format($return->cost_price, 2) }}</td>
+                                <td>{{ number_format($return->getTotalValueAttribute(), 2) }}</td>
+                                <td>{{ $return->returned_at }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
 
-            <!-- Customer Returns (مردودات العملاء) -->
-            <h4 class="mt-4">مردودات العملاء (تقلل الدخل):</h4>
-            <h5>إجمالي مردودات العملاء: {{ number_format($customerReturnsTotal, 2) }} ج.م</h5>
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>رقم الفاتورة</th>
-                        <th>المنتج</th>
-                        <th>الكمية المرتجعة</th>
-                        <th>قيمة الإرجاع</th>
-                        <th>تاريخ الإرجاع</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($customerReturns as $return)
+                <!-- Customer Returns (مردودات العملاء) -->
+                <h4 class="mt-4">{{ __('app.treasury.customer_returns_header') }}</h4>
+                <h5>{{ __('app.treasury.total_customer_returns') }} {{ number_format($customerReturnsTotal, 2) }}
+                    {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</h5>
+                <table class="table table-bordered table-striped">
+                    <thead>
                         <tr>
-                            <td>{{ $return->invoice->invoice_code ?? '-' }}</td>
-                            <td>{{ $return->product->name ?? '-' }}</td>
-                            <td>{{ $return->quantity_returned }}</td>
-                            <td>{{ number_format($return->return_amount, 2) }}</td>
-                            <td>{{ $return->created_at }}</td>
+                            <th>{{ __('app.purchases.invoice_number') }}</th>
+                            <th>{{ __('app.products.product') }}</th>
+                            <th>{{ __('app.supplier_returns.quantity_returned') }}</th>
+                            <th>{{ __('app.treasury.return_value') }}</th>
+                            <th>{{ __('app.supplier_returns.return_date') }}</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($customerReturns as $return)
+                            <tr>
+                                <td>{{ $return->invoice->invoice_code ?? '-' }}</td>
+                                <td>{{ $return->product->name ?? '-' }}</td>
+                                <td>{{ $return->quantity_returned }}</td>
+                                <td>{{ number_format($return->return_amount, 2) }}</td>
+                                <td>{{ $return->created_at }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 @endsection

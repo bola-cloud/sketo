@@ -3,12 +3,13 @@
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
-            <h3 class="content-header-title">تقرير الأرباح التفصيلي</h3>
+            <h3 class="content-header-title">{{ __('app.reports.profit_title') }}</h3>
             <div class="row breadcrumbs-top">
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
-                        <li class="breadcrumb-item active">الأرباح</li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('app.dashboard.title') }}</a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ __('app.reports.profit_title') }}</li>
                     </ol>
                 </div>
             </div>
@@ -24,16 +25,16 @@
                     <form action="{{ route('reports.statistics.profit') }}" method="GET">
                         <div class="row align-items-end">
                             <div class="col-md-4 mb-2">
-                                <label class="text-muted small">تاريخ البداية</label>
+                                <label class="text-muted small">{{ __('app.reports.start_date') }}</label>
                                 <input type="date" name="start_date" class="form-control" value="{{ $startDate }}">
                             </div>
                             <div class="col-md-4 mb-2">
-                                <label class="text-muted small">تاريخ النهاية</label>
+                                <label class="text-muted small">{{ __('app.reports.end_date') }}</label>
                                 <input type="date" name="end_date" class="form-control" value="{{ $endDate }}">
                             </div>
                             <div class="col-md-4 mb-2">
                                 <button type="submit" class="btn btn-primary btn-block">
-                                    <i class="la la-filter"></i> تصفية
+                                    <i class="la la-filter"></i> {{ __('app.reports.filter_btn') }}
                                 </button>
                             </div>
                         </div>
@@ -50,13 +51,13 @@
                         <table class="table table-premium mb-0">
                             <thead class="bg-light">
                                 <tr>
-                                    <th>التاريخ</th>
-                                    <th>المنتج</th>
-                                    <th>الكمية</th>
-                                    <th>سعر البيع</th>
-                                    <th>إجمالي المبيعات</th>
-                                    <th>صافي الربح</th>
-                                    <th>الفاتورة</th>
+                                    <th>{{ __('app.reports.transaction_date') }}</th>
+                                    <th>{{ __('app.cashier.product') }}</th>
+                                    <th>{{ __('app.cashier.quantity') }}</th>
+                                    <th>{{ __('app.reports.unit_price') }}</th>
+                                    <th>{{ __('app.reports.total_sales') }}</th>
+                                    <th>{{ __('app.reports.net_profit') }}</th>
+                                    <th>{{ __('app.reports.invoice_code') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -65,9 +66,12 @@
                                         <td class="text-bold-600">{{ $sale->created_at->format('Y-m-d') }}</td>
                                         <td>{{ $sale->product->name }}</td>
                                         <td><span class="badge badge-soft-info">{{ $sale->quantity }}</span></td>
-                                        <td>{{ number_format($sale->unit_price, 2) }} ج.م</td>
-                                        <td>{{ number_format($sale->total_price, 2) }} ج.م</td>
-                                        <td class="text-bold-700 success">+ {{ number_format($sale->profit, 2) }} ج.م</td>
+                                        <td>{{ number_format($sale->unit_price, 2) }}
+                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                        <td>{{ number_format($sale->total_price, 2) }}
+                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                        <td class="text-bold-700 success">+ {{ number_format($sale->profit, 2) }}
+                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
                                         <td>
                                             <a href="{{ route('invoices.show', $sale->invoice_id) }}"
                                                 class="badge badge-soft-secondary">
@@ -77,7 +81,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center py-5">لا توجد بيانات أرباح متاحة</td>
+                                        <td colspan="7" class="text-center py-5">{{ __('app.reports.no_data') }}</td>
                                     </tr>
                                 @endforelse
                             </tbody>

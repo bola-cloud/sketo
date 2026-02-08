@@ -3,12 +3,12 @@
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
-            <h3 class="content-header-title">إدارة المنتجات والمخزون</h3>
+            <h3 class="content-header-title">{{ __('app.products.title') }}</h3>
             <div class="row breadcrumbs-top">
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">لوحة التحكم</a></li>
-                        <li class="breadcrumb-item active">المنتجات</li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('app.sidebar.dashboard') }}</a></li>
+                        <li class="breadcrumb-item active">{{ __('app.products.all_products') }}</li>
                     </ol>
                 </div>
             </div>
@@ -16,10 +16,10 @@
         <div class="content-header-right col-md-6 col-12">
             <div class="btn-group float-md-right">
                 <a href="{{ route('products.export') }}" class="btn btn-success round px-2 shadow mr-1">
-                    <i class="la la-file-excel-o"></i> تصدير إكسل
+                    <i class="la la-file-excel-o"></i> {{ __('app.products.export_excel') }}
                 </a>
                 <a href="{{ route('products.create') }}" class="btn btn-primary round px-2 shadow">
-                    <i class="la la-plus"></i> إضافة منتج جديد
+                    <i class="la la-plus"></i> {{ __('app.products.add_new') }}
                 </a>
             </div>
         </div>
@@ -37,7 +37,7 @@
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <strong>تم بنجاح!</strong> {{ session('success') }}
+                <strong>{{ __('app.common.success') }}!</strong> {{ session('success') }}
             </div>
         @endif
 
@@ -46,7 +46,7 @@
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <strong>خطأ!</strong> {{ session('error') }}
+                <strong>{{ __('app.common.error') }}!</strong> {{ session('error') }}
             </div>
         @endif
 
@@ -58,7 +58,7 @@
                     <div class="row align-items-end">
                         <div class="col-md-4">
                             <div class="form-group mb-0">
-                                <label class="text-muted small">البحث عن المنتج</label>
+                                <label class="text-muted small">{{ __('app.products.search') }}</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text bg-transparent border-primary border-right-0"
@@ -68,16 +68,16 @@
                                     </div>
                                     <input type="text" class="form-control round border-primary border-left-0"
                                         id="search-barcode" value="{{ request('search') }}"
-                                        placeholder="الباركود أو اسم المنتج...">
+                                        placeholder="{{ __('app.products.search_placeholder') }}">
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="form-group mb-0">
-                                <label class="text-muted small">الفئة</label>
+                                <label class="text-muted small">{{ __('app.products.category') }}</label>
                                 <select class="form-control round border-primary" id="category-filter">
-                                    <option value="">كل الفئات</option>
+                                    <option value="">{{ __('app.products.all_categories') }}</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
                                             {{ $category->name }}
@@ -89,9 +89,9 @@
 
                         <div class="col-md-3">
                             <div class="form-group mb-0">
-                                <label class="text-muted small">الماركة</label>
+                                <label class="text-muted small">{{ __('app.products.brand') }}</label>
                                 <select class="form-control round border-primary" id="brand-filter">
-                                    <option value="">كل الماركات</option>
+                                    <option value="">{{ __('app.products.all_brands') }}</option>
                                     @foreach($brands as $brand)
                                         <option value="{{ $brand->id }}" {{ request('brand_id') == $brand->id ? 'selected' : '' }}>
                                             {{ $brand->name }}
@@ -103,7 +103,7 @@
 
                         <div class="col-md-2">
                             <button type="button" id="search-button" class="btn btn-primary btn-block round shadow">
-                                <i class="la la-filter"></i> تصفية
+                                <i class="la la-filter"></i> {{ __('app.products.filter') }}
                             </button>
                         </div>
                     </div>
@@ -111,9 +111,9 @@
                     @if(request('search') || request('category_id') || request('brand_id'))
                         <div class="mt-2">
                             <a href="{{ route('products.index') }}" class="btn btn-sm btn-soft-danger round">
-                                <i class="la la-times"></i> مسح التصفية
+                                <i class="la la-times"></i> {{ __('app.products.clear_filter') }}
                             </a>
-                            <span class="text-muted small ml-1">نتائج البحث: {{ $products->total() }} منتج</span>
+                            <span class="text-muted small ml-1">{{ __('app.products.search_results', ['count' => $products->total()]) }}</span>
                         </div>
                     @endif
                 </div>
@@ -135,15 +135,15 @@
                             <thead class="bg-light">
                                 <tr>
                                     <th width="60">ID</th>
-                                    <th> المنتج</th>
-                                    <th>الفئة/الماركة</th>
+                                    <th> {{ __('app.products.name') }}</th>
+                                    <th>{{ __('app.products.category_brand') }}</th>
                                     @if($user->hasRole('admin'))
-                                        <th>سعر التكلفة</th>
+                                        <th>{{ __('app.products.cost_price') }}</th>
                                     @endif
-                                    <th>سعر البيع</th>
-                                    <th>الكمية</th>
-                                    <th>الباركود</th>
-                                    <th class="text-right">الإجراءات</th>
+                                    <th>{{ __('app.products.selling_price') }}</th>
+                                    <th>{{ __('app.products.quantity') }}</th>
+                                    <th>{{ __('app.products.barcode') }}</th>
+                                    <th class="text-right">{{ __('app.products.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -165,23 +165,23 @@
                                                     <span class="text-bold-700 block">{{ $product->name }}</span>
                                                     @if($product->quantity <= ($product->threshold ?? 5))
                                                         <span class="text-danger small"><i class="la la-exclamation-triangle"></i>
-                                                            مخزون منخفض</span>
+                                                            {{ __('app.products.low_stock_warning') }}</span>
                                                     @endif
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="small">
-                                                <span class="text-bold-600">الفئة:</span>
-                                                {{ $product->category->name ?? 'غير محدد' }}<br>
-                                                <span class="text-bold-600">الماركة:</span>
-                                                {{ $product->brand->name ?? 'غير محدد' }}
+                                                <span class="text-bold-600">{{ __('app.products.category') }}:</span>
+                                                {{ $product->category->name ?? __('app.products.undefined') }}<br>
+                                                <span class="text-bold-600">{{ __('app.products.brand') }}:</span>
+                                                {{ $product->brand->name ?? __('app.products.undefined') }}
                                             </div>
                                         </td>
                                         @if($user->hasRole('admin'))
-                                            <td class="text-bold-600">{{ number_format($product->cost_price, 2) }} ج.م</td>
+                                            <td class="text-bold-600">{{ number_format($product->cost_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
                                         @endif
-                                        <td class="text-bold-700 primary">{{ number_format($product->selling_price, 2) }} ج.م
+                                        <td class="text-bold-700 primary">{{ number_format($product->selling_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
                                         </td>
                                         <td class="text-center">
                                             @php
@@ -201,7 +201,7 @@
                                                     <span class="badge badge-light text-muted" style="font-family: monospace; letter-spacing: 1px;">{{ $product->barcode }}</span>
                                                 </div>
                                             @else
-                                                <span class="text-muted small">لا يوجد</span>
+                                                <span class="text-muted small">{{ __('app.products.no_barcode') }}</span>
                                             @endif
                                         </td>
                                         <td class="text-right">
@@ -216,7 +216,7 @@
                                                 </a>
                                                 <form action="{{ route('products.destroy', $product->id) }}" method="POST"
                                                     style="display:inline;"
-                                                    onsubmit="return confirm('هل أنت متأكد من حذف هذا المنتج؟')">
+                                                    onsubmit="return confirm('{{ __('app.products.delete_confirm') }}')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-soft-danger">
@@ -232,9 +232,8 @@
                                     <tr>
                                         <td colspan="9" class="text-center py-5">
                                             <i class="la la-box font-large-3 text-muted mb-2"></i>
-                                            <h5 class="text-muted">لم يتم العثور على منتجات</h5>
-                                            <a href="{{ route('products.create') }}" class="btn btn-primary round mt-1">إضافة
-                                                أول منتج</a>
+                                            <h5 class="text-muted">{{ __('app.products.not_found') }}</h5>
+                                            <a href="{{ route('products.create') }}" class="btn btn-primary round mt-1">{{ __('app.products.add_first_product') }}</a>
                                         </td>
                                     </tr>
                                 @endforelse
