@@ -16,7 +16,8 @@ class NativeAppServiceProvider implements ProvidesPhpIni
         Window::open()
             ->width(1280)
             ->height(800)
-            ->title('Sketo - Advanced POS System');
+            ->title('Sketo - Advanced POS System')
+            ->url('https://www.cashier.infinitsmart.com/');
     }
 
     /**

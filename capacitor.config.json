@@ -1,0 +1,9 @@
+{
+  "appId": "com.sketo.pos",
+  "appName": "Sketo POS",
+  "webDir": "public",
+  "server": {
+    "url": "https://www.cashier.infinitsmart.com/",
+    "cleartext": true
+  }
+}

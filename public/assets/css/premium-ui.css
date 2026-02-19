@@ -391,14 +391,17 @@ body {
 }
 
 .main-menu-content {
-    height: 100vh !important;
-    /* Force full height for internal scroll */
+    height: 100% !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
-    display: block !important;
+    display: flex !important;
+    flex-direction: column !important;
     padding-bottom: 120px !important;
-    /* Significant padding for bottom items */
+}
+
+.navigation-main {
+    flex-grow: 1 !important;
 }
 
 /* Modal Stacking Context Fix */
