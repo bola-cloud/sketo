@@ -200,7 +200,7 @@
                 @endphp
 
                 @if($isSuperAdmin)
-                    <li class=" nav-item"><a href="#"><i class="la la-server"></i><span
+                    <li class=" nav-item has-sub"><a href="#"><i class="la la-server"></i><span
                                 class="menu-title">{{ __('app.sidebar.platform_management') }}</span></a>
                         <ul class="menu-content">
                             <li class="{{ Route::currentRouteName() == 'super-admin.dashboard' ? 'active' : '' }} ">
@@ -228,7 +228,7 @@
                 @endif
 
                 @if($isAdmin)
-                    <li class=" nav-item"><a href="#"><i class="la la-cube"></i><span class="menu-title"
+                    <li class=" nav-item has-sub"><a href="#"><i class="la la-cube"></i><span class="menu-title"
                                 data-i18n="nav.dash.main">{{ __('app.sidebar.products') }}</span></a>
                         <ul class="menu-content">
                             @if($isAdmin)
@@ -268,10 +268,10 @@
                                 </li>
                             @endif
                             <!-- @if($isAdmin)
-                                                                                                                                                                <li class="{{ Route::currentRouteName() == 'quantity.updates' ? 'active':'' }} ">
-                                                                                                                                                                    <a class="menu-item" href="{{route('quantity.updates')}}" data-i18n="nav.dash.crypto"> {{ __('app.sidebar.product_quantities') }} </a>
-                                                                                                                                                                </li>
-                                                                                                                                                            @endif -->
+                                                                                                                                                                    <li class="{{ Route::currentRouteName() == 'quantity.updates' ? 'active':'' }} ">
+                                                                                                                                                                        <a class="menu-item" href="{{route('quantity.updates')}}" data-i18n="nav.dash.crypto"> {{ __('app.sidebar.product_quantities') }} </a>
+                                                                                                                                                                    </li>
+                                                                                                                                                                @endif -->
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'product.transactions' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('product.transactions')}}" data-i18n="nav.dash.crypto">
@@ -283,8 +283,8 @@
                 @endif
 
                 @if($isAdmin)
-                    <li class=" nav-item"><a href="#"><i class="la la-calculator"></i><span class="menu-title"
-                                data-i18n="nav.dash.main"> {{ __('app.sidebar.cashier') }} </a>
+                    <li class=" nav-item has-sub"><a href="#"><i class="la la-calculator"></i><span class="menu-title"
+                                data-i18n="nav.dash.main"> {{ __('app.sidebar.cashier') }} </span></a>
                         <ul class="menu-content">
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'cashier.viewCart' ? 'active' : '' }} ">
@@ -315,8 +315,8 @@
                 @endif
 
                 @if($isAdmin)
-                    <li class=" nav-item"><a href="#"><i class="la la-shopping-cart"></i><span class="menu-title"
-                                data-i18n="nav.dash.main"> {{ __('app.sidebar.purchase_invoices') }} </a>
+                    <li class=" nav-item has-sub"><a href="#"><i class="la la-shopping-cart"></i><span class="menu-title"
+                                data-i18n="nav.dash.main"> {{ __('app.sidebar.purchase_invoices') }} </span></a>
                         <ul class="menu-content">
                             @if($isAdmin)
                                 <li class="{{ Route::currentRouteName() == 'purchases.create' ? 'active' : '' }} ">
@@ -354,8 +354,8 @@
                 @endif
 
                 @if($isAdmin)
-                    <li class=" nav-item"><a href="#"><i class="la la-bar-chart"></i><span class="menu-title"
-                                data-i18n="nav.dash.main"> {{ __('app.sidebar.sales_reports') }} </a>
+                    <li class=" nav-item has-sub"><a href="#"><i class="la la-bar-chart"></i><span class="menu-title"
+                                data-i18n="nav.dash.main"> {{ __('app.sidebar.sales_reports') }} </span></a>
                         <ul class="menu-content">
                             <li class="{{ Route::currentRouteName() == 'reports.daily' ? 'active' : '' }} ">
                                 <a class="menu-item" href="{{route('reports.daily')}}" data-i18n="nav.dash.ecommerce">
@@ -374,8 +374,8 @@
                 @endif
 
                 @if($isAdmin)
-                    <li class=" nav-item"><a href="#"><i class="la la-pie-chart"></i><span class="menu-title"
-                                data-i18n="nav.dash.main"> {{ __('app.sidebar.financial_reports') }} </a>
+                    <li class=" nav-item has-sub"><a href="#"><i class="la la-pie-chart"></i><span class="menu-title"
+                                data-i18n="nav.dash.main"> {{ __('app.sidebar.financial_reports') }} </span></a>
                         <ul class="menu-content">
                             <li
                                 class="{{ Route::currentRouteName() == 'reports.statistics.financial_summary' ? 'active' : '' }} ">
@@ -400,8 +400,8 @@
                 @endif
 
                 @if($isAdmin)
-                    <li class=" nav-item"><a href="#"><i class="la la-key"></i><span class="menu-title"
-                                data-i18n="nav.dash.main"> {{ __('app.sidebar.permissions') }} </a>
+                    <li class=" nav-item has-sub"><a href="#"><i class="la la-key"></i><span class="menu-title"
+                                data-i18n="nav.dash.main"> {{ __('app.sidebar.permissions') }} </span></a>
                         <ul class="menu-content">
                             <li class="{{ Route::currentRouteName() == 'roles.create' ? 'active' : '' }} ">
                                 <a class="menu-item" href="{{route('roles.create')}}" data-i18n="nav.dash.ecommerce">
