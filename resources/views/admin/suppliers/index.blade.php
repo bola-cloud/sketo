@@ -97,85 +97,89 @@
         </div>
     </div>
 
-    <!-- Create Supplier Modal -->
-    <div class="modal fade text-left" id="createSupplierModal" tabindex="-1" role="dialog"
-        aria-labelledby="createSupplierModalLabel" aria-hidden="true" style="direction: rtl;">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                <div class="modal-header bg-primary text-white" style="border-radius: 20px 20px 0 0;">
-                    <h5 class="modal-title font-weight-bold white" id="createSupplierModalLabel"><i
-                            class="la la-plus-circle"></i> {{ __('app.suppliers.add_new') }}</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+    @push('modals')
+        <!-- Create Supplier Modal -->
+        <div class="modal fade text-left" id="createSupplierModal" tabindex="-1" role="dialog"
+            aria-labelledby="createSupplierModalLabel" aria-hidden="true" style="direction: rtl;">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                    <div class="modal-header bg-primary text-white" style="border-radius: 20px 20px 0 0;">
+                        <h5 class="modal-title font-weight-bold white" id="createSupplierModalLabel"><i
+                                class="la la-plus-circle"></i> {{ __('app.suppliers.add_new') }}</h5>
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="createSupplierForm">
+                        @csrf
+                        <div class="modal-body p-2">
+                            <div class="form-group mb-2">
+                                <label for="name" class="text-bold-600">{{ __('app.suppliers.name') }} <span
+                                        class="danger">*</span></label>
+                                <input type="text" class="form-control round border-primary" id="name" name="name"
+                                    placeholder="{{ __('app.suppliers.enter_name') }}" required>
+                            </div>
+                            <div class="form-group mb-0">
+                                <label for="phone" class="text-bold-600">{{ __('app.suppliers.phone') }} <span
+                                        class="danger">*</span></label>
+                                <input type="text" class="form-control round border-primary" id="phone" name="phone"
+                                    placeholder="01XXXXXXXXX" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 justify-content-center pb-2">
+                            <button type="button" class="btn btn-light round px-2"
+                                data-dismiss="modal">{{ __('app.suppliers.cancel') }}</button>
+                            <button type="submit"
+                                class="btn btn-primary round px-2 shadow">{{ __('app.suppliers.save') }}</button>
+                        </div>
+                    </form>
                 </div>
-                <form id="createSupplierForm">
-                    @csrf
-                    <div class="modal-body p-2">
-                        <div class="form-group mb-2">
-                            <label for="name" class="text-bold-600">{{ __('app.suppliers.name') }} <span
-                                    class="danger">*</span></label>
-                            <input type="text" class="form-control round border-primary" id="name" name="name"
-                                placeholder="{{ __('app.suppliers.enter_name') }}" required>
-                        </div>
-                        <div class="form-group mb-0">
-                            <label for="phone" class="text-bold-600">{{ __('app.suppliers.phone') }} <span
-                                    class="danger">*</span></label>
-                            <input type="text" class="form-control round border-primary" id="phone" name="phone"
-                                placeholder="01XXXXXXXXX" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-0 justify-content-center pb-2">
-                        <button type="button" class="btn btn-light round px-2"
-                            data-dismiss="modal">{{ __('app.suppliers.cancel') }}</button>
-                        <button type="submit"
-                            class="btn btn-primary round px-2 shadow">{{ __('app.suppliers.save') }}</button>
-                    </div>
-                </form>
             </div>
         </div>
-    </div>
+    @endpush
 
-    <!-- Edit Supplier Modal -->
-    <div class="modal fade text-left" id="editSupplierModal" tabindex="-1" role="dialog"
-        aria-labelledby="editSupplierModalLabel" aria-hidden="true" style="direction: rtl;">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                <div class="modal-header bg-warning text-white" style="border-radius: 20px 20px 0 0;">
-                    <h5 class="modal-title font-weight-bold white" id="editSupplierModalLabel"><i class="la la-edit"></i>
-                        {{ __('app.suppliers.edit') }}</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+    @push('modals')
+        <!-- Edit Supplier Modal -->
+        <div class="modal fade text-left" id="editSupplierModal" tabindex="-1" role="dialog"
+            aria-labelledby="editSupplierModalLabel" aria-hidden="true" style="direction: rtl;">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                    <div class="modal-header bg-warning text-white" style="border-radius: 20px 20px 0 0;">
+                        <h5 class="modal-title font-weight-bold white" id="editSupplierModalLabel"><i class="la la-edit"></i>
+                            {{ __('app.suppliers.edit') }}</h5>
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="editSupplierForm">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-body p-2">
+                            <input type="hidden" id="edit_supplier_id" name="supplier_id">
+                            <div class="form-group mb-2">
+                                <label for="edit_name" class="text-bold-600">{{ __('app.suppliers.name') }} <span
+                                        class="danger">*</span></label>
+                                <input type="text" class="form-control round border-warning" id="edit_name" name="name"
+                                    required>
+                            </div>
+                            <div class="form-group mb-0">
+                                <label for="edit_phone" class="text-bold-600">{{ __('app.suppliers.phone') }} <span
+                                        class="danger">*</span></label>
+                                <input type="text" class="form-control round border-warning" id="edit_phone" name="phone"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 justify-content-center pb-2">
+                            <button type="button" class="btn btn-light round px-2"
+                                data-dismiss="modal">{{ __('app.suppliers.cancel') }}</button>
+                            <button type="submit"
+                                class="btn btn-warning round px-2 shadow text-white">{{ __('app.suppliers.update') }}</button>
+                        </div>
+                    </form>
                 </div>
-                <form id="editSupplierForm">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-body p-2">
-                        <input type="hidden" id="edit_supplier_id" name="supplier_id">
-                        <div class="form-group mb-2">
-                            <label for="edit_name" class="text-bold-600">{{ __('app.suppliers.name') }} <span
-                                    class="danger">*</span></label>
-                            <input type="text" class="form-control round border-warning" id="edit_name" name="name"
-                                required>
-                        </div>
-                        <div class="form-group mb-0">
-                            <label for="edit_phone" class="text-bold-600">{{ __('app.suppliers.phone') }} <span
-                                    class="danger">*</span></label>
-                            <input type="text" class="form-control round border-warning" id="edit_phone" name="phone"
-                                required>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-0 justify-content-center pb-2">
-                        <button type="button" class="btn btn-light round px-2"
-                            data-dismiss="modal">{{ __('app.suppliers.cancel') }}</button>
-                        <button type="submit"
-                            class="btn btn-warning round px-2 shadow text-white">{{ __('app.suppliers.update') }}</button>
-                    </div>
-                </form>
             </div>
         </div>
-    </div>
+    @endpush
 
     <style>
         .round-lg {

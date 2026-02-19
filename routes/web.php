@@ -23,8 +23,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 // Super Admin Routes
 Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
+    Route::get('/', [App\Http\Controllers\SuperAdmin\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/vendors', [App\Http\Controllers\SuperAdmin\VendorController::class, 'index'])->name('vendors.index');
+    Route::get('/vendors/create', [App\Http\Controllers\SuperAdmin\VendorController::class, 'create'])->name('vendors.create');
+    Route::post('/vendors', [App\Http\Controllers\SuperAdmin\VendorController::class, 'store'])->name('vendors.store');
+    Route::get('/vendors/search', [App\Http\Controllers\SuperAdmin\VendorController::class, 'search'])->name('vendors.search');
     Route::get('/vendors/{vendor}', [App\Http\Controllers\SuperAdmin\VendorController::class, 'show'])->name('vendors.show');
+    Route::get('/vendors/{vendor}/insights', [App\Http\Controllers\SuperAdmin\VendorController::class, 'insights'])->name('vendors.insights');
     Route::post('/vendors/{vendor}/update-subscription', [App\Http\Controllers\SuperAdmin\VendorController::class, 'updateSubscription'])->name('vendors.updateSubscription');
     Route::post('/vendors/{vendor}/toggle-status', [App\Http\Controllers\SuperAdmin\VendorController::class, 'toggleStatus'])->name('vendors.toggleStatus');
 });
@@ -33,6 +38,7 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
+    'subscribed',
 ])->group(function () {
     // Route::get('/dashboard', function () {
     //     return view('dashboard');
@@ -58,6 +64,8 @@ Route::middleware([
     //   Route::post('cashier/search-product-by-name', [App\Http\Controllers\CashierController::class, 'searchProductByName'])->name('cashier.searchProductByName');
     Route::post('cashier/remove-from-cart', [App\Http\Controllers\CashierController::class, 'removeFromCart'])->name('cashier.removeFromCart');
     Route::post('cashier/checkout', [App\Http\Controllers\CashierController::class, 'checkout'])->name('cashier.checkout');
+    Route::post('cashier/sync-offline-invoice', [App\Http\Controllers\CashierController::class, 'syncOfflineInvoice'])->name('cashier.syncOffline');
+    Route::post('sync/process', [App\Http\Controllers\SyncController::class, 'process'])->name('sync.process');
     Route::get('cashier/invoice/{id}', [App\Http\Controllers\CashierController::class, 'printInvoice'])->name('cashier.printInvoice');
     Route::get('invoices', [App\Http\Controllers\InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('invoices-export', [App\Http\Controllers\InvoiceController::class, 'export'])->name('invoices.export');
@@ -90,6 +98,9 @@ Route::middleware([
         Route::get('/purchases', [App\Http\Controllers\ReportController::class, 'purchasesDetails'])->name('purchases');
         Route::get('/profit', [App\Http\Controllers\ReportController::class, 'profitDetails'])->name('profit');
         Route::get('/cash-flow', [App\Http\Controllers\ReportController::class, 'cashFlowDetails'])->name('cash_flow');
+        Route::get('/financial-summary', [App\Http\Controllers\ReportController::class, 'financialSummary'])->name('financial_summary');
+        Route::get('/inventory-valuation', [App\Http\Controllers\ReportController::class, 'inventoryValuation'])->name('inventory_valuation');
+        Route::get('/aging-report', [App\Http\Controllers\ReportController::class, 'agingReport'])->name('aging_report');
     });
     Route::get('/purchases/{purchase}/transfer-product/{product}', [App\Http\Controllers\PurchasesController::class, 'transferProductForm'])->name('purchases.transferProduct');
     Route::post('/purchases/{purchase}/transfer-product/{product}', [App\Http\Controllers\PurchasesController::class, 'transferProduct'])->name('purchases.transferProduct.store');

@@ -18,8 +18,7 @@
 
 <div class="content-body">
     <div class="row justify-content-center">
-        <div class="col-lg-8 col-12">
-            <div class="card pull-up border-0 shadow-sm" style="background: rgba(255, 255, 255, 0.95); border-radius: 20px;">
+            <div class="card premium-card border-0 shadow-lg mb-4 animate-fade-in-up" style="border-radius: 28px;">
                 <div class="card-content">
                     <div class="card-body">
                         @if ($errors->any())
@@ -43,7 +42,7 @@
                         <!-- Selection between existing and new product -->
                         <div class="form-group mb-4">
                             <label class="text-bold-700 text-muted small">{{ __('app.products.operation_type') }}</label>
-                            <div class="d-flex gap-2 p-1 bg-light round" style="border-radius: 15px;">
+                            <div class="d-flex gap-2 p-1 bg-glass-light border-white-10" style="border-radius: 18px;">
                                 <div class="custom-control custom-radio custom-control-inline flex-grow-1 text-center m-0">
                                     <input type="radio" id="choice_new" name="product_choice_radio" value="new" class="custom-control-input" checked>
                                     <label class="custom-control-label w-100 p-1 round-lg cursor-pointer transition-all" for="choice_new">{{ __('app.products.new_product') }}</label>
@@ -60,36 +59,43 @@
                             <h4 class="text-bold-700 mb-2 primary"><i class="la la-plus-square"></i> {{ __('app.products.add_quantity_existing') }}</h4>
                             <form action="{{ route('products.store') }}" method="POST">
                                 @csrf
-                                <div class="form-group mb-2">
-                                    <label for="existing_product" class="text-bold-600">{{ __('app.products.select_product') }}</label>
-                                    <select class="form-control select2-single border-primary" id="existing_product" name="existing_product">
-                                        <option value="" disabled selected>{{ __('app.products.search_product_placeholder') }}</option>
-                                        @foreach($products as $product)
-                                            <option value="{{ $product->id }}">{{ $product->name }} - {{ $product->barcode }}</option>
-                                        @endforeach
-                                    </select>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group mb-2">
+                                            <label for="existing_product" class="text-bold-600">{{ __('app.products.select_product') }}</label>
+                                            <select class="form-control select2-single border-primary" id="existing_product" name="existing_product">
+                                                <option value="" disabled selected>{{ __('app.products.search_product_placeholder') }}</option>
+                                                @foreach($products as $product)
+                                                    <option value="{{ $product->id }}">{{ $product->name }} - {{ $product->barcode }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-2">
+                                            <label for="purchase_id_existing" class="text-bold-600">{{ __('app.products.purchase_invoice') }}</label>
+                                            <select class="form-control select2-single border-primary" id="purchase_id_existing" name="purchase_id_existing">
+                                                <option value="" disabled selected>{{ __('app.products.select_invoice') }}</option>
+                                                @foreach($purchases as $purchase)
+                                                    @if($purchase->type == 'product')
+                                                        <option value="{{ $purchase->id }}">{{ $purchase->invoice_number }}</option>
+                                                    @endif
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-2">
+                                            <label for="quantity_existing" class="text-bold-600">{{ __('app.products.added_quantity') }}</label>
+                                            <input type="number" class="form-control round border-primary" id="quantity_existing" name="quantity_existing" placeholder="0">
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div class="form-group mb-2">
-                                    <label for="purchase_id_existing" class="text-bold-600">{{ __('app.products.purchase_invoice') }}</label>
-                                    <select class="form-control select2-single border-primary" id="purchase_id_existing" name="purchase_id_existing">
-                                        <option value="" disabled selected>{{ __('app.products.select_invoice') }}</option>
-                                        @foreach($purchases as $purchase)
-                                            @if($purchase->type == 'product')
-                                                <option value="{{ $purchase->id }}">{{ $purchase->invoice_number }}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="form-group mb-2">
-                                <div class="form-group mb-2">
-                                    <label for="quantity_existing" class="text-bold-600">{{ __('app.products.added_quantity') }}</label>
-                                    <input type="number" class="form-control round border-primary" id="quantity_existing" name="quantity_existing" placeholder="0">
-                                </div>
-
-                                <div class="form-actions mt-3 text-center">
-                                    <button type="submit" class="btn btn-primary btn-block round shadow py-1">
+                                <div class="form-actions mt-4 text-center">
+                                    <button type="submit" class="btn btn-primary round px-4 shadow py-1">
                                         <i class="la la-check"></i> {{ __('app.products.save_added_quantity') }}
                                     </button>
                                 </div>
@@ -181,7 +187,6 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                    <div class="col-md-6">
                                         <div class="form-group mb-2">
                                             <label for="quantity" class="text-bold-600">{{ __('app.products.initial_quantity') }} <span class="danger">*</span></label>
                                             <input type="number" class="form-control round border-primary" id="quantity" name="quantity" 
@@ -193,6 +198,20 @@
                                             <label for="threshold" class="text-bold-600">{{ __('app.products.alert_quantity') }} <span class="danger">*</span></label>
                                             <input type="number" class="form-control round border-primary" id="threshold" name="threshold" 
                                                 value="{{ old('threshold', 5) }}" placeholder="5" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-2">
+                                            <label for="expiry_date" class="text-bold-600">{{ __('app.products.expiry_date') }}</label>
+                                            <input type="date" class="form-control round border-primary" id="expiry_date" name="expiry_date" 
+                                                value="{{ old('expiry_date') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-2">
+                                            <label for="expiry_alert_days" class="text-bold-600">{{ __('app.products.expiry_alert_days') }} <span class="danger">*</span></label>
+                                            <input type="number" class="form-control round border-primary" id="expiry_alert_days" name="expiry_alert_days" 
+                                                value="{{ old('expiry_alert_days', 30) }}" required>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
@@ -225,21 +244,45 @@
     .round-lg { border-radius: 15px !important; }
     .cursor-pointer { cursor: pointer; }
     .transition-all { transition: all 0.3s ease; }
+    .bg-glass-light { background: rgba(255, 255, 255, 0.05); }
+    .border-white-10 { border: 1px solid rgba(255, 255, 255, 0.1); }
+    
     input[name="product_choice_radio"]:checked + label {
-        background-color: #3b82f6 !important;
+        background: linear-gradient(135deg, var(--p-indigo), var(--p-purple)) !important;
         color: white !important;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
     }
+    
     .select2-container--default .select2-selection--single {
-        border-radius: 20px !important;
-        border: 1px solid #ced4da !important;
-        height: 40px !important;
+        border-radius: 14px !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        height: 45px !important;
+        color: white !important;
     }
+    
     .select2-container--default .select2-selection--single .select2-selection__rendered {
-        line-height: 40px !important;
+        line-height: 45px !important;
+        color: white !important;
     }
+    
     .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 38px !important;
+        height: 43px !important;
+    }
+
+    .form-control.round {
+        border-radius: 14px;
+    }
+
+    .custom-file-label.round-lg {
+        border-radius: 14px !important;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .card-body {
+        padding: 2rem !important;
     }
 </style>
 @endsection
@@ -256,11 +299,11 @@
         $('input[name="product_choice_radio"]').on('change', function() {
             var selectedOption = $(this).val();
             if (selectedOption === 'existing') {
-                $('#existing_product_form').fadeIn();
+                $('#existing_product_form').show();
                 $('#new_product_form').hide();
             } else {
                 $('#existing_product_form').hide();
-                $('#new_product_form').fadeIn();
+                $('#new_product_form').show();
             }
         });
 

@@ -115,7 +115,7 @@
         </div>
 
         <!-- Split Screen Layout -->
-        <div class="row g-0" style="height: calc(100vh - 200px); max-height: calc(100vh - 200px);">
+        <div class="row g-0" style="height: calc(100vh - 130px); max-height: calc(100vh - 130px);">
             <!-- Left Panel - Product Search & Barcode Scanner -->
             <div class="col-md-4 border-end border-2">
                 <div class="h-100 d-flex flex-column">
@@ -125,7 +125,7 @@
                             <i class="fas fa-search me-2"></i>{{ __('app.cashier.product_search') }}
                         </h5>
                     </div>
-                    <div class="flex-grow-1 p-3 bg-white" style="overflow: hidden; min-height: 0;">
+                    <div class="flex-grow-1 p-3 bg-white" style="overflow-y: auto; min-height: 0;">
                         <div class="h-100 d-flex flex-column">
                             <!-- Alert Messages -->
                             @if ($errors->any())
@@ -190,8 +190,9 @@
                             </div>
 
                             <!-- Search Results - Always visible container -->
-                            <div id="searchResultsContainer" class="flex-grow-1 search-results-container position-relative"
-                                style="min-height: 150px; max-height: 100%;">
+                            <div id="searchResultsContainer"
+                                class="flex-shrink-0 search-results-container position-relative mb-3"
+                                style="min-height: 400px; overflow: hidden;">
                                 <div class="card border-warning h-100">
                                     <div class="card-header bg-warning text-dark py-1">
                                         <h6 class="mb-0 small">
@@ -199,8 +200,10 @@
                                             <span class="badge bg-dark ms-2" id="search-count">0</span>
                                         </h6>
                                     </div>
-                                    <div class="card-body p-0" style="height: calc(100% - 45px); overflow-y: auto;">
-                                        <ul id="productList" class="list-group list-group-flush">
+                                    <div class="card-body p-0 d-flex flex-column"
+                                        style="height: calc(100% - 35px); overflow: hidden;">
+                                        <ul id="productList" class="list-group list-group-flush flex-grow-1"
+                                            style="overflow-y: auto;">
                                             <!-- Default empty state -->
                                             <li class="list-group-item text-center text-muted py-4" id="empty-search-state">
                                                 <i class="fas fa-search me-2"></i>{{ __('app.cashier.start_typing') }}
@@ -212,12 +215,12 @@
 
                             <!-- Quick Stats -->
                             <div class="mt-2 flex-shrink-0">
-                                <div class="card border-secondary stats-card">
+                                <div class="card border-secondary stats-card mb-5">
                                     <div class="card-header bg-secondary text-white py-1">
                                         <h6 class="mb-0 small"><i
                                                 class="fas fa-chart-bar me-2"></i>{{ __('app.cashier.quick_stats') }}</h6>
                                     </div>
-                                    <div class="card-body p-2">
+                                    <div class="card-body p-3">
                                         <div class="row text-center">
                                             <div class="col-6">
                                                 <div class="border-end">
@@ -284,6 +287,25 @@
             // Initialize cart scripts
             initializeCartScripts();
         });
+
+        // Global handler for offline success (called by SketoSync)
+        window.showOfflineSuccess = function () {
+            // Show a nice glassmorphism alert
+            const alertHtml = `
+                        <div class="position-fixed top-0 start-50 translate-middle-x mt-4 z-index-2000">
+                            <div class="alert bg-glass-dark text-white border-info shadow-lg p-4 rounded-xl text-center" style="backdrop-filter: blur(20px);">
+                                <i class="la la-cloud-download font-large-2 text-info mb-2 d-block"></i>
+                                <h4>{{ __('app.cashier.saved_offline') ?? 'تم الحفظ أوفلاين' }}</h4>
+                                <p class="mb-0 text-white-50">سيتم المزامنة تلقائياً عند عودة الإنترنت</p>
+                            </div>
+                        </div>
+                    `;
+            $('body').append(alertHtml);
+
+            setTimeout(() => {
+                location.reload(); // Clear cart and reset UI
+            }, 3000);
+        };
 
         // Function to update cart quantity via AJAX
         function updateCartQuantity(barcode, quantityChange) {
@@ -352,11 +374,11 @@
                             errorMsg = xhr.responseJSON.message;
                         }
                         const alertHtml = `
-                            <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
-                                <i class="fas fa-exclamation-triangle me-2"></i>${errorMsg}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        `;
+                                                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>${errorMsg}
+                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                </div>
+                                            `;
                         $('#barcode').closest('.card-body').prepend(alertHtml);
                         setTimeout(function () {
                             $('.alert').fadeOut();
@@ -367,63 +389,26 @@
             }
 
             // Product name search handling with improved UI
-            $('#product_name').off('input').on('input', function () {
+            $('#product_name').off('input').on('input', async function () {
                 var query = $(this).val().trim();
 
                 if (query.length >= 2) {
+                    if (SketoSync && !SketoSync.isOnline) {
+                        // Offline Search using Dexie
+                        const results = await SketoSync.db.products
+                            .where('name').startsWithIgnoreCase(query)
+                            .or('barcode').startsWithIgnoreCase(query)
+                            .toArray();
+                        renderSearchResults(results);
+                        return;
+                    }
+
                     $.ajax({
                         url: "{{ route('cashier.searchProductByName') }}",
                         type: "GET",
                         data: { query: query },
                         success: function (data) {
-                            $('#productList').empty();
-                            $('#search-count').text(data.length);
-                            if (data.length === 0) {
-                                $('#productList').append(
-                                    '<li class="list-group-item text-center text-muted py-4">' +
-                                    '<i class="fas fa-search me-2"></i>{{ __('app.cashier.no_results') }}' +
-                                    '</li>'
-                                );
-                                $('#searchResultsContainer').removeClass('show-scroll-hint');
-                            } else {
-                                data.forEach(function (batch) {
-                                    var productName = batch.name || '{{ __('app.cashier.undefined_product') }}';
-                                    var barcode = batch.barcode;
-                                    var price = parseFloat(batch.price || 0);
-                                    var qty = batch.quantity || 0;
-                                    // Use JSON.stringify and slice to safely encode productName for HTML attribute
-                                    var safeName = JSON.stringify(productName);
-                                    // Remove the surrounding quotes from JSON.stringify
-                                    safeName = safeName.slice(1, -1).replace(/'/g, "\\'");
-                                    $('#productList').append(
-                                        '<li class="list-group-item list-group-item-action d-flex align-items-center py-3" ' +
-                                        'onclick="selectProduct(\'' + barcode + '\',\'' + safeName + '\')" ' +
-                                        'style="cursor: pointer;" title="{{ __('app.cashier.click_to_add') }}">' +
-                                        '<div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" ' +
-                                        'style="width: 35px; height: 35px; min-width: 35px;">' +
-                                        '<i class="fas fa-cube fa-sm"></i>' +
-                                        '</div>' +
-                                        '<div class="flex-grow-1">' +
-                                        '<div class="fw-bold text-dark">' + productName + ' <span class="badge bg-secondary">' + barcode + '</span></div>' +
-                                        '<small class="text-muted">' +
-                                        '<i class="fas fa-barcode me-1"></i>' + barcode +
-                                        '</small>' +
-                                        '</div>' +
-                                        '<div class="text-end">' +
-                                        '<span class="badge bg-info">' + price.toFixed(2) + ' {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span>' +
-                                        '<br><small class="text-muted">{{ __('app.cashier.available') }}: ' + qty + '</small>' +
-                                        '</div>' +
-                                        '</li>'
-                                    );
-                                });
-                                if (data.length > 5) {
-                                    $('#searchResultsContainer').addClass('show-scroll-hint');
-                                    setTimeout(function () {
-                                        $('#searchResultsContainer').removeClass('show-scroll-hint');
-                                    }, 3000);
-                                }
-                            }
-                            $('#productList').scrollTop(0);
+                            renderSearchResults(data);
                         },
                         error: function () {
                             $('#productList').empty().append(
@@ -445,7 +430,57 @@
                     $('#searchResultsContainer').removeClass('show-scroll-hint');
                     $('#search-count').text('0');
                 }
-            });    // Hide search results when clicking outside (reset to empty state)
+            });
+
+            function renderSearchResults(data) {
+                $('#productList').empty();
+                $('#search-count').text(data.length);
+                if (data.length === 0) {
+                    $('#productList').append(
+                        '<li class="list-group-item text-center text-muted py-4">' +
+                        '<i class="fas fa-search me-2"></i>{{ __('app.cashier.no_results') }}' +
+                        '</li>'
+                    );
+                    $('#searchResultsContainer').removeClass('show-scroll-hint');
+                } else {
+                    data.forEach(function (batch) {
+                        var productName = batch.name || '{{ __('app.cashier.undefined_product') }}';
+                        var barcode = batch.barcode;
+                        var price = parseFloat(batch.price || 0);
+                        var qty = batch.quantity || 0;
+                        var safeName = JSON.stringify(productName);
+                        safeName = safeName.slice(1, -1).replace(/'/g, "\\'");
+                        $('#productList').append(
+                            '<li class="list-group-item list-group-item-action d-flex align-items-center py-3" ' +
+                            'onclick="selectProduct(\'' + barcode + '\',\'' + safeName + '\')" ' +
+                            'style="cursor: pointer;" title="{{ __('app.cashier.click_to_add') }}">' +
+                            '<div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" ' +
+                            'style="width: 35px; height: 35px; min-width: 35px;">' +
+                            '<i class="fas fa-cube fa-sm"></i>' +
+                            '</div>' +
+                            '<div class="flex-grow-1">' +
+                            '<div class="fw-bold text-dark">' + productName + ' <span class="badge bg-secondary">' + barcode + '</span></div>' +
+                            '<small class="text-muted">' +
+                            '<i class="fas fa-barcode me-1"></i>' + barcode +
+                            '</small>' +
+                            '</div>' +
+                            '<div class="text-end">' +
+                            '<span class="badge bg-info">' + price.toFixed(2) + ' {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span>' +
+                            '<br><small class="text-muted">{{ __('app.cashier.available') }}: ' + qty + '</small>' +
+                            '</div>' +
+                            '</li>'
+                        );
+                    });
+                    if (data.length > 5) {
+                        $('#searchResultsContainer').addClass('show-scroll-hint');
+                        setTimeout(function () {
+                            $('#searchResultsContainer').removeClass('show-scroll-hint');
+                        }, 3000);
+                    }
+                }
+                $('#productList').scrollTop(0);
+            }
+            // Hide search results when clicking outside (reset to empty state)
             $(document).on('click', function (e) {
                 if (!$(e.target).closest('#product_name, #searchResultsContainer').length) {
                     if ($('#product_name').val().trim() === '') {

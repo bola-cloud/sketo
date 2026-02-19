@@ -55,10 +55,10 @@
                                 <td><span class="badge bg-info text-dark">{{ $transfer->transferred_quantity }}</span></td>
 
                                 <td><span class="badge bg-warning text-dark">{{ $transfer->sold_quantity_old_purchase }}</span></td>
-                                <td><span class="text-muted">{{ number_format($transfer->old_cost_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span></td>
-                                <td><span class="text-muted">{{ number_format($transfer->old_selling_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span></td>
-                                <td><span class="text-info">{{ number_format($transfer->new_cost_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span></td>
-                                <td><span class="text-success">{{ number_format($transfer->new_selling_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span></td>
+                                <td><span class="text-muted">{{ number_format($transfer->old_cost_price, 2) }} {{ __('app.common.currency') }}</span></td>
+                                <td><span class="text-muted">{{ number_format($transfer->old_selling_price, 2) }} {{ __('app.common.currency') }}</span></td>
+                                <td><span class="text-info">{{ number_format($transfer->new_cost_price, 2) }} {{ __('app.common.currency') }}</span></td>
+                                <td><span class="text-success">{{ number_format($transfer->new_selling_price, 2) }} {{ __('app.common.currency') }}</span></td>
                                 <td><small>{{ $transfer->formatted_created_at }}</small></td>
                             </tr>
                         @endforeach
@@ -92,7 +92,7 @@
                             <h5><i class="fas fa-chart-line"></i> {{ __('app.reports.avg_profit') }}</h5>
                             <h3>{{ number_format($transfers->avg(function ($t) {
                 return $t->new_selling_price - $t->new_cost_price; }), 2) }}
-                                {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</h3>
+                                {{ __('app.common.currency') }}</h3>
                             <small>{{ __('app.reports.per_unit') }}</small>
                         </div>
                     </div>
@@ -103,7 +103,7 @@
                             <h5><i class="fas fa-coins"></i> {{ __('app.reports.total_profit') }}</h5>
                             <h3>{{ number_format($transfers->sum(function ($t) {
                 return ($t->new_selling_price - $t->new_cost_price) * $t->transferred_quantity; }), 2) }}
-                                {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</h3>
+                                {{ __('app.common.currency') }}</h3>
                             <small>{{ __('app.reports.from_transfers') }}</small>
                         </div>
                     </div>

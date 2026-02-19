@@ -97,6 +97,20 @@
                                             value="{{ $product->threshold }}" required>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-2">
+                                        <label for="expiry_date" class="text-bold-600">{{ __('app.products.expiry_date') }}</label>
+                                        <input type="date" class="form-control round border-primary" id="expiry_date" name="expiry_date" 
+                                            value="{{ $product->expiry_date }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-2">
+                                        <label for="expiry_alert_days" class="text-bold-600">{{ __('app.products.expiry_alert_days') }} <span class="danger">*</span></label>
+                                        <input type="number" class="form-control round border-primary" id="expiry_alert_days" name="expiry_alert_days" 
+                                            value="{{ $product->expiry_alert_days }}" required>
+                                    </div>
+                                </div>
                                 <div class="col-md-12">
                                     <div class="form-group mb-2">
                                         <label for="image" class="text-bold-600">{{ __('app.products.image') }}</label>

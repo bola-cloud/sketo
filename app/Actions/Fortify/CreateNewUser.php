@@ -47,7 +47,7 @@ class CreateNewUser implements CreatesNewUsers
 
             // Assign Owner Role (Laratrust)
             // Note: Assuming 'owner' role exists. If not, we might need to create it.
-            // $user->addRole('owner'); 
+            // $user->attachRole('owner'); 
 
             return $user;
         });

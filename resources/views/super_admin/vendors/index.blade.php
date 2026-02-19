@@ -9,7 +9,13 @@
                     <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center p-4">
                         <div>
                             <h2 class="mb-0 font-weight-bold" style="color: #1e293b;">{{ __('app.sidebar.vendors') }}</h2>
-                            <p class="text-muted mb-0">{{ __('Manage all stores on the platform') }}</p>
+                            <p class="text-muted mb-0">{{ __('app.platform.manage_stores') }}</p>
+                        </div>
+                        <div>
+                            <a href="{{ route('super-admin.vendors.create') }}" class="btn btn-primary shadow-sm"
+                                style="border-radius: 12px; padding: 10px 20px; font-weight: 600;">
+                                <i class="la la-plus-circle"></i> {{ __('app.platform.add_vendor') }}
+                            </a>
                         </div>
                     </div>
                     <div class="card-body p-0">
@@ -18,15 +24,19 @@
                                 <thead style="background: #f8fafc;">
                                     <tr>
                                         <th class="px-4 py-3 border-0" style="color: #64748b; font-weight: 600;">
-                                            {{ __('Store Name') }}</th>
+                                            {{ __('app.platform.store_name') }}
+                                        </th>
                                         <th class="px-4 py-3 border-0" style="color: #64748b; font-weight: 600;">
-                                            {{ __('Owner') }}</th>
+                                            {{ __('app.platform.owner') }}
+                                        </th>
                                         <th class="px-4 py-3 border-0" style="color: #64748b; font-weight: 600;">
-                                            {{ __('Status') }}</th>
+                                            {{ __('app.platform.status') }}
+                                        </th>
                                         <th class="px-4 py-3 border-0" style="color: #64748b; font-weight: 600;">
-                                            {{ __('Subscription Ends') }}</th>
+                                            {{ __('app.platform.subscription_ends') }}
+                                        </th>
                                         <th class="px-4 py-3 border-0 text-center"
-                                            style="color: #64748b; font-weight: 600;">{{ __('Actions') }}</th>
+                                            style="color: #64748b; font-weight: 600;">{{ __('app.platform.actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -34,7 +44,8 @@
                                         <tr>
                                             <td class="px-4 py-4">
                                                 <div class="font-weight-bold" style="color: #334155;">
-                                                    {{ $vendor->business_name }}</div>
+                                                    {{ $vendor->business_name }}
+                                                </div>
                                                 <small class="text-muted">{{ $vendor->domain ?? 'Standard Subdomain' }}</small>
                                             </td>
                                             <td class="px-4 py-4">
@@ -44,16 +55,16 @@
                                             <td class="px-4 py-4">
                                                 @if($vendor->status === 'active')
                                                     <span class="badge badge-pill badge-light-success p-2 px-3"
-                                                        style="font-weight: 600;">Active</span>
+                                                        style="font-weight: 600;">{{ __('app.platform.active') }}</span>
                                                 @else
                                                     <span class="badge badge-pill badge-light-danger p-2 px-3"
-                                                        style="font-weight: 600;">{{ ucfirst($vendor->status) }}</span>
+                                                        style="font-weight: 600;">{{ __('app.platform.' . $vendor->status) }}</span>
                                                 @endif
                                             </td>
                                             <td class="px-4 py-4">
                                                 <span
                                                     class="{{ $vendor->subscription_ends_at && $vendor->subscription_ends_at->isPast() ? 'text-danger font-weight-bold' : '' }}">
-                                                    {{ $vendor->subscription_ends_at ? $vendor->subscription_ends_at->format('Y-m-d') : 'No Limit' }}
+                                                    {{ $vendor->subscription_ends_at ? $vendor->subscription_ends_at->format('Y-m-d') : __('app.platform.no_limit') }}
                                                 </span>
                                             </td>
                                             <td class="px-4 py-4 text-center">

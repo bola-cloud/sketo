@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', __('app.reports.revenue_title'))
+
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
@@ -70,12 +72,13 @@
                                             </a>
                                         </td>
                                         <td>{{ $invoice->client->name ?? __('app.reports.client_cash') }}</td>
-                                        <td>{{ number_format($invoice->total_amount, 2) }}
-                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                        <td>{{ number_format($invoice->total_amount, 2) }} {{ __('app.common.currency') }}</td>
                                         <td class="text-bold-700 success">{{ number_format($invoice->paid_amount, 2) }}
-                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                            {{ __('app.common.currency') }}
+                                        </td>
                                         <td class="danger">{{ number_format($invoice->discount, 2) }}
-                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                            {{ __('app.common.currency') }}
+                                        </td>
                                         <td>
                                             @if($invoice->status == 'paid')
                                                 <span class="badge badge-soft-success">{{ __('app.reports.status_paid') }}</span>

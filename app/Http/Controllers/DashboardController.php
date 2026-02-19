@@ -74,6 +74,10 @@ class DashboardController extends Controller
 
             $lowStockProducts = Product::whereColumn('quantity', '<=', 'threshold')->get();
 
+            $expiringProducts = Product::whereNotNull('expiry_date')
+                ->whereRaw('DATEDIFF(expiry_date, CURDATE()) <= expiry_alert_days')
+                ->get();
+
             if ($request->ajax()) {
                 return response()->json([
                     'productsSold' => $productsSold,
@@ -82,6 +86,7 @@ class DashboardController extends Controller
                     'totalPurchases' => $totalPurchases,
                     'totalProfit' => $totalProfit ?? 0,
                     'lowStockProducts' => $lowStockProducts,
+                    'expiringProducts' => $expiringProducts,
                     'availableMoney' => $availableMoney, // Include available money
                 ]);
             }
@@ -95,6 +100,7 @@ class DashboardController extends Controller
                 'totalProfit',
                 'monthlyData',
                 'lowStockProducts',
+                'expiringProducts',
                 'availableMoney' // Include available money
             ));
         } catch (\Exception $e) {

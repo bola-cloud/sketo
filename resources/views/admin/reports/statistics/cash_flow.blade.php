@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', __('app.reports.cash_flow_title'))
+
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
@@ -68,7 +70,7 @@
                                                 <td>{{ $inst->date_paid }}</td>
                                                 <td>#{{ $inst->invoice->invoice_code ?? $inst->invoice_id }}</td>
                                                 <td class="success text-bold-700">+ {{ number_format($inst->amount_paid, 2) }}
-                                                </td>
+                                                    {{ __('app.common.currency') }}</td>
                                             </tr>
                                         @empty
                                             <tr>
@@ -107,7 +109,7 @@
                                                 <td>{{ $inst->date_paid }}</td>
                                                 <td>#{{ $inst->purchase->purchase_code ?? $inst->purchase_id }}</td>
                                                 <td class="danger text-bold-700">- {{ number_format($inst->amount_paid, 2) }}
-                                                </td>
+                                                    {{ __('app.common.currency') }}</td>
                                             </tr>
                                         @empty
                                             <tr>

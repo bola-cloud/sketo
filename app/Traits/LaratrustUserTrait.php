@@ -56,7 +56,7 @@ trait LaratrustUserTrait
         $roleInstance = $roleModel::where('name', $role)->first();
 
         if ($roleInstance) {
-            $this->roles()->attach($roleInstance);
+            $this->roles()->attach($roleInstance->id, ['user_type' => get_class($this)]);
         }
     }
 
@@ -87,7 +87,9 @@ trait LaratrustUserTrait
         $roleModel = Config::get('laratrust.models.role');
         $roleInstances = $roleModel::whereIn('name', $roles)->get();
 
-        $this->roles()->sync($roleInstances);
+        $this->roles()->sync($roleInstances->pluck('id')->mapWithKeys(function ($id) {
+            return [$id => ['user_type' => get_class($this)]];
+        }));
     }
 
     /**
@@ -98,7 +100,7 @@ trait LaratrustUserTrait
     public function roles()
     {
         return $this->belongsToMany(Config::get('laratrust.models.role'))
-                    ->withPivot('user_type')
-                    ->wherePivot('user_type', get_class($this));
+            ->withPivot('user_type')
+            ->wherePivot('user_type', get_class($this));
     }
 }

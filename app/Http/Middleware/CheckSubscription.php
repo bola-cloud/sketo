@@ -27,6 +27,10 @@ class CheckSubscription
         if ($user && $user->vendor_id) {
             $vendor = $user->vendor;
 
+            if (!$vendor) {
+                return $next($request);
+            }
+
             if ($vendor->status === 'suspended') {
                 return response()->view('errors.suspended', [], 403);
             }
@@ -34,6 +38,9 @@ class CheckSubscription
             if ($vendor->subscription_ends_at && $vendor->subscription_ends_at->isPast()) {
                 return response()->view('errors.subscription_expired', [], 403);
             }
+        } elseif ($user && !$user->hasRole('super_admin')) {
+            // Handle users without vendor_id who are not super admins (optional but safer)
+            // For now, we allow them, or we could block them.
         }
 
         return $next($request);

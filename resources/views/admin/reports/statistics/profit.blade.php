@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', __('app.reports.profit_title'))
+
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
@@ -66,12 +68,10 @@
                                         <td class="text-bold-600">{{ $sale->created_at->format('Y-m-d') }}</td>
                                         <td>{{ $sale->product->name }}</td>
                                         <td><span class="badge badge-soft-info">{{ $sale->quantity }}</span></td>
-                                        <td>{{ number_format($sale->unit_price, 2) }}
-                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
-                                        <td>{{ number_format($sale->total_price, 2) }}
-                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                        <td>{{ number_format($sale->unit_price, 2) }} {{ __('app.common.currency') }}</td>
+                                        <td>{{ number_format($sale->total_price, 2) }} {{ __('app.common.currency') }}</td>
                                         <td class="text-bold-700 success">+ {{ number_format($sale->profit, 2) }}
-                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                            {{ __('app.common.currency') }}</td>
                                         <td>
                                             <a href="{{ route('invoices.show', $sale->invoice_id) }}"
                                                 class="badge badge-soft-secondary">

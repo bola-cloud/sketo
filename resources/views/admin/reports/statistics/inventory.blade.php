@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', __('app.reports.inventory_title'))
+
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
@@ -7,9 +9,10 @@
             <div class="row breadcrumbs-top">
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('app.dashboard.title') }}</a>
+                        <li class="breadcrumb-item"><a
+                                href="{{ route('dashboard') }}">{{ __('app.dashboard.dashboard') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">{{ __('app.products.inventory') }}</li>
+                        <li class="breadcrumb-item active">{{ __('app.reports.inventory_title') }}</li>
                     </ol>
                 </div>
             </div>
@@ -72,11 +75,9 @@
                                                 {{ $product->quantity }}
                                             </span>
                                         </td>
-                                        <td>{{ number_format($product->cost_price, 2) }}
-                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                        <td>{{ number_format($product->cost_price, 2) }} {{ __('app.common.currency') }}</td>
                                         <td class="text-bold-700 primary">{{ number_format($product->selling_price, 2) }}
-                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
-                                        </td>
+                                            {{ __('app.common.currency') }}</td>
                                         <td>{{ $product->threshold }}</td>
                                     </tr>
                                 @empty

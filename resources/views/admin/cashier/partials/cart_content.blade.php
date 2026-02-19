@@ -108,7 +108,7 @@
                         <h6 class="card-title text-success">
                             <i class="fas fa-credit-card me-2"></i>{{ __('app.cashier.payment_details') }}
                         </h6>
-                        <form action="{{ route('cashier.checkout') }}" method="POST">
+                        <form id="checkout-form" action="{{ route('cashier.checkout') }}" method="POST">
                             @csrf
                             <!-- Client Selection -->
                             <div class="form-group mb-3">

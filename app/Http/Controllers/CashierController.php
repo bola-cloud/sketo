@@ -130,83 +130,96 @@ class CashierController extends Controller
         }
 
         $cart = session()->get('cart', []);
-        $subtotal = 0;
+        $discount = $request->input('apply_discount_hidden', 0);
+        $paidAmount = $request->input('paid_amount');
+        $clientId = $request->input('client_id');
 
-        foreach ($cart as $barcode => $details) {
+        $validator = Validator::make($request->all(), [
+            'paid_amount' => 'required|numeric|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('cashier.viewCart')->withErrors($validator)->withInput();
+        }
+
+        try {
+            $invoice = $this->processCheckoutLogic($cart, $discount, $paidAmount, $clientId);
+            session()->forget('cart');
+            return redirect()->route('cashier.printInvoice', $invoice->id)->with('success', 'تمت عملية الدفع بنجاح!');
+        } catch (\Exception $e) {
+            return redirect()->route('cashier.viewCart')->with('error', 'فشل في الدفع: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Process offline synced invoice
+     */
+    public function syncOfflineInvoice(Request $request)
+    {
+        $uuid = $request->input('uuid');
+        $data = $request->input('data');
+
+        // Idempotency check
+        if (Invoice::where('invoice_code', $uuid)->exists()) {
+            return response()->json(['message' => 'Already synced'], 200);
+        }
+
+        try {
+            $this->processCheckoutLogic(
+                $data['cart'],
+                $data['discount'] ?? 0,
+                $data['paid_amount'],
+                $data['client_id'] ?? null,
+                $uuid,
+                $data['user_id'] ?? auth()->id()
+            );
+            return response()->json(['message' => 'Synced successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    /**
+     * Core checkout logic shared between web and sync
+     */
+    protected function processCheckoutLogic($cart, $discount, $paidAmount, $clientId, $invoiceCode = null, $userId = null)
+    {
+        $subtotal = 0;
+        foreach ($cart as $details) {
             $subtotal += $details['price'] * $details['quantity'];
         }
 
-        // Retrieve the discount from the request
-        $discount = $request->input('apply_discount_hidden', 0);
         $totalAfterDiscount = $subtotal - $discount;
-
-        // Custom validation to ensure paid_amount <= totalAfterDiscount
-        $validator = Validator::make($request->all(), [
-            'buyer_name' => 'nullable|string|max:255',
-            'buyer_phone' => 'nullable|string|max:15',
-            'apply_discount_hidden' => 'nullable|numeric|min:0',
-            'paid_amount' => 'required|numeric|min:0',
-            'client_id' => 'nullable',
-        ], [
-            'paid_amount.required' => 'يرجى إدخال المبلغ المدفوع.',
-            'paid_amount.numeric' => 'المبلغ المدفوع يجب أن يكون رقماً.',
-            'paid_amount.min' => 'المبلغ المدفوع يجب أن يكون على الأقل 0.',
-        ]);
-
-        // Add the custom validation for paid_amount
-        $validator->after(function ($validator) use ($totalAfterDiscount, $request) {
-            if ($request->input('paid_amount') > $totalAfterDiscount) {
-                $validator->errors()->add('paid_amount', 'المبلغ المدفوع لا يمكن أن يكون أكبر من الإجمالي بعد الخصم.');
-            }
-        });
-
-        // Check validation
-        if ($validator->fails()) {
-            return redirect()->route('cashier.viewCart')
-                ->withErrors($validator)
-                ->withInput();
-        }
+        $userId = $userId ?? auth()->id();
 
         DB::beginTransaction();
-
         try {
-            $paidAmount = $request->input('paid_amount');
-            $change = $totalAfterDiscount - $paidAmount;
-
-            // Create the invoice
             $invoice = Invoice::create([
-                'invoice_code' => strtoupper(uniqid('INV-')),
+                'invoice_code' => $invoiceCode ?? strtoupper(uniqid('INV-')),
                 'subtotal' => $subtotal,
                 'discount' => $discount,
                 'total_amount' => $totalAfterDiscount,
                 'paid_amount' => 0,
-                'change' => $change, // Positive if they owe, negative if they overpaid
-                'user_id' => auth()->id(),
-                'client_id' => $request->input('client_id'),
+                'change' => $totalAfterDiscount - $paidAmount,
+                'user_id' => $userId,
+                'client_id' => $clientId,
             ]);
 
-            // Process each item in the cart
             foreach ($cart as $barcode => $details) {
                 $product = Product::where('barcode', $barcode)->first();
-                if ($product->quantity < $details['quantity']) {
-                    DB::rollBack();
-                    throw ValidationException::withMessages([
-                        'cart' => "الكمية المتاحة غير كافية للمنتج: {$product->name}",
-                    ]);
+                if (!$product || $product->quantity < $details['quantity']) {
+                    throw new \Exception("الكمية غير كافية للمنتج: " . ($product->name ?? $barcode));
                 }
 
-                // Implement FIFO: Get purchase_products ordered by creation date (oldest first)
                 $purchaseProducts = \App\Models\PurchaseProduct::where('product_id', $product->id)
                     ->orderBy('created_at', 'asc')
                     ->get();
 
                 $remainingToSell = $details['quantity'];
-
                 foreach ($purchaseProducts as $purchaseProduct) {
                     if ($remainingToSell <= 0)
                         break;
 
-                    // Calculate how much of this batch has already been sold
                     $soldFromThisBatch = DB::table('sales')
                         ->where('purchase_product_id', $purchaseProduct->id)
                         ->sum('quantity');
@@ -215,8 +228,6 @@ class CashierController extends Controller
 
                     if ($availableFromThisBatch > 0) {
                         $quantityToTakeFromThisBatch = min($remainingToSell, $availableFromThisBatch);
-
-                        // Create sales record linked to this specific purchase batch
                         Sales::create([
                             'product_id' => $product->id,
                             'quantity' => $quantityToTakeFromThisBatch,
@@ -224,45 +235,30 @@ class CashierController extends Controller
                             'invoice_id' => $invoice->id,
                             'purchase_product_id' => $purchaseProduct->id,
                         ]);
-
-                        // Decrement remaining_quantity in the batch
                         $purchaseProduct->reduceStock($quantityToTakeFromThisBatch);
-
                         $remainingToSell -= $quantityToTakeFromThisBatch;
                     }
                 }
-
-                // Update the product's total quantity
-                // Always recalculate product quantity after sale
                 $product->recalculateProductQuantity();
             }
 
-            // Create an installment for the initial payment
             SalesInstallment::create([
                 'invoice_id' => $invoice->id,
                 'amount_paid' => $paidAmount,
                 'date_paid' => now(),
             ]);
 
-            // Calculate the total paid amount from all installments
             $totalPaid = SalesInstallment::where('invoice_id', $invoice->id)->sum('amount_paid');
-
-            // Update the paid_amount in the invoice and recalculate the change
             $invoice->update([
                 'paid_amount' => $totalPaid,
                 'change' => $invoice->total_amount - $totalPaid,
             ]);
 
             DB::commit();
-            session()->forget('cart');
-            return redirect()->route('cashier.printInvoice', $invoice->id)->with('success', 'تمت عملية الدفع بنجاح!');
-
-        } catch (ValidationException $e) {
-            DB::rollBack();
-            return redirect()->route('cashier.viewCart')->withErrors($e->errors())->withInput();
+            return $invoice;
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('cashier.viewCart')->with('error', 'فشل في الدفع: ' . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -292,13 +288,14 @@ class CashierController extends Controller
     public function searchProductByName(Request $request)
     {
         $query = $request->input('query');
-        if (!$query) {
-            return response()->json([]);
+        if ($query === null || $query === '') {
+            $products = Product::where('quantity', '>', 0)->get();
+        } else {
+            $products = Product::where('name', 'LIKE', "%{$query}%")
+                ->orWhere('barcode', 'LIKE', "%{$query}%")
+                ->where('quantity', '>', 0)
+                ->get();
         }
-        $products = Product::where('name', 'LIKE', "%{$query}%")
-            ->orWhere('barcode', 'LIKE', "%{$query}%")
-            ->where('quantity', '>', 0)
-            ->get();
         $results = $products->map(function ($product) {
             return [
                 'barcode' => $product->barcode,

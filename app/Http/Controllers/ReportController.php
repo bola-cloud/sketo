@@ -7,6 +7,10 @@ use App\Models\Sales;
 use App\Models\Invoice;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\FinancialSummaryExport;
+use App\Exports\InventoryValuationExport;
+use App\Exports\AgingReportExport;
 
 class ReportController extends Controller
 {
@@ -174,5 +178,89 @@ class ReportController extends Controller
         $purchaseInstallments = $purchaseInstallmentsQuery->latest('date_paid')->get();
 
         return view('admin.reports.statistics.cash_flow', compact('salesInstallments', 'purchaseInstallments', 'startDate', 'endDate'));
+    }
+
+    public function financialSummary(Request $request)
+    {
+        $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date'))->startOfDay() : Carbon::now()->startOfMonth();
+        $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date'))->endOfDay() : Carbon::now()->endOfDay();
+
+        // 1. Revenue (Fully & Partially Paid Invoices)
+        $revenue = Invoice::whereBetween('created_at', [$startDate, $endDate])->sum('total_amount');
+
+        // 2. COGS (Cost of Goods Sold)
+        $cogs = Sales::whereBetween('sales.created_at', [$startDate, $endDate])
+            ->join('purchase_products', 'sales.purchase_product_id', '=', 'purchase_products.id')
+            ->sum(DB::raw('sales.quantity * purchase_products.cost_price'));
+
+        // 3. Gross Profit
+        $grossProfit = $revenue - $cogs;
+
+        // 4. Operating Expenses (Purchases of type 'expense')
+        $operatingExpenses = \App\Models\Purchase::where('type', 'expense')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('total_amount');
+
+        // 5. Net Profit
+        $netProfit = $grossProfit - $operatingExpenses;
+        if ($request->has('export')) {
+            return Excel::download(new FinancialSummaryExport($revenue, $cogs, $grossProfit, $operatingExpenses, $netProfit, $startDate, $endDate), 'Financial_Summary_' . now()->format('Y-m-d') . '.xlsx');
+        }
+
+        return view('admin.reports.statistics.financial_summary', compact(
+            'revenue',
+            'cogs',
+            'grossProfit',
+            'operatingExpenses',
+            'netProfit',
+            'startDate',
+            'endDate'
+        ));
+    }
+
+    public function inventoryValuation()
+    {
+        $products = \App\Models\Product::where('quantity', '>', 0)->get();
+
+        $totalCostValue = $products->sum(function ($p) {
+            return $p->quantity * $p->cost_price;
+        });
+
+        $totalRetailValue = $products->sum(function ($p) {
+            return $p->quantity * $p->selling_price;
+        });
+
+        $potentialProfit = $totalRetailValue - $totalCostValue;
+        if (request()->has('export')) {
+            return Excel::download(new InventoryValuationExport(), 'Inventory_Valuation_' . now()->format('Y-m-d') . '.xlsx');
+        }
+
+        return view('admin.reports.statistics.inventory_valuation', compact(
+            'products',
+            'totalCostValue',
+            'totalRetailValue',
+            'potentialProfit'
+        ));
+    }
+
+    public function agingReport()
+    {
+        // Accounts Receivable (Clients who owe us)
+        $receivables = Invoice::with('client')
+            ->where('change', '>', 0)
+            ->get();
+
+        // Accounts Payable (Suppliers we owe)
+        $payables = \App\Models\Purchase::with('supplier')
+            ->where('change', '>', 0)
+            ->get();
+
+        $view = view('admin.reports.statistics.aging_report', compact('receivables', 'payables'));
+
+        if (request()->has('export')) {
+            return Excel::download(new AgingReportExport(), 'Aging_Report_' . now()->format('Y-m-d') . '.xlsx');
+        }
+
+        return $view;
     }
 }

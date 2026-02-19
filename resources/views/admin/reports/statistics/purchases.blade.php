@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', __('app.reports.purchases_title'))
+
 @section('content')
     <div class="content-header row">
         <div class="content-header-left col-md-6 col-12 mb-2">
@@ -70,12 +72,14 @@
                                         </td>
                                         <td>{{ $purchase->supplier->name ?? __('app.common.not_specified') }}</td>
                                         <td class="text-bold-700 danger">{{ number_format($purchase->total_amount, 2) }}
-                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                                            {{ __('app.common.currency') }}
                                         </td>
                                         <td class="success">{{ number_format($purchase->paid_amount, 2) }}
-                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                            {{ __('app.common.currency') }}
+                                        </td>
                                         <td class="warning">{{ number_format($purchase->remaining_amount, 2) }}
-                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                            {{ __('app.common.currency') }}
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>

@@ -92,6 +92,8 @@ class ProductController extends Controller
                 'quantity' => 'required|integer|min:1',
                 'color' => 'required|string|max:255',
                 'threshold' => 'required|integer|min:1',
+                'expiry_date' => 'nullable|date',
+                'expiry_alert_days' => 'required|integer|min:0',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
         }
@@ -306,6 +308,8 @@ class ProductController extends Controller
             'selling_price' => 'required|numeric',
             'color' => 'required|string|max:255',
             'threshold' => 'required|integer|min:1',
+            'expiry_date' => 'nullable|date',
+            'expiry_alert_days' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ], [
             'name.required' => 'يرجى إدخال اسم المنتج.',

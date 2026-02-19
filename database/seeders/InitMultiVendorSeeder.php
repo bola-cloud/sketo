@@ -34,7 +34,7 @@ class InitMultiVendorSeeder extends Seeder
         if ($user) {
             // First user becomes Super Admin of the whole platform
             if (!$user->hasRole('super_admin')) {
-                $user->addRole($superAdmin);
+                $user->attachRole('super_admin');
             }
         }
     }

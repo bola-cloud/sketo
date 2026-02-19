@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\DB;
 
 class Product extends Model
 {
-    use HasFactory;
+    // use HasFactory;
     use \App\Traits\BelongsToVendor;
 
-    protected $fillable = ['vendor_id', 'name', 'category_id', 'brand_id', 'cost_price', 'selling_price', 'quantity', 'barcode', 'barcode_path', 'color', 'threshold', 'image'];
+    protected $fillable = ['vendor_id', 'name', 'category_id', 'brand_id', 'cost_price', 'selling_price', 'quantity', 'barcode', 'barcode_path', 'color', 'threshold', 'image', 'expiry_date', 'expiry_alert_days'];
 
     public function sales()
     {

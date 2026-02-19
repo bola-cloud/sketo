@@ -1,21 +1,118 @@
-<x-guest-layout>
-    <div class="pt-4 bg-gray-100 min-h-screen">
-        <div class="flex flex-col items-center pt-6 sm:pt-0">
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg text-center">
-                <h2 class="text-2xl font-bold text-red-600 mb-4">{{ __('Subscription Expired') }}</h2>
-                <p class="mb-6 text-gray-600">
-                    {{ __('Your business subscription has expired. Please contact the platform administrator to renew your plan.') }}
-                </p>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }}">
 
-                <div class="flex justify-center">
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="underline text-sm text-gray-600 hover:text-gray-900">
-                            {{ __('Log Out') }}
-                        </button>
-                    </form>
-                </div>
-            </div>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ __('app.platform.subscription_expired') }}</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Inter:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --bg: #f8fafc;
+        }
+
+        body {
+            font-family:
+                {{ app()->getLocale() == 'ar' ? "'Tajawal', sans-serif" : "'Inter', sans-serif" }}
+            ;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: #1e293b;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 3rem;
+            border-radius: 2rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            background: #fff1f2;
+            color: #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 1.5rem;
+        }
+
+        h1 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 1rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .support {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="icon-box">
+            <i class="la la-clock"></i>
+        </div>
+        <h1>{{ __('app.platform.subscription_expired') }}</h1>
+        <p>{{ __('app.platform.subscription_expired_msg') }}</p>
+
+        <a href="mailto:support@sketo.com" class="btn">
+            <i class="la la-envelope mr-1"></i> {{ __('app.platform.contact_support') }}
+        </a>
+
+        <div class="support">
+            {{ __('app.platform.platform_name') }} &copy; {{ date('Y') }}
+        </div>
+
+        <div class="mt-4">
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit"
+                    style="background: none; border: none; color: #ef4444; cursor: pointer; text-decoration: underline; font-size: 0.9rem;">
+                    {{ __('app.platform.logout') }}
+                </button>
+            </form>
         </div>
     </div>
-</x-guest-layout>
+</body>
+
+</html>
