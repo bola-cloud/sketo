@@ -159,6 +159,7 @@ class ProductController extends Controller
                     ]);
                     // Create a new batch (pivot row) for this product and purchase
                     $purchase->products()->attach($product->id, [
+                        'vendor_id' => $user->vendor_id,
                         'quantity' => $quantity,
                         'cost_price' => $costPrice,
                         'remaining_quantity' => $quantity, // Add remaining_quantity
@@ -252,10 +253,14 @@ class ProductController extends Controller
             // Attach the new product to the purchase
             $purchase = Purchase::find($validatedData['purchase_id']);
             $purchase->products()->attach($product->id, [
+                'vendor_id' => auth()->user()->vendor_id,
                 'quantity' => $validatedData['quantity'],
                 'cost_price' => $validatedData['cost_price'],
                 'remaining_quantity' => $validatedData['quantity'], // Add remaining_quantity
             ]);
+
+            // Recalculate and update the product's total quantity
+            $product->recalculateProductQuantity();
 
             // Record the quantity update
             DB::table('quantity_updates')->insert([
