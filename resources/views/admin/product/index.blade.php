@@ -197,8 +197,8 @@
                                                     <img src="{{ asset('storage/' . $product->barcode_path) }}"
                                                         alt="{{ $product->barcode }}"
                                                         class="d-block mx-auto mb-1" 
-                                                        style="max-height: 30px; max-width: 140px; filter: grayscale(1); opacity: 0.8;">
-                                                    <span class="badge badge-light text-muted" style="font-family: monospace; letter-spacing: 1px;">{{ $product->barcode }}</span>
+                                                        style="max-height: 30px; max-width: 140px; filter: grayscale(1) brightness(1.5) opacity(0.8);">
+                                                    <span class="badge badge-light" style="font-family: monospace; letter-spacing: 1px;">{{ $product->barcode }}</span>
                                                 </div>
                                             @else
                                                 <span class="text-muted small">{{ __('app.products.no_barcode') }}</span>

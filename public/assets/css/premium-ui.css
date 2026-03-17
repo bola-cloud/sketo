@@ -426,12 +426,12 @@ body {
     z-index: 1050 !important;
 }
 
-/* Modal Dark Mode Fixes */
+/* Modal Theme Support */
 .modal-content {
     background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
+    color: #f8fafc;
 }
 
 .modal-header {
@@ -442,34 +442,62 @@ body {
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-body.light-mode .modal-content {
+/* Light Mode Overrides (Selector Fix) */
+.light-mode .modal-content {
     background: rgba(255, 255, 255, 0.98);
     color: #0f172a;
     border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-body.light-mode .modal-header,
-body.light-mode .modal-footer {
+.light-mode .modal-header,
+.light-mode .modal-footer {
     border-color: rgba(0, 0, 0, 0.05);
 }
 
-body.light-mode .modal .form-control {
+/* Form Control Visibility */
+.modal .form-control {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+.modal .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.light-mode .modal .form-control {
     background: #f8fafc !important;
     border: 1px solid #e2e8f0 !important;
     color: #0f172a !important;
 }
 
-body.light-mode .modal label {
+.light-mode .modal .form-control::placeholder {
+    color: #94a3b8;
+}
+
+.light-mode .modal label {
     color: #475569 !important;
 }
 
-/* Fix text visibility inside inputs in dark mode */
-.modal .form-control {
-    color: white !important;
+/* Visibility Improvements for Gray Text/Badges */
+.badge-light {
+    background-color: rgba(241, 245, 249, 0.1);
+    color: #cbd5e1 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-body.light-mode .modal .form-control {
-    color: #0f172a !important;
+.light-mode .badge-light {
+    background-color: #f1f5f9;
+    color: #475569 !important;
+    border: 1px solid #e2e8f0;
+}
+
+.text-muted {
+    color: #94a3b8 !important;
+}
+
+.light-mode .text-muted {
+    color: #64748b !important;
 }
 
 /* Sidebar Scrollbar Overhaul */
