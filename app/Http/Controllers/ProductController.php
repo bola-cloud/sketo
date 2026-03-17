@@ -51,7 +51,9 @@ class ProductController extends Controller
 
         $user = auth()->user();
         $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('owner') || $user->hasRole('super_admin'));
-        $permissions = $user ? $user->allPermissions()->pluck('name') : collect();
+        $permissions = $user ? $user->roles->flatMap(function ($role) {
+            return $role->permissions;
+        })->pluck('name')->unique() : collect();
 
         return view('admin.product.index', compact('products', 'categories', 'brands', 'isAdmin', 'permissions'));
     }
