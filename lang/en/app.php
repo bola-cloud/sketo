@@ -251,6 +251,7 @@ return [
         'add_fail' => 'Failed to add client.',
         'fetch_fail' => 'Failed to fetch client data.',
         'update_fail' => 'Failed to update client data.',
+        'cancel' => 'Cancel',
     ],
     'suppliers' => [
         'title' => 'Suppliers Management',

@@ -49,7 +49,11 @@ class ProductController extends Controller
         $categories = Category::all();
         $brands = Brand::all();
 
-        return view('admin.product.index', compact('products', 'categories', 'brands'));
+        $user = auth()->user();
+        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('owner') || $user->hasRole('super_admin'));
+        $permissions = $user ? $user->allPermissions()->pluck('name') : collect();
+
+        return view('admin.product.index', compact('products', 'categories', 'brands', 'isAdmin', 'permissions'));
     }
 
     public function printSelectedBarcodes(Request $request)

@@ -102,8 +102,8 @@
     <div class="modal fade text-left" id="createClientModal" tabindex="-1" role="dialog"
         aria-labelledby="createClientModalLabel" aria-hidden="true" style="direction: rtl;">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                <div class="modal-header bg-primary text-white" style="border-radius: 20px 20px 0 0;">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title font-weight-bold white" id="createClientModalLabel"><i
                             class="la la-plus-circle"></i> {{ __('app.clients.add_new') }}</h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
@@ -141,8 +141,8 @@
     <div class="modal fade text-left" id="editClientModal" tabindex="-1" role="dialog"
         aria-labelledby="editClientModalLabel" aria-hidden="true" style="direction: rtl;">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                <div class="modal-header bg-warning text-white" style="border-radius: 20px 20px 0 0;">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-warning text-white">
                     <h5 class="modal-title font-weight-bold white" id="editClientModalLabel"><i class="la la-edit"></i>
                         {{ __('app.clients.edit') }}</h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">

@@ -426,6 +426,52 @@ body {
     z-index: 1050 !important;
 }
 
+/* Modal Dark Mode Fixes */
+.modal-content {
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+body.light-mode .modal-content {
+    background: rgba(255, 255, 255, 0.98);
+    color: #0f172a;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .modal-header,
+body.light-mode .modal-footer {
+    border-color: rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .modal .form-control {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+body.light-mode .modal label {
+    color: #475569 !important;
+}
+
+/* Fix text visibility inside inputs in dark mode */
+.modal .form-control {
+    color: white !important;
+}
+
+body.light-mode .modal .form-control {
+    color: #0f172a !important;
+}
+
 /* Sidebar Scrollbar Overhaul */
 .main-menu-content::-webkit-scrollbar {
     width: 5px;
