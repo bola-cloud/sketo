@@ -205,7 +205,7 @@
                                             @endif
                                         </td>
                                         <td class="text-right">
-                                            @if(Auth::user()->hasRole('admin') || $permissions->contains('عرض المنتجات'))
+                                            @if($isAdmin || $permissions->contains('edit-products'))
                                                 <a href="{{ route('products.edit', $product->id) }}"
                                                     class="btn btn-sm btn-soft-warning mr-1">
                                                     <i class="la la-edit"></i>
@@ -214,15 +214,17 @@
                                                     class="btn btn-sm btn-soft-info mr-1">
                                                     <i class="la la-print"></i>
                                                 </a>
-                                                <form action="{{ route('products.destroy', $product->id) }}" method="POST"
-                                                    style="display:inline;"
-                                                    onsubmit="return confirm('{{ __('app.products.delete_confirm') }}')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-soft-danger">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
-                                                </form>
+                                                @if($isAdmin || $permissions->contains('delete-products'))
+                                                    <form action="{{ route('products.destroy', $product->id) }}" method="POST"
+                                                        style="display:inline;"
+                                                        onsubmit="return confirm('{{ __('app.products.delete_confirm') }}')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-soft-danger">
+                                                            <i class="la la-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             @else
                                                 <i class="la la-lock text-muted"></i>
                                             @endif

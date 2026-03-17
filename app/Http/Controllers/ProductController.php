@@ -440,18 +440,20 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        // Check if the product is related to any sales or invoices
+        // Check if the product has any sales
         $hasSales = $product->sales()->exists();
-        $hasPurchases = $product->purchases()->exists();
 
-        if ($hasSales || $hasPurchases) {
-            // If the product is related to sales or invoices, return a specific message
-            return redirect()->route('products.index')->with('error', 'لا يمكن حذف المنتج لأنه مرتبط بمبيعات أو فواتير.');
+        if ($hasSales) {
+            // If the product is related to sales, return a specific message
+            return redirect()->route('products.index')->with('error', 'لا يمكن حذف المنتج لأنه مرتبط بمبيعات.');
         } else {
-            // If no relations exist, delete the product
+            // If no sales exist, delete the product
             DB::beginTransaction();
 
             try {
+                // Delete related purchase_products dependencies first if any
+                DB::table('purchase_products')->where('product_id', $product->id)->delete();
+                
                 // Delete the product
                 $product->delete();
 

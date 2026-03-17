@@ -97,6 +97,7 @@
         </div>
     </div>
 
+@push('modals')
     <!-- Create Client Modal -->
     <div class="modal fade text-left" id="createClientModal" tabindex="-1" role="dialog"
         aria-labelledby="createClientModalLabel" aria-hidden="true" style="direction: rtl;">
@@ -176,6 +177,7 @@
             </div>
         </div>
     </div>
+@endpush
 
     <style>
         .round-lg {
