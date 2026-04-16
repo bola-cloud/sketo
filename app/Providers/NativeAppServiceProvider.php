@@ -13,11 +13,21 @@ class NativeAppServiceProvider implements ProvidesPhpIni
      */
     public function boot(): void
     {
+        // Run migrations for the local SQLite database used by NativePHP
+        // to prevent 'no such table: jobs' errors.
+        if (!\Illuminate\Support\Facades\Schema::hasTable('jobs')) {
+            try {
+                \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            } catch (\Exception $e) {
+                // Silently pass or log
+            }
+        }
+
         Window::open()
             ->width(1280)
             ->height(800)
-            ->title('Sketo - Advanced POS System')
-            ->url('https://www.cashier.infinitsmart.com/');
+            ->title('Sketo - Advanced POS System');
+            // ->url('https://www.cashier.infinitsmart.com/'); // Removed to ensure it loads the LOCAL offline-capable version!
     }
 
     /**

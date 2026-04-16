@@ -121,9 +121,17 @@ Route::middleware([
     //sales installments
     Route::get('sales/installments/{invoice}', [App\Http\Controllers\SalesInstallmentController::class, 'indexInstallments'])->name('sales.installments.index');
     Route::post('sales/installments/{invoice}', [App\Http\Controllers\SalesInstallmentController::class, 'storeInstallment'])->name('sales.installments.store');
-    Route::get('/treasury', [App\Http\Controllers\TreasuryController::class, 'treasury'])->name('treasury');
-    Route::resource('suppliers', App\Http\Controllers\Suppliercontroller::class);
-    Route::resource('clients', App\Http\Controllers\ClientController::class);
+    Route::middleware(['plan.feature:treasury'])->group(function() {
+        Route::get('/treasury', [App\Http\Controllers\TreasuryController::class, 'treasury'])->name('treasury');
+    });
+
+    Route::middleware(['plan.feature:suppliers'])->group(function() {
+        Route::resource('suppliers', App\Http\Controllers\Suppliercontroller::class);
+    });
+
+    Route::middleware(['plan.feature:clients'])->group(function() {
+        Route::resource('clients', App\Http\Controllers\ClientController::class);
+    });
     Route::put('invoices/{invoice}/update-discount', [App\Http\Controllers\InvoiceController::class, 'updateDiscount'])->name('invoices.updateDiscount');
     Route::delete('/purchases/{purchase}', [App\Http\Controllers\PurchasesController::class, 'destroy'])->name('purchases.destroy');
     // Route to show the edit form
@@ -133,15 +141,20 @@ Route::middleware([
     Route::get('/admin/product-transactions', [App\Http\Controllers\ProductController::class, 'productTransactions'])->name('product.transactions');
 
     // Customer Returns Routes
-    Route::resource('customer-returns', App\Http\Controllers\CustomerReturnsController::class);
-    Route::get('/customer-returns/create/invoice/{invoice}', [App\Http\Controllers\CustomerReturnsController::class, 'createForInvoice'])->name('customer-returns.createForInvoice');
-    Route::post('/customer-returns/search', [App\Http\Controllers\CustomerReturnsController::class, 'search'])->name('customer-returns.search');
+    Route::middleware(['plan.feature:returns'])->group(function() {
+        Route::resource('customer-returns', App\Http\Controllers\CustomerReturnsController::class);
+        Route::get('/customer-returns/create/invoice/{invoice}', [App\Http\Controllers\CustomerReturnsController::class, 'createForInvoice'])->name('customer-returns.createForInvoice');
+        Route::post('/customer-returns/search', [App\Http\Controllers\CustomerReturnsController::class, 'search'])->name('customer-returns.search');
+    });
+
 
     // Supplier Returns Routes
-    Route::resource('supplier-returns', App\Http\Controllers\SupplierReturnController::class);
-    Route::get('/supplier-returns/products-by-supplier/{supplier}', [App\Http\Controllers\SupplierReturnController::class, 'getProductsBySupplier'])->name('supplier-returns.productsBySupplier');
-    Route::get('/supplier-returns/purchases-by-supplier/{supplier}', [App\Http\Controllers\SupplierReturnController::class, 'getPurchasesBySupplier'])->name('supplier-returns.purchasesBySupplier');
-    Route::get('/supplier-returns/stock-batches/{product}/{supplier}', [App\Http\Controllers\SupplierReturnController::class, 'getStockBatches'])->name('supplier-returns.stockBatches');
+    Route::middleware(['plan.feature:returns'])->group(function() {
+        Route::resource('supplier-returns', App\Http\Controllers\SupplierReturnController::class);
+        Route::get('/supplier-returns/products-by-supplier/{supplier}', [App\Http\Controllers\SupplierReturnController::class, 'getProductsBySupplier'])->name('supplier-returns.productsBySupplier');
+        Route::get('/supplier-returns/purchases-by-supplier/{supplier}', [App\Http\Controllers\SupplierReturnController::class, 'getPurchasesBySupplier'])->name('supplier-returns.purchasesBySupplier');
+        Route::get('/supplier-returns/stock-batches/{product}/{supplier}', [App\Http\Controllers\SupplierReturnController::class, 'getStockBatches'])->name('supplier-returns.stockBatches');
+    });
     Route::get('/cashier/cart-content', [\App\Http\Controllers\CashierController::class, 'cartContent'])->name('cashier.cartContent');
 });
 

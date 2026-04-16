@@ -25,5 +25,11 @@ class AppServiceProvider extends ServiceProvider
     {
         CustomerReturn::observe(CustomerReturnObserver::class);
         SupplierReturn::observe(SupplierReturnObserver::class);
+
+        \Illuminate\Support\Facades\Blade::if('planFeature', function ($feature) {
+            $activePlan = \Illuminate\Support\Facades\Config::get('system_plan.active_plan', 'enterprise');
+            $features = \Illuminate\Support\Facades\Config::get("system_plan.plans.{$activePlan}", []);
+            return isset($features[$feature]) && $features[$feature] === true;
+        });
     }
 }

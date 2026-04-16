@@ -273,10 +273,12 @@
                                                                                                                                                                     </li>
                                                                                                                                                                 @endif -->
                             @if($isAdmin)
+                                @planFeature('audit_logs')
                                 <li class="{{ Route::currentRouteName() == 'product.transactions' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('product.transactions')}}" data-i18n="nav.dash.crypto">
                                         <i class="la la-exchange"></i> {{ __('app.sidebar.product_transfer_report') }} </a>
                                 </li>
+                                @endplanFeature
                             @endif
                         </ul>
                     </li>
@@ -299,16 +301,20 @@
                                 </li>
                             @endif
                             @if($isAdmin)
+                                @planFeature('clients')
                                 <li class="{{ Route::currentRouteName() == 'clients.index' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('clients.index')}}" data-i18n="nav.dash.ecommerce">
                                         <i class="la la-users"></i> {{ __('app.sidebar.manage_clients') }} </a>
                                 </li>
+                                @endplanFeature
                             @endif
                             @if($isAdmin)
+                                @planFeature('returns')
                                 <li class="{{ Route::currentRouteName() == 'customer-returns.index' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('customer-returns.index')}}" data-i18n="nav.dash.crypto">
                                         <i class="la la-reply"></i> {{ __('app.sidebar.customer_returns') }} </a>
                                 </li>
+                                @endplanFeature
                             @endif
                         </ul>
                     </li>
@@ -338,22 +344,27 @@
                                 </li>
                             @endif
                             @if($isAdmin)
+                                @planFeature('suppliers')
                                 <li class="{{ Route::currentRouteName() == 'suppliers.index' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('suppliers.index')}}" data-i18n="nav.dash.ecommerce">
                                         <i class="la la-briefcase"></i> {{ __('app.sidebar.manage_suppliers') }} </a>
                                 </li>
+                                @endplanFeature
                             @endif
                             @if($isAdmin)
+                                @planFeature('returns')
                                 <li class="{{ Route::currentRouteName() == 'supplier-returns.index' ? 'active' : '' }} ">
                                     <a class="menu-item" href="{{route('supplier-returns.index')}}" data-i18n="nav.dash.crypto">
                                         <i class="la la-undo"></i> {{ __('app.sidebar.supplier_returns') }} </a>
                                 </li>
+                                @endplanFeature
                             @endif
                         </ul>
                     </li>
                 @endif
 
                 @if($isAdmin)
+                    @planFeature('reports_advanced')
                     <li class=" nav-item has-sub"><a href="#"><i class="la la-bar-chart"></i><span class="menu-title"
                                 data-i18n="nav.dash.main"> {{ __('app.sidebar.sales_reports') }} </span></a>
                         <ul class="menu-content">
@@ -371,9 +382,11 @@
                             </li>
                         </ul>
                     </li>
+                    @endplanFeature
                 @endif
 
                 @if($isAdmin)
+                    @planFeature('reports_advanced')
                     <li class=" nav-item has-sub"><a href="#"><i class="la la-pie-chart"></i><span class="menu-title"
                                 data-i18n="nav.dash.main"> {{ __('app.sidebar.financial_reports') }} </span></a>
                         <ul class="menu-content">
@@ -397,9 +410,11 @@
                             </li>
                         </ul>
                     </li>
+                    @endplanFeature
                 @endif
 
                 @if($isAdmin)
+                    @planFeature('users')
                     <li class=" nav-item has-sub"><a href="#"><i class="la la-key"></i><span class="menu-title"
                                 data-i18n="nav.dash.main"> {{ __('app.sidebar.permissions') }} </span></a>
                         <ul class="menu-content">
@@ -429,13 +444,16 @@
                             </li>
                         </ul>
                     </li>
+                    @endplanFeature
                 @endif
 
                 @if($isAdmin)
+                    @planFeature('treasury')
                     <li class="{{ Route::currentRouteName() == 'treasury' ? 'active' : '' }} nav-item">
                         <a href="{{route('treasury')}}"><i class="la la-bank"></i><span class="menu-title"
                                 data-i18n="nav.dash.crypto"> {{ __('app.sidebar.treasury') }}</span></a>
                     </li>
+                    @endplanFeature
                 @endif
 
             </ul>
