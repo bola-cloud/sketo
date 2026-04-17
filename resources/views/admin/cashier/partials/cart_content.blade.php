@@ -1,8 +1,8 @@
 @if(!empty($cart))
     <!-- Cart Items Table -->
     <div class="table-responsive">
-        <table class="table table-striped table-hover mb-0">
-            <thead class="bg-light sticky-top">
+        <table class="table table-hover mb-0" style="color: inherit;">
+            <thead class="sticky-top" style="background: var(--p-card-bg, rgba(0,0,0,0.05));">
                 <tr>
                     <th width="35%"><i class="fas fa-box me-1"></i>{{ __('app.cashier.product') }}</th>
                     <th width="25%" class="text-center"><i
@@ -24,7 +24,7 @@
                                     <i class="fas fa-cube"></i>
                                 </div>
                                 <div>
-                                    <div class="fw-bold text-dark">{{ $details['name'] }}</div>
+                                    <div class="fw-bold">{{ $details['name'] }}</div>
                                     <small class="text-muted">
                                         <i class="fas fa-barcode me-1"></i>{{ $barcode }}
                                     </small>
@@ -37,7 +37,7 @@
                                     onclick="updateCartQuantity('{{ $barcode }}', -1)">
                                     <i class="fas fa-minus"></i>
                                 </button>
-                                <span class="bg-light px-3 py-1 rounded fw-bold text-primary">
+                                <span class="px-3 py-1 rounded fw-bold text-primary" style="background: rgba(16, 185, 129, 0.1);">
                                     {{ $details['quantity'] }}
                                 </span>
                                 <button type="button" class="btn btn-outline-success btn-sm ms-2"
@@ -73,10 +73,10 @@
     </div>
 
     <!-- Cart Summary -->
-    <div class="border-top bg-light p-3">
+    <div class="border-top p-3">
         <div class="row">
             <div class="col-md-6">
-                <div class="card bg-white border-0 shadow-sm">
+                <div class="card premium-card border-0 shadow-sm mb-3">
                     <div class="card-body">
                         <h6 class="card-title text-primary">
                             <i class="fas fa-calculator me-2"></i>{{ __('app.cashier.invoice_summary') }}
@@ -103,7 +103,7 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="card bg-white border-0 shadow-sm">
+                <div class="card premium-card border-0 shadow-sm">
                     <div class="card-body">
                         <h6 class="card-title text-success">
                             <i class="fas fa-credit-card me-2"></i>{{ __('app.cashier.payment_details') }}

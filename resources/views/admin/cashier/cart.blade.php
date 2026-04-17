@@ -2,19 +2,98 @@
 
 @section('content')
     <style>
+        /* ===== Cart Page Theme Support ===== */
         .cart-container {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            overflow: hidden;
         }
 
         .cart-panel {
             backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Dynamic Panel Backgrounds */
+        .cart-panel-body {
+            background-color: var(--p-card-bg, rgba(30, 41, 59, 0.6));
+            color: var(--p-text, #e2e8f0);
+        }
+        body.light-mode .cart-panel-body {
+            background-color: #ffffff;
+            color: #0f172a;
+        }
+
+        /* Override Bootstrap .card inside cart for dark mode */
+        .cart-panel-body .card {
+            background: rgba(255,255,255,0.05) !important;
+            border-color: rgba(255,255,255,0.1) !important;
+            color: var(--p-text, #e2e8f0);
+        }
+        .cart-panel-body .card .card-header {
+            border-bottom-color: rgba(255,255,255,0.08) !important;
+        }
+        .cart-panel-body .card .card-body {
+            color: var(--p-text, #e2e8f0);
+        }
+        .cart-panel-body .card-title {
+            color: inherit !important;
+        }
+        .cart-panel-body .form-control,
+        .cart-panel-body .input-group-text {
+            background: rgba(255,255,255,0.08) !important;
+            border-color: rgba(255,255,255,0.15) !important;
+            color: var(--p-text, #e2e8f0) !important;
+        }
+        .cart-panel-body .form-control::placeholder {
+            color: var(--p-text-muted, #94a3b8) !important;
+        }
+        .cart-panel-body .list-group-item {
+            background: transparent !important;
+            border-color: rgba(255,255,255,0.06) !important;
+            color: var(--p-text, #e2e8f0) !important;
+        }
+        .cart-panel-body .text-muted {
+            color: var(--p-text-muted, #94a3b8) !important;
+        }
+        .cart-panel-body .text-dark {
+            color: var(--p-text, #e2e8f0) !important;
+        }
+
+        /* Light mode: restore normal Bootstrap look */
+        body.light-mode .cart-panel-body .card {
+            background: #fff !important;
+            border-color: rgba(0,0,0,0.1) !important;
+            color: #0f172a;
+        }
+        body.light-mode .cart-panel-body .card .card-body {
+            color: #0f172a;
+        }
+        body.light-mode .cart-panel-body .form-control,
+        body.light-mode .cart-panel-body .input-group-text {
+            background: #fff !important;
+            border-color: #ced4da !important;
+            color: #212529 !important;
+        }
+        body.light-mode .cart-panel-body .form-control::placeholder {
+            color: #6c757d !important;
+        }
+        body.light-mode .cart-panel-body .list-group-item {
+            background: #fff !important;
+            border-color: rgba(0,0,0,0.08) !important;
+            color: #212529 !important;
+        }
+        body.light-mode .cart-panel-body .text-muted {
+            color: #6c757d !important;
+        }
+        body.light-mode .cart-panel-body .text-dark {
+            color: #212529 !important;
         }
 
         .product-item:hover {
-            background-color: #f8f9fa !important;
+            background-color: rgba(99, 102, 241, 0.08) !important;
             transform: translateY(-1px);
             transition: all 0.2s ease;
+        }
+        body.light-mode .product-item:hover {
+            background-color: #f8f9fa !important;
         }
 
         .quantity-controls .btn {
@@ -27,12 +106,6 @@
             justify-content: center;
         }
 
-        .cart-summary {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
         .search-input:focus {
             box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
             border-color: #007bff;
@@ -40,48 +113,17 @@
 
         .stats-card {
             border-radius: 15px;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
         }
 
         /* Custom scrollbar for search results */
-        #productList::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        #productList::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        #productList::-webkit-scrollbar-thumb {
-            background: #007bff;
-            border-radius: 4px;
-        }
-
-        #productList::-webkit-scrollbar-thumb:hover {
-            background: #0056b3;
-        }
-
-        /* Ensure proper height constraints */
-        .cart-container {
-            /* max-height: calc(100vh - 60px); */
-            overflow: hidden;
-        }
+        #productList::-webkit-scrollbar { width: 8px; }
+        #productList::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
+        #productList::-webkit-scrollbar-thumb { background: var(--p-indigo, #6366f1); border-radius: 4px; }
 
         /* Search results specific styling */
-        .search-results-container {
-            overflow: hidden;
-        }
-
-        .search-results-container .card-body {
-            padding: 0;
-            overflow-y: auto;
-        }
-
-        #productList {
-            max-height: 100%;
-            overflow-y: auto;
-        }
+        .search-results-container { overflow: hidden; }
+        .search-results-container .card-body { padding: 0; overflow-y: auto; }
+        #productList { max-height: 100%; overflow-y: auto; }
 
         /* Search results scroll indicator */
         .search-results-container::after {
@@ -98,9 +140,83 @@
             transition: opacity 0.3s;
             pointer-events: none;
         }
+        .search-results-container.show-scroll-hint::after { opacity: 1; }
 
-        .search-results-container.show-scroll-hint::after {
-            opacity: 1;
+        /* ===== Mobile Responsive ===== */
+        @media (max-width: 767.98px) {
+            /* Remove fixed height, allow natural stacking */
+            .cart-split-row {
+                height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }
+            .cart-split-row > .col-md-4,
+            .cart-split-row > .col-md-8 {
+                height: auto !important;
+                min-height: auto !important;
+            }
+            .cart-split-row > .col-md-4 .h-100,
+            .cart-split-row > .col-md-8 .h-100 {
+                height: auto !important;
+            }
+            /* Show cart panel first on mobile */
+            .cart-split-row > .col-md-8 { order: -1; margin-bottom: 8px; }
+            .cart-split-row > .col-md-4 { order: 1; border: none !important; }
+
+            /* Compact container */
+            .cart-container { padding-bottom: 8px !important; }
+
+            /* Kill the big header on mobile */
+            .cart-container > .row.mb-3 { margin-bottom: 4px !important; }
+            .cart-container > .row.mb-3 .p-3 { padding: 6px 8px !important; }
+            .cart-container > .row.mb-3 h2 { font-size: 1rem !important; margin: 0 !important; }
+
+            /* Compact panel headers */
+            .cart-split-row .card-header { padding: 6px 10px !important; }
+            .cart-split-row .card-header h5 { font-size: 0.85rem !important; }
+
+            /* Tight panel body */
+            .cart-panel-body { padding: 8px !important; min-height: 0 !important; }
+
+            /* Compact cards inside panels */
+            .cart-panel-body .card { margin-bottom: 6px !important; }
+            .cart-panel-body .card .card-body { padding: 8px !important; }
+            .cart-panel-body .card .card-header { padding: 4px 8px !important; }
+            .cart-panel-body .card h6 { font-size: 0.8rem !important; margin-bottom: 4px !important; }
+
+            /* Shrink search results container drastically */
+            .search-results-container { min-height: 150px !important; margin-bottom: 6px !important; }
+
+            /* Compact input groups */
+            .cart-panel-body .input-group { margin-bottom: 0 !important; }
+            .cart-panel-body .mb-2 { margin-bottom: 6px !important; }
+
+            /* Compact stats card */
+            .stats-card { margin-bottom: 8px !important; }
+            .stats-card .card-body { padding: 6px !important; }
+            .stats-card h6 { font-size: 0.85rem !important; }
+
+            /* Compact table */
+            .cart-panel-body .table th,
+            .cart-panel-body .table td { padding: 6px 4px !important; font-size: 0.75rem !important; }
+            .cart-panel-body .table .badge { font-size: 0.7rem !important; }
+
+            /* Compact cart summary section */
+            .cart-panel-body .border-top { padding: 8px !important; }
+            .cart-panel-body .border-top .card { margin-bottom: 8px !important; }
+            .cart-panel-body .border-top .card-body { padding: 8px !important; }
+            .cart-panel-body .border-top h6 { font-size: 0.8rem !important; }
+
+            /* Quantity controls smaller */
+            .quantity-controls .btn { width: 28px !important; height: 28px !important; }
+
+            /* Product icon smaller */
+            .cart-panel-body .rounded-circle { width: 30px !important; height: 30px !important; min-width: 30px !important; }
+
+            /* Form controls compact */
+            .cart-panel-body .form-control { font-size: 0.8rem !important; padding: 4px 8px !important; }
+            .cart-panel-body .form-label { font-size: 0.75rem !important; margin-bottom: 2px !important; }
+            .cart-panel-body .btn-success.w-100 { padding: 8px !important; font-size: 0.85rem !important; }
         }
     </style>
 
@@ -115,7 +231,7 @@
         </div>
 
         <!-- Split Screen Layout -->
-        <div class="row g-0" style="height: calc(100vh - 130px); max-height: calc(100vh - 130px);">
+        <div class="row g-0 cart-split-row" style="height: calc(100vh - 130px); max-height: calc(100vh - 130px); overflow: hidden;">
             <!-- Left Panel - Product Search & Barcode Scanner -->
             <div class="col-md-4 border-end border-2">
                 <div class="h-100 d-flex flex-column">
@@ -125,7 +241,7 @@
                             <i class="fas fa-search me-2"></i>{{ __('app.cashier.product_search') }}
                         </h5>
                     </div>
-                    <div class="flex-grow-1 p-3 bg-white" style="overflow-y: auto; min-height: 0;">
+                    <div class="flex-grow-1 p-3 cart-panel-body" style="overflow-y: auto; min-height: 0;">
                         <div class="h-100 d-flex flex-column">
                             <!-- Alert Messages -->
                             @if ($errors->any())
@@ -256,7 +372,7 @@
                             <span class="badge bg-light text-dark ms-2" id="cart-badge">{{ count($cart ?? []) }}</span>
                         </h5>
                     </div>
-                    <div class="flex-grow-1 bg-white" style="overflow-y: auto; min-height: 0;">
+                    <div class="flex-grow-1 cart-panel-body" style="overflow-y: auto; min-height: 0;">
                         <div id="cart-content">@include('admin.cashier.partials.cart_content')</div>
                     </div>
                 </div>

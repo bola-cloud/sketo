@@ -90,7 +90,7 @@
                                     style="width: 38px; filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.4));"
                                     class="mr-2 ml-2">
                                 <span class="brand-text text-gradient-premium font-weight-bold"
-                                    style="font-size: 1.4rem; letter-spacing: 1.5px;">SKETO</span>
+                                    style="font-size: 1.4rem; letter-spacing: 1.5px;">{{ auth()->user()->vendor->business_name ?? auth()->user()->name }}</span>
                             </a>
                         </div>
                     </li>

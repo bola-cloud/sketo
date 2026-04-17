@@ -18,6 +18,52 @@
         .bg-white-10 {
             background: rgba(255, 255, 255, 0.1);
         }
+
+        /* Default (Dark Mode) Alerts */
+        .alert-stock-card { background: rgba(225, 29, 72, 0.15) !important; }
+        .alert-stock-card h5, .alert-stock-card p { color: #fda4af !important; }
+        .alert-stock-card .icon-wrapper { background: rgba(225, 29, 72, 0.25) !important; }
+        .alert-stock-card .icon-wrapper i { color: #f43f5e !important; }
+
+        .alert-expiry-card { background: rgba(217, 119, 6, 0.15) !important; }
+        .alert-expiry-card h5, .alert-expiry-card p { color: #fde68a !important; }
+        .alert-expiry-card .icon-wrapper { background: rgba(217, 119, 6, 0.25) !important; }
+        .alert-expiry-card .icon-wrapper i { color: #fbbf24 !important; }
+
+        /* Light Mode Alerts */
+        body.light-mode .alert-stock-card { background: #fff1f2 !important; }
+        body.light-mode .alert-stock-card h5 { color: #9f1239 !important; }
+        body.light-mode .alert-stock-card p { color: #be123c !important; }
+        body.light-mode .alert-stock-card .icon-wrapper { background: #ffe4e6 !important; }
+        body.light-mode .alert-stock-card .icon-wrapper i { color: #e11d48 !important; }
+
+        body.light-mode .alert-expiry-card { background: #fffbeb !important; }
+        body.light-mode .alert-expiry-card h5 { color: #92400e !important; }
+        body.light-mode .alert-expiry-card p { color: #b45309 !important; }
+        body.light-mode .alert-expiry-card .icon-wrapper { background: #fef3c7 !important; }
+        body.light-mode .alert-expiry-card .icon-wrapper i { color: #d97706 !important; }
+
+        /* Alert Action Buttons */
+        .alert-action-btn {
+            background: rgba(255,255,255,0.15) !important;
+            color: #e2e8f0 !important;
+            border: 1px solid rgba(255,255,255,0.2) !important;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .alert-action-btn:hover {
+            background: rgba(255,255,255,0.25) !important;
+            color: #fff !important;
+        }
+        body.light-mode .alert-action-btn {
+            background: #fff !important;
+            color: #1e293b !important;
+            border: 1px solid rgba(0,0,0,0.1) !important;
+        }
+        body.light-mode .alert-action-btn:hover {
+            background: #f1f5f9 !important;
+        }
     </style>
 
     @php
@@ -60,24 +106,23 @@
         @if($lowStockProducts->count() > 0)
             <div class="row animate-fade-in-up" style="animation-delay: 0.1s;">
                 <div class="col-12 mb-4">
-                    <div class="premium-card border-0" style="background: #fff1f2; --card-accent: var(--p-rose);">
+                    <div class="premium-card border-0 alert-stock-card" style="--card-accent: var(--p-rose);">
                         <div class="d-flex align-items-center">
-                            <div class="bg-rose-100 p-3 rounded-xl mr-3" style="background: #ffe4e6;">
-                                <i class="la la-exclamation-triangle text-rose h4 mb-0" style="color: var(--p-rose-dark);"></i>
+                            <div class="icon-wrapper p-3 rounded-xl mr-3">
+                                <i class="la la-exclamation-triangle h4 mb-0"></i>
                             </div>
                             <div>
-                                <h5 class="font-weight-bold mb-1" style="color: #9f1239;">
+                                <h5 class="font-weight-bold mb-1">
                                     {{ __('app.dashboard.low_stock_alert') }}
                                 </h5>
-                                <p class="text-rose-700 mb-0 small">
+                                <p class="mb-0 small">
                                     @foreach($lowStockProducts->take(2) as $p)
                                         {{ $p->name }} ({{ $p->quantity }}){{ !$loop->last ? ',' : '' }}
                                     @endforeach
                                     @if($lowStockProducts->count() > 2) +{{ $lowStockProducts->count() - 2 }} more @endif
                                 </p>
                             </div>
-                            <a href="{{ route('products.index') }}" class="btn btn-sm btn-white ml-auto shadow-sm"
-                                style="border-radius: 8px;">{{ __('app.dashboard.restock_now') }}</a>
+                            <a href="{{ route('products.index') }}" class="btn btn-sm alert-action-btn ml-auto shadow-sm">{{ __('app.dashboard.restock_now') }}</a>
                         </div>
                     </div>
                 </div>
@@ -87,24 +132,23 @@
         @if($expiringProducts->count() > 0)
             <div class="row animate-fade-in-up" style="animation-delay: 0.15s;">
                 <div class="col-12 mb-4">
-                    <div class="premium-card border-0" style="background: #fffbeb; --card-accent: #f59e0b;">
+                    <div class="premium-card border-0 alert-expiry-card" style="--card-accent: #f59e0b;">
                         <div class="d-flex align-items-center">
-                            <div class="bg-amber-100 p-3 rounded-xl mr-3" style="background: #fef3c7;">
-                                <i class="la la-clock h4 mb-0" style="color: #d97706;"></i>
+                            <div class="icon-wrapper p-3 rounded-xl mr-3">
+                                <i class="la la-clock h4 mb-0"></i>
                             </div>
                             <div>
-                                <h5 class="font-weight-bold mb-1" style="color: #92400e;">
+                                <h5 class="font-weight-bold mb-1">
                                     {{ __('app.dashboard.expiry_alert') }}
                                 </h5>
-                                <p class="mb-0 small" style="color: #b45309;">
+                                <p class="mb-0 small">
                                     @foreach($expiringProducts->take(2) as $p)
                                         {{ $p->name }} ({{ $p->expiry_date }}){{ !$loop->last ? ',' : '' }}
                                     @endforeach
                                     @if($expiringProducts->count() > 2) +{{ $expiringProducts->count() - 2 }} more @endif
                                 </p>
                             </div>
-                            <a href="{{ route('products.index') }}" class="btn btn-sm btn-white ml-auto shadow-sm"
-                                style="border-radius: 8px;">{{ __('app.sidebar.view_products') }}</a>
+                            <a href="{{ route('products.index') }}" class="btn btn-sm alert-action-btn ml-auto shadow-sm">{{ __('app.sidebar.view_products') }}</a>
                         </div>
                     </div>
                 </div>

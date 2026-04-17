@@ -281,7 +281,7 @@ class CashierController extends Controller
     public function printInvoice($id)
     {
 
-        $invoice = Invoice::with('sales.product')->findOrFail($id);
+        $invoice = Invoice::with(['sales.product', 'vendor'])->findOrFail($id);
         return view('admin.cashier.invoice', compact('invoice'));
     }
 

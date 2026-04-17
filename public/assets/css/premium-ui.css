@@ -1126,3 +1126,11 @@ body.light-mode .card-header {
 .content-wrapper a:not(.btn):hover {
     color: white;
 }
+
+/* Light Mode Overrides for brand text gradient */
+:is(html, body).light-mode .text-gradient-premium {
+    background: none !important;
+    -webkit-text-fill-color: #0f172a !important; /* Force deep dark text */
+    color: #0f172a !important;
+    text-shadow: none !important;
+}

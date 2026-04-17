@@ -72,6 +72,9 @@ return [
         'developer' => 'Eng: Bola Eshaq',
         'type' => 'Type',
         'back' => 'Back',
+        'reset' => 'Reset',
+        'all_statuses' => 'All Statuses',
+        'actions' => 'Actions',
     ],
     'login' => [
         'title' => 'Login',
@@ -225,6 +228,7 @@ return [
         'search_product' => 'Search Product',
         'invoice_purchase_number' => 'Invoice / Purchase Number',
         'back_to_products' => 'Back to Products',
+        'product' => 'Product',
     ],
     'clients' => [
         'client_name' => 'Client Name',
@@ -433,6 +437,7 @@ return [
         'password' => 'Password',
         'password_confirmation' => 'Confirm Password',
         'save' => 'Save User',
+        'user' => 'User',
     ],
     'user_roles' => [
         'title' => 'User Roles Management',

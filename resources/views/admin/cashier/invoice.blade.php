@@ -164,7 +164,7 @@
     <div class="container">
         <div id="invoice-POS" class="receipt">
             <div id="top" class="header">
-                <h1>Sketo</h1>
+                <h1>{{ $invoice->vendor->business_name ?? (auth()->user()->vendor->business_name ?? auth()->user()->name) }}</h1>
                 <h1>{{ __('app.cashier.invoice') }}</h1>
                 <div class="date">{{ __('app.cashier.date') }}: {{$invoice->created_at}}</div>
                 <div class="invoice-code">INV-{{$invoice->invoice_code}}</div>
@@ -191,10 +191,9 @@
                     <tbody>
                         @foreach($invoice->sales as $sale)
                             <tr class="service">
-                                <td>{{ $sale->product->name }}</td>
+                                <td style="text-align: {{ App::getLocale() == 'ar' ? 'right' : 'left' }}; padding: 0 5px;">{{ $sale->product->name }}</td>
                                 <td>{{ $sale->quantity }}</td>
-                                <td>{{ $sale->product->selling_price * $sale->quantity }}
-                                    {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                <td>{{ number_format($sale->product->selling_price * $sale->quantity, 2) }} {{ __('app.common.currency') }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -204,31 +203,31 @@
                     <tr>
                         <td></td>
                         <th>{{ __('app.cashier.subtotal') }}:</th>
-                        <td><strong>{{ $invoice->subtotal }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</strong>
+                        <td><strong>{{ number_format($invoice->subtotal, 2) }} {{ __('app.common.currency') }}</strong>
                         </td>
                     </tr>
                     <tr>
                         <td></td>
                         <th>{{ __('app.cashier.discount') }}:</th>
-                        <td><strong>{{ $invoice->discount }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</strong>
+                        <td><strong>{{ number_format($invoice->discount, 2) }} {{ __('app.common.currency') }}</strong>
                         </td>
                     </tr>
                     <tr>
                         <td></td>
                         <th>{{ __('app.cashier.total') }}:</th>
-                        <td><strong>{{ $invoice->total_amount }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</strong>
+                        <td><strong>{{ number_format($invoice->total_amount, 2) }} {{ __('app.common.currency') }}</strong>
                         </td>
                     </tr>
                     <tr>
                         <td></td>
                         <th>{{ __('app.cashier.paid_amount') }}:</th>
-                        <td><strong>{{ $invoice->paid_amount }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</strong>
+                        <td><strong>{{ number_format($invoice->paid_amount, 2) }} {{ __('app.common.currency') }}</strong>
                         </td>
                     </tr>
                     <tr>
                         <td></td>
                         <th>{{ __('app.cashier.remaining') }}:</th>
-                        <td><strong>{{ $invoice->change }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</strong></td>
+                        <td><strong>{{ number_format($invoice->change, 2) }} {{ __('app.common.currency') }}</strong></td>
                     </tr>
                 </table>
             </div>

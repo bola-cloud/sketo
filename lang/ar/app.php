@@ -77,6 +77,9 @@ return [
         'developer' => 'م: بولا إسحاق',
         'type' => 'النوع',
         'back' => 'رجوع',
+        'reset' => 'إعادة تعيين',
+        'all_statuses' => 'كل الحالات',
+        'actions' => 'الإجراءات',
     ],
     'login' => [
         'title' => 'تسجيل الدخول',
@@ -230,6 +233,7 @@ return [
         'search_product' => 'ابحث عن منتج',
         'invoice_purchase_number' => 'رقم الفاتورة / الشراء',
         'back_to_products' => 'العودة لصفحة المنتجات',
+        'product' => 'المنتج',
     ],
     'clients' => [
         'client_name' => 'اسم العميل',
@@ -438,6 +442,7 @@ return [
         'password' => 'كلمة المرور',
         'password_confirmation' => 'تأكيد كلمة المرور',
         'save' => 'حفظ المستخدم',
+        'user' => 'المستخدم',
     ],
     'user_roles' => [
         'title' => 'إدارة أدوار المستخدمين',
