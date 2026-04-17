@@ -18,17 +18,19 @@ return new class extends Migration
 
         // For records that might have some sales already, we need to calculate the remaining quantity
         // by subtracting the sold quantities from the original quantity
-        DB::statement('
-            UPDATE purchase_products pp
-            LEFT JOIN (
-                SELECT purchase_product_id, SUM(quantity) as sold_quantity
-                FROM sales
-                WHERE purchase_product_id IS NOT NULL
-                GROUP BY purchase_product_id
-            ) s ON pp.id = s.purchase_product_id
-            SET pp.remaining_quantity = pp.quantity - COALESCE(s.sold_quantity, 0)
-            WHERE pp.remaining_quantity != pp.quantity - COALESCE(s.sold_quantity, 0)
-        ');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('
+                UPDATE purchase_products pp
+                LEFT JOIN (
+                    SELECT purchase_product_id, SUM(quantity) as sold_quantity
+                    FROM sales
+                    WHERE purchase_product_id IS NOT NULL
+                    GROUP BY purchase_product_id
+                ) s ON pp.id = s.purchase_product_id
+                SET pp.remaining_quantity = pp.quantity - COALESCE(s.sold_quantity, 0)
+                WHERE pp.remaining_quantity != pp.quantity - COALESCE(s.sold_quantity, 0)
+            ');
+        }
     }
 
     /**

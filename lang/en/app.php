@@ -71,6 +71,7 @@ return [
         'copyright' => 'Copyright',
         'developer' => 'Eng: Bola Eshaq',
         'type' => 'Type',
+        'back' => 'Back',
     ],
     'login' => [
         'title' => 'Login',

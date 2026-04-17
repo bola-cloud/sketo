@@ -64,8 +64,14 @@ class DashboardController extends Controller
             $availableMoney = $totalSalesInstallments - $totalPurchaseInstallments;
 
 
+            $isSqlite = DB::getDriverName() === 'sqlite';
+
             // Prepare data for the charts (products sold and total revenue per month)
-            $monthlyData = Sales::selectRaw('MONTH(sales.created_at) as month, YEAR(sales.created_at) as year, SUM(sales.quantity) as total_sold, SUM(sales.total_price) as total_revenue')
+            $selectRaw = $isSqlite
+                ? "strftime('%m', sales.created_at) as month, strftime('%Y', sales.created_at) as year, SUM(sales.quantity) as total_sold, SUM(sales.total_price) as total_revenue"
+                : "MONTH(sales.created_at) as month, YEAR(sales.created_at) as year, SUM(sales.quantity) as total_sold, SUM(sales.total_price) as total_revenue";
+
+            $monthlyData = Sales::selectRaw($selectRaw)
                 ->groupBy('month', 'year')
                 ->get()
                 ->keyBy(function ($item) {
@@ -74,9 +80,16 @@ class DashboardController extends Controller
 
             $lowStockProducts = Product::whereColumn('quantity', '<=', 'threshold')->get();
 
-            $expiringProducts = Product::whereNotNull('expiry_date')
-                ->whereRaw('DATEDIFF(expiry_date, CURDATE()) <= expiry_alert_days')
-                ->get();
+            if ($isSqlite) {
+                // SQLite uses julianday for date differences
+                $expiringProducts = Product::whereNotNull('expiry_date')
+                    ->whereRaw('julianday(expiry_date) - julianday(\'now\') <= expiry_alert_days')
+                    ->get();
+            } else {
+                $expiringProducts = Product::whereNotNull('expiry_date')
+                    ->whereRaw('DATEDIFF(expiry_date, CURDATE()) <= expiry_alert_days')
+                    ->get();
+            }
 
             if ($request->ajax()) {
                 return response()->json([
