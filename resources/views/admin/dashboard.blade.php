@@ -78,7 +78,7 @@
                     style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(255,255,255,0.1);">
                     <div class="row align-items-center">
                         <div class="col-md-7">
-                            <h1 class="display-4 font-weight-bold mb-2 text-gradient-premium">
+                            <h1 class="display-5 font-weight-bold mb-2 text-gradient-premium">
                                 {{ __('app.common.welcome') }}, {{ Auth::user()->name }}!
                             </h1>
                             <p class="h5 text-muted opacity-75 mb-0">

@@ -90,7 +90,7 @@
                                     style="width: 38px; filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.4));"
                                     class="mr-2 ml-2">
                                 <span class="brand-text text-gradient-premium font-weight-bold"
-                                    style="font-size: 1.4rem; letter-spacing: 1.5px;">{{ auth()->user()->vendor->business_name ?? auth()->user()->name }}</span>
+                                    style="font-size: 1.2rem; letter-spacing: 0.5px;">{{ auth()->user()->vendor->business_name ?? 'SKETO' }}</span>
                             </a>
                         </div>
                     </li>
@@ -154,9 +154,7 @@
                         <li class="dropdown dropdown-user nav-item">
                             <a class="dropdown-toggle nav-link dropdown-user-link d-flex align-items-center" href="#"
                                 data-toggle="dropdown">
-                                <div class="text-right mr-3 d-none d-md-block">
-                                    <small class="text-muted d-block opacity-75" style="font-size: 0.7rem;">Welcome
-                                        back</small>
+                                <div class="text-right d-none d-lg-block mx-3">
                                     <span class="user-name text-white font-weight-bold">{{Auth::user()->name}}</span>
                                 </div>
                                 <span class="avatar avatar-online shadow-glow"
