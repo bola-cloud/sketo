@@ -140,6 +140,9 @@ Route::middleware([
     Route::put('sales/installments/{invoice}/{installment}', [App\Http\Controllers\SalesInstallmentController::class, 'updateInstallment'])->name('sales.installments.update');
     Route::get('/admin/product-transactions', [App\Http\Controllers\ProductController::class, 'productTransactions'])->name('product.transactions');
 
+    // Custom AI Agent Chat Route
+    Route::post('/ai/chat', [\App\Http\Controllers\AiChatController::class, 'handleChat'])->name('ai.chat');
+
     // Customer Returns Routes
     Route::middleware(['plan.feature:returns'])->group(function() {
         Route::resource('customer-returns', App\Http\Controllers\CustomerReturnsController::class);
