@@ -8,8 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <title>@yield('title', 'Sketo')</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="shortcut icon" type="image/x-icon" href="{{asset('logo.png')}}">
-    <link rel="icon" type="image/x-icon" href="{{asset('logo.png')}}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{asset('logo.png')}}?v=1.1">
+    <link rel="icon" type="image/x-icon" href="{{asset('logo.png')}}?v=1.1">
 
     <!-- Modern Fonts -->
     <link
@@ -86,7 +86,7 @@
                     <li class="nav-item d-none d-md-block">
                         <div class="d-flex align-items-center ml-2">
                             <a class="navbar-brand py-0 d-flex align-items-center" href="{{route('dashboard')}}">
-                                <img src="{{asset('logo.png')}}"
+                                <img src="{{asset('logo.png')}}?v=1.1"
                                     style="width: 38px; filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.4));"
                                     class="mr-2 ml-2">
                                 <span class="brand-text text-gradient-premium font-weight-bold"
