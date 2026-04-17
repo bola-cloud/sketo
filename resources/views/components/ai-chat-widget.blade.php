@@ -11,7 +11,7 @@
             <h5 class="mb-0 text-white font-weight-bold">
                 <i class="la la-robot mr-2"></i> Sketo AI Advisor
             </h5>
-            <button id="ai-chat-close" class="text-white"><i class="la la-times"></i></button>
+            <button id="ai-chat-close"><i class="la la-times"></i></button>
         </div>
         
         <div class="ai-body" id="ai-chat-body">
@@ -105,6 +105,7 @@
     cursor: pointer;
     opacity: 0.7;
     transition: opacity 0.2s;
+    color: white; /* Default dark mode color */
 }
 .ai-header button:hover { opacity: 1; }
 
@@ -243,6 +244,61 @@ html[data-textdirection="rtl"] #sketo-ai-widget { right: auto; left: 30px; }
 html[data-textdirection="rtl"] .premium-ai-submit { margin-left: 0; margin-right: 10px; }
 html[data-textdirection="rtl"] .ai-system .ai-bubble { border-bottom-left-radius: 18px; border-bottom-right-radius: 4px; }
 html[data-textdirection="rtl"] .ai-user .ai-bubble { border-bottom-right-radius: 18px; border-bottom-left-radius: 4px; }
+
+/* -------------------------------------
+   Light Mode Theme Overrides
+   ------------------------------------- */
+html.light-mode .ai-panel, body.light-layout .ai-panel {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+}
+
+html.light-mode .ai-header, body.light-layout .ai-header {
+    background: linear-gradient(90deg, #f8fafc, #f1f5f9);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+html.light-mode .ai-header h5, body.light-layout .ai-header h5 {
+    color: #1e293b !important;
+}
+
+html.light-mode .ai-header button, body.light-layout .ai-header button {
+    color: #64748b !important;
+}
+
+html.light-mode .ai-footer, body.light-layout .ai-footer {
+    background: rgba(255, 255, 255, 0.98);
+    border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+html.light-mode #ai-chat-input, body.light-layout #ai-chat-input {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #1e293b !important;
+}
+
+html.light-mode #ai-chat-input::placeholder, body.light-layout #ai-chat-input::placeholder {
+    color: #94a3b8 !important;
+}
+
+html.light-mode #ai-chat-input:focus, body.light-layout #ai-chat-input:focus {
+    background-color: #ffffff !important;
+}
+
+html.light-mode .ai-system .ai-bubble, body.light-layout .ai-system .ai-bubble {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+}
+
+html.light-mode .ai-system .ai-bubble p, body.light-layout .ai-system .ai-bubble p {
+    color: #334155;
+}
+
+html.light-mode .ai-typing, body.light-layout .ai-typing {
+    background: #f1f5f9;
+}
 </style>
 
 <!-- Marked JS for parsing AI Markdown Responses -->
