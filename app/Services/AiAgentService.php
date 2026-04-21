@@ -79,6 +79,56 @@ class AiAgentService
             [
                 'type' => 'function',
                 'function' => [
+                    'name' => 'get_stagnant_products',
+                    'description' => 'Get a list of stagnant products that have had zero sales in the last 30 days.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [],
+                        'required' => [],
+                    ],
+                ]
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'get_purchase_summary',
+                    'description' => 'Get a summary of recent purchase invoices (stock incoming).',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [],
+                        'required' => [],
+                    ],
+                ]
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'get_top_selling_products',
+                    'description' => 'Identify the top 5 best-selling products by quantity.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [],
+                        'required' => [],
+                    ],
+                ]
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'get_profit_summary',
+                    'description' => 'Get a gross profit summary for a specific period (default today).',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'days' => ['type' => 'integer', 'description' => 'Number of days to look back (default 1)']
+                        ],
+                        'required' => [],
+                    ],
+                ]
+            ],
+            [
+                'type' => 'function',
+                'function' => [
                     'name' => 'get_recent_invoices',
                     'description' => 'Get the 5 most recent sales invoices including client name and paid amount.',
                     'parameters' => [
@@ -123,6 +173,64 @@ class AiAgentService
                         ->select('name', 'quantity', 'threshold')
                         ->get();
                     return json_encode(['status' => 'success', 'low_stock_items' => $products]);
+
+                case 'get_top_selling_products':
+                    $topProducts = Sales::where('vendor_id', $vendorId)
+                        ->select('product_id', \DB::raw('SUM(quantity) as total_qty'))
+                        ->with('product:id,name')
+                        ->groupBy('product_id')
+                        ->orderByDesc('total_qty')
+                        ->limit(5)
+                        ->get();
+                    return json_encode(['status' => 'success', 'top_products' => $topProducts]);
+
+                case 'get_purchase_summary':
+                    $recentPurchases = \App\Models\Purchase::where('vendor_id', $vendorId)
+                        ->orderBy('created_at', 'desc')
+                        ->limit(5)
+                        ->get();
+                    return json_encode(['status' => 'success', 'recent_purchases' => $recentPurchases]);
+
+                case 'get_profit_summary':
+                    $days = $args['days'] ?? 1;
+                    $startDate = Carbon::now()->subDays($days);
+                    
+                    $sales = Sales::where('vendor_id', $vendorId)
+                        ->where('created_at', '>=', $startDate)
+                        ->with('product:id,cost_price,selling_price')
+                        ->get();
+                    
+                    $totalCost = 0;
+                    $totalRevenue = 0;
+                    foreach($sales as $sale) {
+                        $totalCost += ($sale->product->cost_price ?? 0) * $sale->quantity;
+                        $totalRevenue += $sale->total_price;
+                    }
+                    
+                    return json_encode([
+                        'status' => 'success',
+                        'period_days' => $days,
+                        'revenue' => $totalRevenue,
+                        'cost' => $totalCost,
+                        'gross_profit' => $totalRevenue - $totalCost
+                    ]);
+
+                case 'get_stagnant_products':
+                    $thirtyDaysAgo = Carbon::now()->subDays(30);
+                    // Find products with zero sales in the last 30 days
+                    $soldProductIds = Sales::where('vendor_id', $vendorId)
+                        ->where('created_at', '>=', $thirtyDaysAgo)
+                        ->distinct()
+                        ->pluck('product_id');
+
+                    $stagnantProducts = Product::where('vendor_id', $vendorId)
+                        ->whereNotIn('id', $soldProductIds)
+                        ->where('quantity', '>', 0)
+                        ->select('name', 'quantity', 'cost_price', 'selling_price')
+                        ->limit(10)
+                        ->get();
+
+                    return json_encode(['status' => 'success', 'stagnant_items' => $stagnantProducts]);
 
                 case 'get_expiring_products':
                     $isSqlite = \Illuminate\Support\Facades\DB::getDriverName() === 'sqlite';

@@ -130,7 +130,10 @@ class CashierController extends Controller
         }
 
         $cart = session()->get('cart', []);
-        $discount = $request->input('apply_discount_hidden', 0);
+        $discount = 0;
+        if (auth()->user()->can('apply_discount')) {
+            $discount = $request->input('apply_discount_hidden', 0);
+        }
         $paidAmount = $request->input('paid_amount');
         $clientId = $request->input('client_id');
 

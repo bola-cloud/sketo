@@ -618,6 +618,9 @@
 
                 $('#total_after_discount').text(totalAfterDiscount.toFixed(2) + ' {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}');
                 $('#apply_discount_hidden').val(discount);
+                
+                // Real-time update for paid amount to match final total
+                $('#paid_amount').val(totalAfterDiscount.toFixed(2));
 
                 // Visual feedback for discount validation
                 if (discount > subtotal) {
