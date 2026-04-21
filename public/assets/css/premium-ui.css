@@ -31,17 +31,17 @@ body.light-mode {
 }
 
 body.light-mode {
-    background: radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
-        #f8fafc;
+    background: radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        #f1f5f9 !important; /* Darker slate background for better contrast */
     background-attachment: fixed;
     color: var(--p-text);
 }
 
 body.light-mode .premium-card {
-    background: rgba(255, 255, 255, 0.85) !important;
-    border-color: rgba(255, 255, 255, 0.6) !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05) !important;
     backdrop-filter: blur(20px) !important;
     color: #0f172a !important;
 }
@@ -53,9 +53,11 @@ body.light-mode h1,
 :is(html, body).light-mode h5,
 :is(html, body).light-mode h6,
 :is(html, body).light-mode .text-white,
+:is(html, body).light-mode .text-gradient-premium,
 :is(html, body).light-mode .sidebar-user-name,
 :is(html, body).light-mode .brand-text {
     color: #0f172a !important;
+    -webkit-text-fill-color: #0f172a !important;
     text-shadow: none !important;
 }
 
@@ -636,6 +638,13 @@ h6 {
     -webkit-text-fill-color: transparent;
 }
 
+body.light-mode .text-gradient-premium {
+    background: linear-gradient(135deg, var(--p-indigo), var(--p-purple)) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
 /* New Layout Spacing */
 .content-wrapper {
     padding: 2.5rem 2rem !important;
@@ -724,17 +733,46 @@ h6 {
 }
 
 .btn-white {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
     color: white !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.light-mode .btn-white {
+    background: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
 }
 
 .btn-white:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15) !important;
     transform: translateY(-2px);
     border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+body.light-mode .btn-white:hover {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Fix for Autofill blinding white background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #1e293b inset !important;
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+body.light-mode input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #f8fafc inset !important;
+    -webkit-text-fill-color: #0f172a !important;
 }
 
 .btn-outline-primary {

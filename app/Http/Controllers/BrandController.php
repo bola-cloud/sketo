@@ -30,7 +30,14 @@ class BrandController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:brands,name',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                \Illuminate\Validation\Rule::unique('brands')->where(function ($query) {
+                    return $query->where('vendor_id', auth()->user()->vendor_id);
+                }),
+            ],
             'description' => 'nullable|string|max:1000',
         ]);
 
@@ -65,7 +72,14 @@ class BrandController extends Controller
     public function update(Request $request, Brand $brand)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:brands,name,' . $brand->id,
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                \Illuminate\Validation\Rule::unique('brands')->where(function ($query) {
+                    return $query->where('vendor_id', auth()->user()->vendor_id);
+                })->ignore($brand->id),
+            ],
             'description' => 'nullable|string|max:1000',
         ]);
 
