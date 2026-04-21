@@ -351,11 +351,18 @@ class AiAgentService
             'tools' => [['function_declarations' => array_map(fn($t) => $t['function'], $this->getTools())]],
         ];
 
-        $response = Http::withHeaders([
-            'x-goog-api-key' => $this->apiKey, // Native Gemini key header
-            'Authorization' => "Bearer {$this->apiKey}", // Fallback for proxies
+        $headers = [
             'Content-Type' => 'application/json',
-        ])->timeout(45)->post($this->apiUrl, $payload);
+        ];
+
+        // Google Direct API uses x-goog-api-key, OpenAI/Proxies use Authorization: Bearer
+        if (str_contains($this->apiUrl, 'generativelanguage')) {
+            $headers['x-goog-api-key'] = $this->apiKey;
+        } else {
+            $headers['Authorization'] = "Bearer {$this->apiKey}";
+        }
+
+        $response = Http::withHeaders($headers)->timeout(45)->post($this->apiUrl, $payload);
 
         if ($response->failed()) {
             throw new \Exception('Gemini API Error: ' . $response->body());
@@ -400,12 +407,9 @@ class AiAgentService
         }
 
         // Re-call with tool results
-        $finalResponse = Http::withHeaders([
-            'x-goog-api-key' => $this->apiKey,
-            'Content-Type' => 'application/json',
-        ])->timeout(45)->post($this->apiUrl, ['contents' => $contents]);
+        $response = Http::withHeaders($headers)->timeout(45)->post($this->apiUrl, ['contents' => $contents]);
 
-        $finalData = $finalResponse->json();
+        $finalData = $response->json();
         $finalParts = $finalData['candidates'][0]['content']['parts'] ?? [['text' => 'Error processing tool output']];
         
         return ['role' => 'assistant', 'content' => $finalParts[0]['text'] ?? ''];
