@@ -272,11 +272,21 @@ class AiAgentService
     }
 
     /**
-     * Process a chat message using the OpenAI API spec
+     * Process a chat message using the Gemini Native API structure (fallback for proxies)
      */
     public function ask(array $messages)
     {
-        // Send initial request with tools
+        $isGemini = str_contains($this->apiUrl, 'generativelanguage') || str_contains($this->apiUrl, 'v1beta');
+
+        if ($isGemini) {
+            return $this->askGemini($messages);
+        }
+
+        return $this->askOpenAI($messages);
+    }
+
+    protected function askOpenAI(array $messages)
+    {
         $response = Http::withHeaders([
             'Authorization' => "Bearer {$this->apiKey}",
             'Content-Type' => 'application/json',
@@ -288,35 +298,21 @@ class AiAgentService
         ]);
 
         if ($response->failed()) {
-            Log::error('AI API Error: ' . $response->body());
-            throw new \Exception('Failed to communicate with AI API. Ensure the mse_ai_api proxy is running at ' . $this->apiUrl);
+            throw new \Exception('OpenAI API Error: ' . $response->body());
         }
 
         $responseData = $response->json();
-        
-        // Ensure successful response shape
-        if (!isset($responseData['choices'][0]['message'])) {
-            return ['role' => 'assistant', 'content' => 'Error: Improper format received from AI server.'];
-        }
-
         $responseMessage = $responseData['choices'][0]['message'];
-        
-        // Handle standard response without tool calls
+
         if (empty($responseMessage['tool_calls'])) {
             return $responseMessage;
         }
 
-        // Handle Tool Calling iteratively
-        $messages[] = $responseMessage; // Append the assistant's context of tool request
-
+        $messages[] = $responseMessage;
         foreach ($responseMessage['tool_calls'] as $toolCall) {
             $functionName = $toolCall['function']['name'];
             $functionArgs = json_decode($toolCall['function']['arguments'], true) ?? [];
-            
-            // Execute the isolated internal tool
             $functionResponse = $this->executeTool($functionName, $functionArgs);
-            
-            // Provide tool response back to AI
             $messages[] = [
                 'tool_call_id' => $toolCall['id'],
                 'role' => 'tool',
@@ -325,7 +321,6 @@ class AiAgentService
             ];
         }
 
-        // Second Call: Get final answer with tool data injected
         $finalResponse = Http::withHeaders([
             'Authorization' => "Bearer {$this->apiKey}",
             'Content-Type' => 'application/json',
@@ -334,11 +329,85 @@ class AiAgentService
             'messages' => $messages,
         ]);
 
-        if ($finalResponse->failed()) {
-            throw new \Exception('AI API failed during tool response synthesis.');
-        }
-
         $finalData = $finalResponse->json();
         return $finalData['choices'][0]['message'];
+    }
+
+    protected function askGemini(array $messages)
+    {
+        // Convert messages to Gemini format (contents/parts)
+        $contents = [];
+        foreach ($messages as $msg) {
+            if ($msg['role'] === 'system') continue; // Gemini uses systemInstruction or prompt-injection
+            
+            $contents[] = [
+                'role' => ($msg['role'] === 'assistant' || $msg['role'] === 'tool') ? 'model' : 'user',
+                'parts' => [['text' => $msg['content']]]
+            ];
+        }
+
+        $payload = [
+            'contents' => $contents,
+            'tools' => [['function_declarations' => array_map(fn($t) => $t['function'], $this->getTools())]],
+        ];
+
+        $response = Http::withHeaders([
+            'x-goog-api-key' => $this->apiKey, // Native Gemini key header
+            'Authorization' => "Bearer {$this->apiKey}", // Fallback for proxies
+            'Content-Type' => 'application/json',
+        ])->timeout(45)->post($this->apiUrl, $payload);
+
+        if ($response->failed()) {
+            throw new \Exception('Gemini API Error: ' . $response->body());
+        }
+
+        $responseData = $response->json();
+        
+        // Handle Gemini response structure
+        $candidate = $responseData['candidates'][0] ?? null;
+        if (!$candidate) return ['role' => 'assistant', 'content' => 'No response from Gemini.'];
+
+        $modelMessage = $candidate['content'] ?? null;
+        $parts = $modelMessage['parts'] ?? [];
+        
+        $text = '';
+        $toolCalls = [];
+        foreach ($parts as $part) {
+            if (isset($part['text'])) $text .= $part['text'];
+            if (isset($part['functionCall'])) $toolCalls[] = $part['functionCall'];
+        }
+
+        if (empty($toolCalls)) {
+            return ['role' => 'assistant', 'content' => $text];
+        }
+
+        // Handle tool calls for Gemini
+        foreach ($toolCalls as $call) {
+            $functionName = $call['name'];
+            $functionArgs = $call['args'] ?? [];
+            $functionResponse = $this->executeTool($functionName, $functionArgs);
+            
+            $contents[] = $modelMessage;
+            $contents[] = [
+                'role' => 'function',
+                'parts' => [
+                    'functionResponse' => [
+                        'name' => $functionName,
+                        'response' => ['content' => $functionResponse]
+                    ]
+                ]
+            ];
+        }
+
+        // Re-call with tool results
+        $finalResponse = Http::withHeaders([
+            'x-goog-api-key' => $this->apiKey,
+            'Content-Type' => 'application/json',
+        ])->timeout(45)->post($this->apiUrl, ['contents' => $contents]);
+
+        $finalData = $finalResponse->json();
+        $finalParts = $finalData['candidates'][0]['content']['parts'] ?? [['text' => 'Error processing tool output']];
+        
+        return ['role' => 'assistant', 'content' => $finalParts[0]['text'] ?? ''];
     }
 }
