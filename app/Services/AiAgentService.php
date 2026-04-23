@@ -276,9 +276,10 @@ class AiAgentService
      */
     public function ask(array $messages)
     {
-        $isGemini = str_contains($this->apiUrl, 'generativelanguage') || str_contains($this->apiUrl, 'v1beta');
+        // Route to Native Gemini only if using the specific Google native endpoint
+        $isNativeGemini = str_contains($this->apiUrl, ':generateContent');
 
-        if ($isGemini) {
+        if ($isNativeGemini) {
             return $this->askGemini($messages);
         }
 
@@ -287,10 +288,13 @@ class AiAgentService
 
     protected function askOpenAI(array $messages)
     {
-        $response = Http::withHeaders([
+        $headers = [
             'Authorization' => "Bearer {$this->apiKey}",
             'Content-Type' => 'application/json',
-        ])->timeout(45)->post($this->apiUrl, [
+        ];
+
+        // Google's OpenAI-compatible endpoint uses Bearer token, so this works natively
+        $response = Http::withHeaders($headers)->timeout(45)->post($this->apiUrl, [
             'model' => $this->model,
             'messages' => $messages,
             'tools' => $this->getTools(),
