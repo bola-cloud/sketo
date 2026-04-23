@@ -337,17 +337,27 @@ class AiAgentService
     {
         // Convert messages to Gemini format (contents/parts)
         $contents = [];
-        $systemInstruction = null;
+        $systemText = '';
 
+        // Extract system instruction first
         foreach ($messages as $msg) {
             if ($msg['role'] === 'system') {
-                $systemInstruction = ['parts' => [['text' => $msg['content']]]];
-                continue;
+                $systemText .= $msg['content'] . "\n\n";
             }
+        }
+
+        foreach ($messages as $msg) {
+            if ($msg['role'] === 'system') continue;
             
+            $text = $msg['content'];
+            // Prepend system instruction to the very first user message to guarantee compatibility with all models
+            if ($systemText && $msg['role'] !== 'assistant' && $msg['role'] !== 'tool' && empty($contents)) {
+                $text = "System Rules:\n" . $systemText . "User Message:\n" . $text;
+            }
+
             $contents[] = [
                 'role' => ($msg['role'] === 'assistant' || $msg['role'] === 'tool') ? 'model' : 'user',
-                'parts' => [['text' => $msg['content']]]
+                'parts' => [['text' => $text]]
             ];
         }
 
@@ -355,10 +365,6 @@ class AiAgentService
             'contents' => $contents,
             'tools' => [['function_declarations' => array_map(fn($t) => $t['function'], $this->getTools())]],
         ];
-
-        if ($systemInstruction) {
-            $payload['system_instruction'] = $systemInstruction;
-        }
 
         $headers = [
             'Content-Type' => 'application/json',
