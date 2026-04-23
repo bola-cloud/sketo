@@ -33,6 +33,7 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_today_summary',
                     'description' => 'Get a quick financial summary for today, including total revenue and total products sold.',
+                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ],
             [
@@ -40,6 +41,7 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_low_stock_products',
                     'description' => 'Get a list of products that have reached or dropped below their minimum allowed stock threshold.',
+                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ],
             [
@@ -47,6 +49,7 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_expiring_products',
                     'description' => 'Get a list of products that are about to expire within their defined expiry alert period.',
+                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ],
             [
@@ -54,6 +57,7 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_recent_clients',
                     'description' => 'Get a list of the 5 most recently added clients.',
+                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ],
             [
@@ -61,6 +65,7 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_stagnant_products',
                     'description' => 'Get a list of stagnant products that have had zero sales in the last 30 days.',
+                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ],
             [
@@ -68,6 +73,7 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_purchase_summary',
                     'description' => 'Get a summary of recent purchase invoices (stock incoming).',
+                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ],
             [
@@ -75,6 +81,7 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_top_selling_products',
                     'description' => 'Identify the top 5 best-selling products by quantity.',
+                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ],
             [
@@ -96,6 +103,7 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_recent_invoices',
                     'description' => 'Get the 5 most recent sales invoices including client name and paid amount.',
+                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ]
         ];
