@@ -261,8 +261,9 @@ class AiAgentService
             'Content-Type' => 'application/json',
         ];
 
-        // Google's OpenAI-compatible endpoint uses Bearer token, so this works natively
-        $response = Http::withHeaders($headers)->timeout(45)->post($this->apiUrl, [
+        // mse_ai_api uses browser automation, which can take longer than a normal API.
+        // We increase the timeout to 120 seconds to prevent cURL error 28.
+        $response = Http::withHeaders($headers)->timeout(120)->post($this->apiUrl, [
             'model' => $this->model,
             'messages' => $messages,
             'tools' => $this->getTools(),
