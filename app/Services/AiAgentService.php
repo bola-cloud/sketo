@@ -297,7 +297,7 @@ class AiAgentService
         $finalResponse = Http::withHeaders([
             'Authorization' => "Bearer {$this->apiKey}",
             'Content-Type' => 'application/json',
-        ])->timeout(45)->post($this->apiUrl, [
+        ])->timeout(120)->post($this->apiUrl, [
             'model' => $this->model,
             'messages' => $messages,
         ]);
