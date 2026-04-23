@@ -337,8 +337,13 @@ class AiAgentService
     {
         // Convert messages to Gemini format (contents/parts)
         $contents = [];
+        $systemInstruction = null;
+
         foreach ($messages as $msg) {
-            if ($msg['role'] === 'system') continue; // Gemini uses systemInstruction or prompt-injection
+            if ($msg['role'] === 'system') {
+                $systemInstruction = ['parts' => [['text' => $msg['content']]]];
+                continue;
+            }
             
             $contents[] = [
                 'role' => ($msg['role'] === 'assistant' || $msg['role'] === 'tool') ? 'model' : 'user',
@@ -351,18 +356,31 @@ class AiAgentService
             'tools' => [['function_declarations' => array_map(fn($t) => $t['function'], $this->getTools())]],
         ];
 
+        if ($systemInstruction) {
+            $payload['system_instruction'] = $systemInstruction;
+        }
+
         $headers = [
             'Content-Type' => 'application/json',
         ];
 
+        $url = $this->apiUrl;
+
         // Google Direct API uses x-goog-api-key, OpenAI/Proxies use Authorization: Bearer
-        if (str_contains($this->apiUrl, 'generativelanguage')) {
+        if (str_contains($url, 'generativelanguage')) {
             $headers['x-goog-api-key'] = $this->apiKey;
+            if (!str_contains($url, 'key=')) {
+                $url .= (str_contains($url, '?') ? '&' : '?') . 'key=' . $this->apiKey;
+            }
+            // Fix model 404 issue automatically if URL doesn't have the full model name
+            if (str_contains($url, 'gemini-1.5-flash:generateContent')) {
+                $url = str_replace('gemini-1.5-flash:generateContent', 'gemini-1.5-flash-latest:generateContent', $url);
+            }
         } else {
             $headers['Authorization'] = "Bearer {$this->apiKey}";
         }
 
-        $response = Http::withHeaders($headers)->timeout(45)->post($this->apiUrl, $payload);
+        $response = Http::withHeaders($headers)->timeout(45)->post($url, $payload);
 
         if ($response->failed()) {
             throw new \Exception('Gemini API Error: ' . $response->body());
@@ -407,7 +425,7 @@ class AiAgentService
         }
 
         // Re-call with tool results
-        $response = Http::withHeaders($headers)->timeout(45)->post($this->apiUrl, ['contents' => $contents]);
+        $response = Http::withHeaders($headers)->timeout(45)->post($url, ['contents' => $contents]);
 
         $finalData = $response->json();
         $finalParts = $finalData['candidates'][0]['content']['parts'] ?? [['text' => 'Error processing tool output']];
