@@ -357,6 +357,25 @@ class AiAgentService
 
         $response = Http::withHeaders($headers)->timeout(45)->post($url, $payload);
 
+        // Smart Fallback: If 404 Model Not Found, automatically try alternative models
+        if ($response->status() === 404 && str_contains($url, 'generativelanguage')) {
+            $fallbackModels = ['gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-pro'];
+            
+            foreach ($fallbackModels as $fallbackModel) {
+                // Dynamically replace the model name in the URL
+                $newUrl = preg_replace('/models\/[^\:]+:/', "models/{$fallbackModel}:", $url);
+                
+                if ($newUrl !== $url) {
+                    $retryResponse = Http::withHeaders($headers)->timeout(45)->post($newUrl, $payload);
+                    if ($retryResponse->successful() || $retryResponse->status() !== 404) {
+                        $response = $retryResponse;
+                        $url = $newUrl; // Keep the working URL for the second tool call later
+                        break;
+                    }
+                }
+            }
+        }
+
         if ($response->failed()) {
             throw new \Exception('Gemini API Error: ' . $response->body());
         }
