@@ -372,10 +372,6 @@ class AiAgentService
             if (!str_contains($url, 'key=')) {
                 $url .= (str_contains($url, '?') ? '&' : '?') . 'key=' . $this->apiKey;
             }
-            // Fix model 404 issue automatically if URL doesn't have the full model name
-            if (str_contains($url, 'gemini-1.5-flash:generateContent')) {
-                $url = str_replace('gemini-1.5-flash:generateContent', 'gemini-1.5-flash-latest:generateContent', $url);
-            }
         } else {
             $headers['Authorization'] = "Bearer {$this->apiKey}";
         }
