@@ -632,10 +632,13 @@
             // Discount input handling with real-time calculation
             $('#discount').off('input').on('input', function () {
                 var discount = parseFloat($(this).val()) || 0;
-                var subtotal = {{ isset($subtotal) && is_numeric($subtotal) ? $subtotal : 0 }};
+                // Get subtotal dynamically from the UI instead of static PHP variable
+                var subtotalText = $('#cart-content').find('span:contains("{{ __("app.cashier.subtotal_before_discount") }}")').next().text() || '0';
+                var subtotal = parseFloat(subtotalText.replace(/[^\d.]/g, '')) || 0;
+                
                 var totalAfterDiscount = Math.max(0, subtotal - discount); // Ensure non-negative
 
-                $('#total_after_discount').text(totalAfterDiscount.toFixed(2) + ' {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}');
+                $('#total_after_discount').text(totalAfterDiscount.toFixed(2));
                 $('#apply_discount_hidden').val(discount);
                 
                 // Real-time update for paid amount to match final total
@@ -705,12 +708,22 @@
                 type: "GET",
                 success: function (html) {
                     $('#cart-content').html(html);
+                    
+                    // Re-initialize scripts to attach listeners to new elements
+                    initializeCartScripts();
+                    
                     // Update cart badge and stats
-                    let itemsCount = $('#cart-content').find('#cart-badge').text() || '0';
-                    let totalAmount = $('#cart-content').find('#cart-total-amount').text() || '0';
+                    let itemsCount = $('#cart-badge-val').text() || '0';
+                    if(!itemsCount || itemsCount == '0') {
+                        itemsCount = $('#cart-content').find('.product-item').length || '0';
+                    }
+                    
                     $('#cart-badge').text(itemsCount);
                     $('#cart-items-count').text(itemsCount);
-                    $('#cart-total-amount').text(totalAmount);
+                    
+                    // Update total from the new HTML
+                    let totalVal = $('#total_after_discount').text() || '0';
+                    $('#cart-total-amount').text(totalVal + ' {{ App::getLocale() == "ar" ? "ج.م" : "EGP" }}');
                 },
                 error: function () {
                     // fallback: reload if AJAX fails

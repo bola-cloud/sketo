@@ -141,7 +141,8 @@
                                     <input type="text" class="form-control @error('paid_amount') is-invalid @enderror"
                                         id="paid_amount" name="paid_amount"
                                         placeholder="{{ __('app.cashier.enter_paid_amount') }}" required
-                                        value="{{ old('paid_amount') }}">
+                                        value="{{ old('paid_amount', number_format($subtotal - ($discount ?? 0), 2, '.', '')) }}"
+                                        @unless(auth()->user()->can('change_paid_amount')) readonly @endunless>
                                 </div>
                                 @error('paid_amount')
                                     <div class="invalid-feedback">{{ $message }}</div>
