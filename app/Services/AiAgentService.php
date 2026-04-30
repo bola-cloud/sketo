@@ -33,7 +33,6 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_today_summary',
                     'description' => 'Get a quick financial summary for today, including total revenue and total products sold.',
-                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ],
             [
@@ -41,7 +40,6 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_low_stock_products',
                     'description' => 'Get a list of products that have reached or dropped below their minimum allowed stock threshold.',
-                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ],
             [
@@ -49,7 +47,6 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_expiring_products',
                     'description' => 'Get a list of products that are about to expire within their defined expiry alert period.',
-                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ],
             [
@@ -57,7 +54,6 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_recent_clients',
                     'description' => 'Get a list of the 5 most recently added clients.',
-                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ],
             [
@@ -65,7 +61,6 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_stagnant_products',
                     'description' => 'Get a list of stagnant products that have had zero sales in the last 30 days.',
-                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ],
             [
@@ -73,7 +68,6 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_purchase_summary',
                     'description' => 'Get a summary of recent purchase invoices (stock incoming).',
-                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ],
             [
@@ -81,7 +75,6 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_top_selling_products',
                     'description' => 'Identify the top 5 best-selling products by quantity.',
-                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ],
             [
@@ -103,7 +96,6 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_recent_invoices',
                     'description' => 'Get the 5 most recent sales invoices including client name and paid amount.',
-                    'parameters' => ['type' => 'object', 'properties' => (object)[]]
                 ]
             ]
         ];
@@ -261,17 +253,40 @@ class AiAgentService
             'Content-Type' => 'application/json',
         ];
 
+        // --- Smart Payload Adapter ---
+        // Some proxies (like mse_ai_api) are strict about the OpenAI schema 
+        // and require the 'parameters' key even if empty. 
+        // Official Google OpenAI bridge hates it. We adapt on the fly.
+        $isProxy = !str_contains($this->apiUrl, 'googleapis.com');
+        $tools = $this->getTools();
+        
+        if ($isProxy) {
+            $tools = array_map(function($tool) {
+                if ($tool['type'] === 'function' && !isset($tool['function']['parameters'])) {
+                    $tool['function']['parameters'] = ['type' => 'object', 'properties' => (object)[]];
+                }
+                return $tool;
+            }, $tools);
+        }
+
         // mse_ai_api uses browser automation, which can take longer than a normal API.
         // We increase the timeout to 120 seconds to prevent cURL error 28.
         $response = Http::withHeaders($headers)->timeout(120)->post($this->apiUrl, [
             'model' => $this->model,
             'messages' => $messages,
-            'tools' => $this->getTools(),
-            'tool_choice' => 'auto',
+            'tools' => !empty($tools) ? $tools : null,
+            'tool_choice' => !empty($tools) ? 'auto' : null,
         ]);
 
         if ($response->failed()) {
-            throw new \Exception('OpenAI API Error: ' . $response->body());
+            $errorBody = $response->body();
+            
+            // Helpful hints for browser-based proxies (mse_ai_api / mse_ai_g)
+            if (str_contains($errorBody, 'Execution context was destroyed') || str_contains($errorBody, 'DOM.describeNode')) {
+                throw new \Exception('AI Proxy Error: The browser session crashed. Please RESTART the AI Proxy script (mse_ai_api) on your server.');
+            }
+            
+            throw new \Exception('OpenAI API Error: ' . $errorBody);
         }
 
         $responseData = $response->json();
