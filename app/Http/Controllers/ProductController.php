@@ -79,6 +79,7 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge(['is_weighted' => $request->has('is_weighted') ? 1 : 0]);
         // Check if the user is adding a new product or an existing one
         if ($request->filled('existing_product')) {
             // Validation for existing product
@@ -324,6 +325,7 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
+        $request->merge(['is_weighted' => $request->has('is_weighted') ? 1 : 0]);
         // Uncomment for debugging
         // dd($request->all(), $product->toArray());
 

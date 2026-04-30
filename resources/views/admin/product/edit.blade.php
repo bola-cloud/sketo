@@ -45,7 +45,7 @@
                                                 value="{{ $product->name }}" required>
                                             <div class="ml-2">
                                                 <div class="custom-control custom-checkbox" style="white-space: nowrap;">
-                                                    <input type="checkbox" class="custom-control-input" id="is_weighted" name="is_weighted" {{ $product->is_weighted ? 'checked' : '' }}>
+                                                    <input type="checkbox" class="custom-control-input" id="is_weighted" name="is_weighted" value="1" {{ $product->is_weighted ? 'checked' : '' }}>
                                                     <label class="custom-control-label text-bold-600 warning" for="is_weighted">بيع بالميزان؟</label>
                                                 </div>
                                             </div>
