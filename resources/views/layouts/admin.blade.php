@@ -460,6 +460,8 @@
                 if (mainToggle) mainToggle.click();
                 else body.classList.remove('menu-open');
             }
+        });
+
         // Global Keyboard Shortcuts
         document.addEventListener('keydown', function(e) {
             // F1: Cashier
