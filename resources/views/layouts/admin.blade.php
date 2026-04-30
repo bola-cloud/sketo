@@ -193,267 +193,124 @@
             <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
                 @php
                     $user = auth()->user();
-                    // Check if user has admin role
                     $isSuperAdmin = $user && $user->hasRole('super_admin');
                     $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('owner') || $isSuperAdmin);
                 @endphp
 
+                @if($isAdmin)
+                {{-- 1. Daily Operations - العمليات اليومية --}}
+                <li class="navigation-header"><span>{{ __('العمليات اليومية') }}</span></li>
+                <li class="{{ Route::currentRouteName() == 'dashboard' ? 'active' : '' }} nav-item">
+                    <a href="{{route('dashboard')}}"><i class="la la-home"></i><span class="menu-title">{{ __('app.sidebar.dashboard') }}</span></a>
+                </li>
+                <li class="{{ Route::currentRouteName() == 'cashier.viewCart' ? 'active' : '' }} nav-item">
+                    <a href="{{route('cashier.viewCart')}}"><i class="la la-calculator"></i><span class="menu-title">{{ __('app.sidebar.add_invoice') }}</span></a>
+                </li>
+                <li class="{{ Route::currentRouteName() == 'invoices.index' ? 'active' : '' }} nav-item">
+                    <a href="{{route('invoices.index')}}"><i class="la la-file-text"></i><span class="menu-title">{{ __('app.sidebar.view_invoices') }}</span></a>
+                </li>
+                <li class="{{ Request::is('shifts*') ? 'active' : '' }} nav-item">
+                    <a href="{{route('shifts.index')}}"><i class="la la-clock-o"></i><span class="menu-title">{{ __('app.sidebar.shift_management') }}</span></a>
+                </li>
+                @planFeature('treasury')
+                <li class="{{ Route::currentRouteName() == 'treasury' ? 'active' : '' }} nav-item">
+                    <a href="{{route('treasury')}}"><i class="la la-bank"></i><span class="menu-title">{{ __('app.sidebar.treasury') }}</span></a>
+                </li>
+                @endplanFeature
+
+                {{-- 2. Inventory & Purchases - المخازن والمشتريات --}}
+                <li class="navigation-header"><span>{{ __('المخازن والمشتريات') }}</span></li>
+                <li class="nav-item has-sub {{ Request::is('products*') || Request::is('categories*') || Request::is('brands*') ? 'open' : '' }}">
+                    <a href="#"><i class="la la-cube"></i><span class="menu-title">{{ __('app.sidebar.products') }}</span></a>
+                    <ul class="menu-content">
+                        <li class="{{ Route::currentRouteName() == 'products.index' ? 'active' : '' }}"><a href="{{route('products.index')}}"><i class="la la-cubes"></i> {{ __('app.sidebar.view_products') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'products.create' ? 'active' : '' }}"><a href="{{route('products.create')}}"><i class="la la-plus"></i> {{ __('app.sidebar.add_product') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'categories.index' ? 'active' : '' }}"><a href="{{route('categories.index')}}"><i class="la la-list"></i> {{ __('app.sidebar.view_categories') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'brands.index' ? 'active' : '' }}"><a href="{{route('brands.index')}}"><i class="la la-certificate"></i> {{ __('app.sidebar.view_brands') }}</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item has-sub {{ Request::is('purchases*') || Request::is('suppliers*') ? 'open' : '' }}">
+                    <a href="#"><i class="la la-shopping-cart"></i><span class="menu-title">{{ __('app.sidebar.purchase_invoices') }}</span></a>
+                    <ul class="menu-content">
+                        <li class="{{ Route::currentRouteName() == 'purchases.index' ? 'active' : '' }}"><a href="{{route('purchases.index')}}"><i class="la la-file-invoice"></i> {{ __('app.sidebar.view_purchase_invoices') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'purchases.create' ? 'active' : '' }}"><a href="{{route('purchases.create')}}"><i class="la la-plus-square"></i> {{ __('app.sidebar.add_purchase_invoice') }}</a></li>
+                        @planFeature('suppliers')
+                        <li class="{{ Route::currentRouteName() == 'suppliers.index' ? 'active' : '' }}"><a href="{{route('suppliers.index')}}"><i class="la la-briefcase"></i> {{ __('app.sidebar.manage_suppliers') }}</a></li>
+                        @endplanFeature
+                    </ul>
+                </li>
+
+                {{-- 3. Clients & Returns - العملاء والمرتجعات --}}
+                <li class="navigation-header"><span>{{ __('العملاء والمرتجعات') }}</span></li>
+                @planFeature('clients')
+                <li class="{{ Route::currentRouteName() == 'clients.index' ? 'active' : '' }} nav-item">
+                    <a href="{{route('clients.index')}}"><i class="la la-users"></i><span class="menu-title">{{ __('app.sidebar.manage_clients') }}</span></a>
+                </li>
+                @endplanFeature
+                @planFeature('returns')
+                <li class="nav-item has-sub {{ Request::is('*-returns*') ? 'open' : '' }}">
+                    <a href="#"><i class="la la-reply-all"></i><span class="menu-title">{{ __('المرتجعات') }}</span></a>
+                    <ul class="menu-content">
+                        <li class="{{ Route::currentRouteName() == 'customer-returns.index' ? 'active' : '' }}"><a href="{{route('customer-returns.index')}}"><i class="la la-reply"></i> {{ __('app.sidebar.customer_returns') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'supplier-returns.index' ? 'active' : '' }}"><a href="{{route('supplier-returns.index')}}"><i class="la la-undo"></i> {{ __('app.sidebar.supplier_returns') }}</a></li>
+                    </ul>
+                </li>
+                @endplanFeature
+
+                {{-- 4. Reports & Analytics - التقارير والإحصائيات --}}
+                <li class="navigation-header"><span>{{ __('التقارير والإحصائيات') }}</span></li>
+                @planFeature('reports_advanced')
+                <li class="nav-item has-sub {{ Request::is('reports/statistics*') ? 'open' : '' }}">
+                    <a href="#"><i class="la la-pie-chart"></i><span class="menu-title">{{ __('app.sidebar.financial_reports') }}</span></a>
+                    <ul class="menu-content">
+                        <li class="{{ Route::currentRouteName() == 'reports.statistics.financial_summary' ? 'active' : '' }}"><a href="{{route('reports.statistics.financial_summary')}}"><i class="la la-file-text"></i> {{ __('app.sidebar.income_statement') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'reports.statistics.inventory_valuation' ? 'active' : '' }}"><a href="{{route('reports.statistics.inventory_valuation')}}"><i class="la la-tags"></i> {{ __('app.sidebar.inventory_valuation') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'reports.statistics.aging_report' ? 'active' : '' }}"><a href="{{route('reports.statistics.aging_report')}}"><i class="la la-hourglass-half"></i> {{ __('app.sidebar.aging_report') }}</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item has-sub {{ Request::is('reports/sales*') || Request::is('reports/daily*') || Request::is('reports/monthly*') || Request::is('reports/date-range*') ? 'open' : '' }}">
+                    <a href="#"><i class="la la-bar-chart"></i><span class="menu-title">{{ __('app.sidebar.sales_reports') }}</span></a>
+                    <ul class="menu-content">
+                        <li class="{{ Route::currentRouteName() == 'reports.daily' ? 'active' : '' }}"><a href="{{route('reports.daily')}}"><i class="la la-calendar-check-o"></i> {{ __('app.sidebar.daily_reports') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'reports.monthly' ? 'active' : '' }}"><a href="{{route('reports.monthly')}}"><i class="la la-calendar-plus-o"></i> {{ __('app.sidebar.monthly_reports') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'reports.dateRange' ? 'active' : '' }}"><a href="{{route('reports.dateRange')}}"><i class="la la-calendar"></i> {{ __('app.sidebar.date_range_reports') }}</a></li>
+                    </ul>
+                </li>
+                @endplanFeature
+                <li class="nav-item has-sub {{ Request::is('reports/product-transfers*') || Route::currentRouteName() == 'product.transactions' ? 'open' : '' }}">
+                    <a href="#"><i class="la la-exchange"></i><span class="menu-title">{{ __('حركة المنتجات') }}</span></a>
+                    <ul class="menu-content">
+                        <li class="{{ Route::currentRouteName() == 'reports.productTransfers' ? 'active' : '' }}"><a href="{{route('reports.productTransfers')}}"><i class="la la-truck"></i> {{ __('app.sidebar.product_transfer_report') }}</a></li>
+                        @planFeature('audit_logs')
+                        <li class="{{ Route::currentRouteName() == 'product.transactions' ? 'active' : '' }}"><a href="{{route('product.transactions')}}"><i class="la la-history"></i> {{ __('app.sidebar.product_transfer_report') }}</a></li>
+                        @endplanFeature
+                    </ul>
+                </li>
+
+                {{-- 5. System Settings - إعدادات النظام --}}
+                <li class="navigation-header"><span>{{ __('إعدادات النظام') }}</span></li>
+                @planFeature('users')
+                <li class="nav-item has-sub {{ Request::is('roles*') || Request::is('permissions*') || Request::is('users*') || Request::is('role-user*') ? 'open' : '' }}">
+                    <a href="#"><i class="la la-key"></i><span class="menu-title">{{ __('app.sidebar.permissions') }}</span></a>
+                    <ul class="menu-content">
+                        <li class="{{ Route::currentRouteName() == 'users.create' ? 'active' : '' }}"><a href="{{route('users.create')}}"><i class="la la-user-plus"></i> {{ __('app.sidebar.add_user') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'role_user.index' ? 'active' : '' }}"><a href="{{route('role_user.index')}}"><i class="la la-user-secret"></i> {{ __('app.sidebar.user_roles') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'roles.index' ? 'active' : '' }}"><a href="{{route('roles.index')}}"><i class="la la-users"></i> {{ __('app.sidebar.view_roles') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'permissions.index' ? 'active' : '' }}"><a href="{{route('permissions.index')}}"><i class="la la-check-square"></i> {{ __('app.sidebar.view_permissions') }}</a></li>
+                    </ul>
+                </li>
+                @endplanFeature
+
                 @if($isSuperAdmin)
-                    <li class=" nav-item has-sub"><a href="#"><i class="la la-server"></i><span
-                                class="menu-title">{{ __('app.sidebar.platform_management') }}</span></a>
-                        <ul class="menu-content">
-                            <li class="{{ Route::currentRouteName() == 'super-admin.dashboard' ? 'active' : '' }} ">
-                                <a class="menu-item" href="{{route('super-admin.dashboard')}}">
-                                    <i class="la la-chart-area"></i> {{ __('app.sidebar.platform_overview') }} </a>
-                            </li>
-                            <li
-                                class="{{ Request::is('super-admin/vendors*') && Route::currentRouteName() != 'super-admin.dashboard' ? 'active' : '' }} ">
-                                <a class="menu-item" href="{{route('super-admin.vendors.index')}}">
-                                    <i class="la la-industry"></i> {{ __('app.sidebar.vendors') }} </a>
-                            </li>
-                        </ul>
-                    </li>
+                <li class="nav-item has-sub {{ Request::is('super-admin*') ? 'open' : '' }}">
+                    <a href="#"><i class="la la-server"></i><span class="menu-title">{{ __('app.sidebar.platform_management') }}</span></a>
+                    <ul class="menu-content">
+                        <li class="{{ Route::currentRouteName() == 'super-admin.dashboard' ? 'active' : '' }}"><a href="{{route('super-admin.dashboard')}}"><i class="la la-chart-area"></i> {{ __('app.sidebar.platform_overview') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'super-admin.vendors.index' ? 'active' : '' }}"><a href="{{route('super-admin.vendors.index')}}"><i class="la la-industry"></i> {{ __('app.sidebar.vendors') }}</a></li>
+                    </ul>
+                </li>
                 @endif
-
-                @if($isAdmin)
-                    <li class="{{ Route::currentRouteName() == 'dashboard' ? 'active' : '' }} nav-item">
-                        <a href="{{route('dashboard')}}"><i class="la la-home"></i><span class="menu-title"
-                                data-i18n="">{{ __('app.sidebar.dashboard') }}</span></a>
-                    </li>
-                    <li class="{{ Request::is('shifts*') ? 'active' : '' }} nav-item">
-                        <a href="{{route('shifts.index')}}"><i class="la la-clock-o"></i><span class="menu-title"
-                                data-i18n="">{{ __('app.sidebar.shift_management') }}</span></a>
-                    </li>
-                @endif
-
-                @if($isAdmin)
-                    <li class=" nav-item has-sub"><a href="#"><i class="la la-cube"></i><span class="menu-title"
-                                data-i18n="nav.dash.main">{{ __('app.sidebar.products') }}</span></a>
-                        <ul class="menu-content">
-                            @if($isAdmin)
-                                <li class="{{ Route::currentRouteName() == 'categories.index' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('categories.index')}}" data-i18n="nav.dash.ecommerce">
-                                        <i class="la la-list"></i> {{ __('app.sidebar.view_categories') }} </a>
-                                </li>
-                            @endif
-                            @if($isAdmin)
-                                <li class="{{ Route::currentRouteName() == 'categories.create' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('categories.create')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-plus"></i> {{ __('app.sidebar.add_category') }}</a>
-                                </li>
-                            @endif
-                            @if($isAdmin)
-                                <li class="{{ Route::currentRouteName() == 'brands.index' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('brands.index')}}" data-i18n="nav.dash.ecommerce">
-                                        <i class="la la-certificate"></i> {{ __('app.sidebar.view_brands') }} </a>
-                                </li>
-                            @endif
-                            @if($isAdmin)
-                                <li class="{{ Route::currentRouteName() == 'brands.create' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('brands.create')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-plus-circle"></i> {{ __('app.sidebar.add_brand') }}</a>
-                                </li>
-                            @endif
-                            @if($isAdmin)
-                                <li class="{{ Route::currentRouteName() == 'products.index' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('products.index')}}" data-i18n="nav.dash.ecommerce">
-                                        <i class="la la-cubes"></i> {{ __('app.sidebar.view_products') }} </a>
-                                </li>
-                            @endif
-                            @if($isAdmin)
-                                <li class="{{ Route::currentRouteName() == 'products.create' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('products.create')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-plus"></i> {{ __('app.sidebar.add_product') }}</a>
-                                </li>
-                            @endif
-                            <!-- @if($isAdmin)
-                                                                                                                                                                    <li class="{{ Route::currentRouteName() == 'quantity.updates' ? 'active':'' }} ">
-                                                                                                                                                                        <a class="menu-item" href="{{route('quantity.updates')}}" data-i18n="nav.dash.crypto"> {{ __('app.sidebar.product_quantities') }} </a>
-                                                                                                                                                                    </li>
-                                                                                                                                                                @endif -->
-                            @if($isAdmin)
-                                @planFeature('audit_logs')
-                                <li class="{{ Route::currentRouteName() == 'product.transactions' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('product.transactions')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-exchange"></i> {{ __('app.sidebar.product_transfer_report') }} </a>
-                                </li>
-                                @endplanFeature
-                            @endif
-                        </ul>
-                    </li>
-                @endif
-
-                @if($isAdmin)
-                    <li class=" nav-item has-sub"><a href="#"><i class="la la-calculator"></i><span class="menu-title"
-                                data-i18n="nav.dash.main"> {{ __('app.sidebar.cashier') }} </span></a>
-                        <ul class="menu-content">
-                            @if($isAdmin)
-                                <li class="{{ Route::currentRouteName() == 'cashier.viewCart' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('cashier.viewCart')}}" data-i18n="nav.dash.ecommerce">
-                                        <i class="la la-shopping-basket"></i> {{ __('app.sidebar.add_invoice') }} </a>
-                                </li>
-                            @endif
-                            @if($isAdmin)
-                                <li class="{{ Route::currentRouteName() == 'invoices.index' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('invoices.index')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-file-text"></i> {{ __('app.sidebar.view_invoices') }} </a>
-                                </li>
-                            @endif
-                            @if($isAdmin)
-                                @planFeature('clients')
-                                <li class="{{ Route::currentRouteName() == 'clients.index' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('clients.index')}}" data-i18n="nav.dash.ecommerce">
-                                        <i class="la la-users"></i> {{ __('app.sidebar.manage_clients') }} </a>
-                                </li>
-                                @endplanFeature
-                            @endif
-                            @if($isAdmin)
-                                @planFeature('returns')
-                                <li class="{{ Route::currentRouteName() == 'customer-returns.index' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('customer-returns.index')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-reply"></i> {{ __('app.sidebar.customer_returns') }} </a>
-                                </li>
-                                @endplanFeature
-                            @endif
-                        </ul>
-                    </li>
-                @endif
-
-                @if($isAdmin)
-                    <li class=" nav-item has-sub"><a href="#"><i class="la la-shopping-cart"></i><span class="menu-title"
-                                data-i18n="nav.dash.main"> {{ __('app.sidebar.purchase_invoices') }} </span></a>
-                        <ul class="menu-content">
-                            @if($isAdmin)
-                                <li class="{{ Route::currentRouteName() == 'purchases.create' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('purchases.create')}}" data-i18n="nav.dash.ecommerce">
-                                        <i class="la la-plus-square"></i> {{ __('app.sidebar.add_purchase_invoice') }} </a>
-                                </li>
-                            @endif
-                            @if($isAdmin)
-                                <li class="{{ Route::currentRouteName() == 'purchases.index' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('purchases.index')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-file-invoice"></i> {{ __('app.sidebar.view_purchase_invoices') }} </a>
-                                </li>
-                            @endif
-                            @if($isAdmin)
-                                <li class="{{ Route::currentRouteName() == 'reports.productTransfers' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('reports.productTransfers')}}"
-                                        data-i18n="nav.dash.ecommerce"><i class="la la-truck"></i>
-                                        {{ __('app.sidebar.product_transfer_report') }} </a>
-                                </li>
-                            @endif
-                            @if($isAdmin)
-                                @planFeature('suppliers')
-                                <li class="{{ Route::currentRouteName() == 'suppliers.index' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('suppliers.index')}}" data-i18n="nav.dash.ecommerce">
-                                        <i class="la la-briefcase"></i> {{ __('app.sidebar.manage_suppliers') }} </a>
-                                </li>
-                                @endplanFeature
-                            @endif
-                            @if($isAdmin)
-                                @planFeature('returns')
-                                <li class="{{ Route::currentRouteName() == 'supplier-returns.index' ? 'active' : '' }} ">
-                                    <a class="menu-item" href="{{route('supplier-returns.index')}}" data-i18n="nav.dash.crypto">
-                                        <i class="la la-undo"></i> {{ __('app.sidebar.supplier_returns') }} </a>
-                                </li>
-                                @endplanFeature
-                            @endif
-                        </ul>
-                    </li>
-                @endif
-
-                @if($isAdmin)
-                    @planFeature('reports_advanced')
-                    <li class=" nav-item has-sub"><a href="#"><i class="la la-bar-chart"></i><span class="menu-title"
-                                data-i18n="nav.dash.main"> {{ __('app.sidebar.sales_reports') }} </span></a>
-                        <ul class="menu-content">
-                            <li class="{{ Route::currentRouteName() == 'reports.daily' ? 'active' : '' }} ">
-                                <a class="menu-item" href="{{route('reports.daily')}}" data-i18n="nav.dash.ecommerce">
-                                    <i class="la la-calendar-check-o"></i> {{ __('app.sidebar.daily_reports') }} </a>
-                            </li>
-                            <li class="{{ Route::currentRouteName() == 'reports.monthly' ? 'active' : '' }} ">
-                                <a class="menu-item" href="{{route('reports.monthly')}}" data-i18n="nav.dash.crypto">
-                                    <i class="la la-calendar-plus-o"></i> {{ __('app.sidebar.monthly_reports') }} </a>
-                            </li>
-                            <li class="{{ Route::currentRouteName() == 'reports.dateRange' ? 'active' : '' }} ">
-                                <a class="menu-item" href="{{route('reports.dateRange')}}" data-i18n="nav.dash.crypto">
-                                    <i class="la la-calendar"></i> {{ __('app.sidebar.date_range_reports') }}</a>
-                            </li>
-                        </ul>
-                    </li>
-                    @endplanFeature
-                @endif
-
-                @if($isAdmin)
-                    @planFeature('reports_advanced')
-                    <li class=" nav-item has-sub"><a href="#"><i class="la la-pie-chart"></i><span class="menu-title"
-                                data-i18n="nav.dash.main"> {{ __('app.sidebar.financial_reports') }} </span></a>
-                        <ul class="menu-content">
-                            <li
-                                class="{{ Route::currentRouteName() == 'reports.statistics.financial_summary' ? 'active' : '' }} ">
-                                <a class="menu-item" href="{{route('reports.statistics.financial_summary')}}"
-                                    data-i18n="nav.dash.ecommerce">
-                                    <i class="la la-file-text"></i> {{ __('app.sidebar.income_statement') }} </a>
-                            </li>
-                            <li
-                                class="{{ Route::currentRouteName() == 'reports.statistics.inventory_valuation' ? 'active' : '' }} ">
-                                <a class="menu-item" href="{{route('reports.statistics.inventory_valuation')}}"
-                                    data-i18n="nav.dash.crypto">
-                                    <i class="la la-tags"></i> {{ __('app.sidebar.inventory_valuation') }} </a>
-                            </li>
-                            <li
-                                class="{{ Route::currentRouteName() == 'reports.statistics.aging_report' ? 'active' : '' }} ">
-                                <a class="menu-item" href="{{route('reports.statistics.aging_report')}}"
-                                    data-i18n="nav.dash.crypto">
-                                    <i class="la la-hourglass-half"></i> {{ __('app.sidebar.aging_report') }}</a>
-                            </li>
-                        </ul>
-                    </li>
-                    @endplanFeature
-                @endif
-
-                @if($isAdmin)
-                    @planFeature('users')
-                    <li class=" nav-item has-sub"><a href="#"><i class="la la-key"></i><span class="menu-title"
-                                data-i18n="nav.dash.main"> {{ __('app.sidebar.permissions') }} </span></a>
-                        <ul class="menu-content">
-                            <li class="{{ Route::currentRouteName() == 'roles.create' ? 'active' : '' }} ">
-                                <a class="menu-item" href="{{route('roles.create')}}" data-i18n="nav.dash.ecommerce">
-                                    <i class="la la-user-plus"></i> {{ __('app.sidebar.add_roles') }} </a>
-                            </li>
-                            <li class="{{ Route::currentRouteName() == 'roles.index' ? 'active' : '' }} ">
-                                <a class="menu-item" href="{{route('roles.index')}}" data-i18n="nav.dash.crypto">
-                                    <i class="la la-users"></i> {{ __('app.sidebar.view_roles') }} </a>
-                            </li>
-                            <li class="{{ Route::currentRouteName() == 'permissions.create' ? 'active' : '' }} ">
-                                <a class="menu-item" href="{{route('permissions.create')}}" data-i18n="nav.dash.ecommerce">
-                                    <i class="la la-toggle-on"></i> {{ __('app.sidebar.add_permission') }} </a>
-                            </li>
-                            <li class="{{ Route::currentRouteName() == 'permissions.index' ? 'active' : '' }} ">
-                                <a class="menu-item" href="{{route('permissions.index')}}" data-i18n="nav.dash.crypto">
-                                    <i class="la la-check-square"></i> {{ __('app.sidebar.view_permissions') }} </a>
-                            </li>
-                            <li class="{{ Route::currentRouteName() == 'role_user.index' ? 'active' : '' }} ">
-                                <a class="menu-item" href="{{route('role_user.index')}}" data-i18n="nav.dash.crypto">
-                                    <i class="la la-user-secret"></i> {{ __('app.sidebar.user_roles') }} </a>
-                            </li>
-                            <li class="{{ Route::currentRouteName() == 'users.create' ? 'active' : '' }} ">
-                                <a class="menu-item" href="{{route('users.create')}}" data-i18n="nav.dash.ecommerce">
-                                    <i class="la la-user-plus"></i> {{ __('app.sidebar.add_user') }} </a>
-                            </li>
-                        </ul>
-                    </li>
-                    @endplanFeature
-                @endif
-
-                @if($isAdmin)
-                    @planFeature('treasury')
-                    <li class="{{ Route::currentRouteName() == 'treasury' ? 'active' : '' }} nav-item">
-                        <a href="{{route('treasury')}}"><i class="la la-bank"></i><span class="menu-title"
-                                data-i18n="nav.dash.crypto"> {{ __('app.sidebar.treasury') }}</span></a>
-                    </li>
-                    @endplanFeature
-                @endif
+        @endif
 
             </ul>
 
