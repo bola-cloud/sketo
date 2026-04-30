@@ -41,6 +41,53 @@ class Product extends Model
         return $this->hasMany(ProductTransfer::class);
     }
 
+    public function subUnits()
+    {
+        return $this->hasMany(ProductSubUnit::class, 'main_product_id');
+    }
+
+    public function parentUnit()
+    {
+        return $this->hasOne(ProductSubUnit::class, 'sub_product_id');
+    }
+
+    /**
+     * Ensure we have enough stock, breaking a parent unit if necessary.
+     */
+    public function ensureStock($requiredQuantity)
+    {
+        if ($this->quantity >= $requiredQuantity) {
+            return true;
+        }
+
+        // Check if this product has a parent bulk unit
+        $parentRelation = $this->parentUnit;
+        if (!$parentRelation) {
+            return false; // No parent to break
+        }
+
+        $parentProduct = $parentRelation->mainProduct;
+        $conversionFactor = $parentRelation->conversion_factor;
+
+        // Try to break one unit from parent
+        if ($parentProduct->quantity >= 1) {
+            $parentProduct->decrement('quantity', 1);
+            $this->increment('quantity', $conversionFactor);
+            
+            // Recursive check in case we need more
+            return $this->ensureStock($requiredQuantity);
+        }
+
+        // If parent is also out, try to break the parent's parent!
+        if ($parentProduct->ensureStock(1)) {
+            $parentProduct->decrement('quantity', 1);
+            $this->increment('quantity', $conversionFactor);
+            return $this->ensureStock($requiredQuantity);
+        }
+
+        return false;
+    }
+
     public function supplierReturns()
     {
         return $this->hasMany(SupplierReturn::class);

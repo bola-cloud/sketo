@@ -119,6 +119,22 @@ class AiAgentService
             [
                 'type' => 'function',
                 'function' => [
+                    'name' => 'set_product_subunit',
+                    'description' => 'Link a bulk product (main) to a retail product (sub) with a conversion factor. e.g. 1 Box = 12 Sachets.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'main_product_id' => ['type' => 'integer', 'description' => 'ID of the bulk product'],
+                            'sub_product_id' => ['type' => 'integer', 'description' => 'ID of the retail product'],
+                            'conversion_factor' => ['type' => 'number', 'description' => 'How many sub-items in one main item']
+                        ],
+                        'required' => ['main_product_id', 'sub_product_id', 'conversion_factor']
+                    ]
+                ]
+            ],
+            [
+                'type' => 'function',
+                'function' => [
                     'name' => 'get_stagnant_products',
                     'description' => 'Get a list of stagnant products that have had zero sales in the last 30 days.',
                 ]
@@ -212,6 +228,14 @@ class AiAgentService
                         'color' => '' // Added to satisfy DB constraint
                     ]);
                     return json_encode(['status' => 'success', 'message' => "تم إضافة المنتج ({$product->name}) بنجاح."]);
+                    break;
+
+                case 'set_product_subunit':
+                    \App\Models\ProductSubUnit::updateOrCreate(
+                        ['main_product_id' => $args['main_product_id'], 'sub_product_id' => $args['sub_product_id']],
+                        ['vendor_id' => $vendorId, 'conversion_factor' => $args['conversion_factor']]
+                    );
+                    return json_encode(['status' => 'success', 'message' => 'تم ربط الوحدات بنجاح.']);
                     break;
 
                 case 'get_low_stock_products':

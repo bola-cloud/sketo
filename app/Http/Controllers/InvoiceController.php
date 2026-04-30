@@ -207,10 +207,10 @@ class InvoiceController extends Controller
         $product = Product::findOrFail($request->input('product_id'));
         $quantity = $request->input('quantity');
 
-        // Check if there's enough stock
-        if ($product->quantity < $quantity) {
+        // Check if there's enough stock (with auto-breaking support)
+        if (!$product->ensureStock($quantity)) {
             return redirect()->back()->withErrors([
-                'quantity' => 'الكمية المطلوبة (' . $quantity . ') غير متوفرة. الكمية المتاحة: ' . $product->quantity
+                'quantity' => 'الكمية المطلوبة (' . $quantity . ') غير متوفرة حتى مع محاولة فك الوحدات الكبيرة. الكمية المتاحة: ' . $product->quantity
             ]);
         }
 

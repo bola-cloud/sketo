@@ -210,7 +210,7 @@ class CashierController extends Controller
 
             foreach ($cart as $barcode => $details) {
                 $product = Product::where('barcode', $barcode)->first();
-                if (!$product || $product->quantity < $details['quantity']) {
+                if (!$product || !$product->ensureStock($details['quantity'])) {
                     throw new \Exception("الكمية غير كافية للمنتج: " . ($product->name ?? $barcode));
                 }
 
