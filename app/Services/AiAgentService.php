@@ -45,6 +45,36 @@ class AiAgentService
             [
                 'type' => 'function',
                 'function' => [
+                    'name' => 'get_categories',
+                    'description' => 'Get a list of product categories to help assign the right category_id when creating a product.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => []
+                    ]
+                ]
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'create_product',
+                    'description' => 'Create a new product in the database. Use this when the user asks to add a new product.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => ['type' => 'string', 'description' => 'Product name'],
+                            'category_id' => ['type' => 'integer', 'description' => 'The ID of the category'],
+                            'cost_price' => ['type' => 'number', 'description' => 'Purchase price'],
+                            'selling_price' => ['type' => 'number', 'description' => 'Retail price'],
+                            'quantity' => ['type' => 'integer', 'description' => 'Initial stock quantity'],
+                            'barcode' => ['type' => 'string', 'description' => 'Barcode (optional)']
+                        ],
+                        'required' => ['name', 'category_id', 'selling_price', 'quantity']
+                    ]
+                ]
+            ],
+            [
+                'type' => 'function',
+                'function' => [
                     'name' => 'get_today_summary',
                     'description' => 'Get a quick financial summary for ONLY today.',
                 ]
@@ -147,6 +177,25 @@ class AiAgentService
                         'total_revenue' => (float)$totalRevenue,
                         'currency' => 'ج.م'
                     ]);
+
+                case 'get_categories':
+                    $categories = \App\Models\Category::where('vendor_id', $vendorId)->get(['id', 'name']);
+                    return json_encode(['status' => 'success', 'categories' => $categories]);
+                    break;
+
+                case 'create_product':
+                    $product = \App\Models\Product::create([
+                        'vendor_id' => $vendorId,
+                        'name' => $args['name'],
+                        'category_id' => $args['category_id'],
+                        'cost_price' => $args['cost_price'] ?? 0,
+                        'selling_price' => $args['selling_price'],
+                        'quantity' => $args['quantity'],
+                        'barcode' => $args['barcode'] ?? 'AI-'.time(),
+                        'threshold' => 5
+                    ]);
+                    return json_encode(['status' => 'success', 'message' => "تم إضافة المنتج ({$product->name}) بنجاح."]);
+                    break;
 
                 case 'get_low_stock_products':
                     $products = Product::where('vendor_id', $vendorId)
