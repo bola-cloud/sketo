@@ -140,10 +140,12 @@ class AiAgentService
                     
                     return json_encode([
                         'status' => 'success', 
-                        'period' => $days . ' days',
-                        'start_date' => $startDate->toDateString(),
-                        'total_items_sold' => $totalSold, 
-                        'total_revenue' => $totalRevenue
+                        'period' => "آخر $days أيام",
+                        'from_date' => $startDate->toDateString(),
+                        'to_date' => Carbon::now()->toDateString(),
+                        'total_items_sold' => (float)$totalSold, 
+                        'total_revenue' => (float)$totalRevenue,
+                        'currency' => 'ج.م'
                     ]);
 
                 case 'get_low_stock_products':
