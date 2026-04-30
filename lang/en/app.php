@@ -261,6 +261,7 @@ return [
     'suppliers' => [
         'title' => 'Suppliers Management',
         'all_suppliers' => 'Suppliers',
+        'supplier' => 'Supplier',
         'add_new' => 'Add New Supplier',
         'name' => 'Supplier Name',
         'phone' => 'Phone Number',
@@ -782,6 +783,7 @@ return [
         'date_paid' => 'Date Paid',
         'unit_price' => 'Unit Price',
         'return_value' => 'Return Value',
+        'return_amount' => 'Return Amount',
     ],
     'quantity_updates' => [
         'title' => 'Product Updates & Additions Report',

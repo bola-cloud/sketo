@@ -266,6 +266,7 @@ return [
     'suppliers' => [
         'title' => 'إدارة الموردين',
         'all_suppliers' => 'الموردين',
+        'supplier' => 'المورد',
         'add_new' => 'إضافة مورد جديد',
         'name' => 'اسم المورد',
         'phone' => 'رقم الهاتف',
@@ -787,6 +788,7 @@ return [
         'date_paid' => 'تاريخ الدفع',
         'unit_price' => 'سعر الوحدة',
         'return_value' => 'قيمة الإرجاع',
+        'return_amount' => 'مبلغ المرتجع',
     ],
     'quantity_updates' => [
         'title' => 'تقرير تحديثات وإضافات المنتجات',
