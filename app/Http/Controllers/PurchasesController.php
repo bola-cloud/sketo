@@ -240,7 +240,7 @@ class PurchasesController extends Controller
             'new_product_name' => 'required|string|max:255',
             'new_cost_price' => 'required|numeric|min:0',
             'new_selling_price' => 'required|numeric|min:0',
-            'transfer_quantity' => 'required|integer|min:1',
+            'transfer_quantity' => 'required|numeric|min:0.001',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ], [
             'new_purchase_id.required' => 'يرجى اختيار الفاتورة الجديدة.',
@@ -254,8 +254,8 @@ class PurchasesController extends Controller
             'new_selling_price.numeric' => 'سعر البيع يجب أن يكون رقماً.',
             'new_selling_price.min' => 'سعر البيع يجب أن يكون أكبر من أو يساوي 0.',
             'transfer_quantity.required' => 'يرجى إدخال كمية النقل.',
-            'transfer_quantity.integer' => 'كمية النقل يجب أن تكون عدداً صحيحاً.',
-            'transfer_quantity.min' => 'كمية النقل يجب أن تكون أكبر من أو تساوي 1.',
+            'transfer_quantity.numeric' => 'كمية النقل يجب أن تكون رقماً.',
+            'transfer_quantity.min' => 'كمية النقل يجب أن تكون أكبر من أو تساوي 0.001.',
         ]);
 
         DB::beginTransaction();

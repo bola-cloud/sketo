@@ -153,13 +153,13 @@
                                 <span class="badge badge-warning">{{ __('app.invoices.has_returns') }}</span>
                             @endif
                         </td>
-                        <td>{{ $sale->quantity }}</td>
+                        <td>{{ number_format($sale->quantity, 3) }}</td>
                         <td>{{ number_format($sale->product->selling_price, 2) }}</td>
                         <td>{{ number_format($sale->total_price, 2) }}</td>
                         @if($invoice->returns()->count() > 0)
                             <td>
                                 @if($returnedQuantity > 0)
-                                    <span class="text-danger">{{ $returnedQuantity }}</span>
+                                    <span class="text-danger">{{ number_format($returnedQuantity, 3) }}</span>
                                 @else
                                     <span class="text-muted">0</span>
                                 @endif
@@ -250,7 +250,7 @@
                 </div>
                 <div class="form-group">
                     <label for="quantity">{{ __('app.invoices.quantity') }}</label>
-                    <input type="number" name="quantity" id="quantity" class="form-control" min="1" required>
+                    <input type="number" name="quantity" id="quantity" class="form-control" min="0.001" step="0.001" required>
                 </div>
                 <button type="submit" class="btn btn-primary">{{ __('app.invoices.add_btn') }}</button>
             </form>

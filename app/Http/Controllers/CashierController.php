@@ -46,6 +46,7 @@ class CashierController extends Controller
                 'product_id' => $product->id,
                 'barcode' => $product->barcode,
                 'quantity_available' => $product->quantity,
+                'is_weighted' => $product->is_weighted,
             ];
         } else {
             $cart[$barcode]['quantity'] += 1;
@@ -63,13 +64,18 @@ class CashierController extends Controller
     {
         $barcode = $request->input('barcode');
         $quantityChange = $request->input('quantity_change');
+        $absoluteQuantity = $request->input('absolute_quantity');
 
         // Retrieve or initialize the cart from the session
         $cart = session()->get('cart', []);
 
         // Check if the product exists in the cart
         if (isset($cart[$barcode])) {
-            $newQuantity = $cart[$barcode]['quantity'] + $quantityChange;
+            if ($absoluteQuantity !== null) {
+                $newQuantity = (float)$absoluteQuantity;
+            } else {
+                $newQuantity = $cart[$barcode]['quantity'] + $quantityChange;
+            }
 
             if ($newQuantity > 0) {
                 $cart[$barcode]['quantity'] = $newQuantity;

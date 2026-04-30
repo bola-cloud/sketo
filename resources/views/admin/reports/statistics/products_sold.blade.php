@@ -74,7 +74,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="badge badge-soft-info">{{ $sale->quantity }}</span>
+                                            <span class="badge badge-soft-info">{{ number_format($sale->quantity, 3) }}</span>
                                         </td>
                                         <td>{{ number_format($sale->unit_price, 2) }} {{ __('app.common.currency') }}</td>
                                         <td class="text-bold-700 primary">{{ number_format($sale->total_price, 2) }}

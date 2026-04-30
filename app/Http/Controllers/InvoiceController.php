@@ -201,7 +201,7 @@ class InvoiceController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|numeric|min:0.001',
         ]);
 
         $product = Product::findOrFail($request->input('product_id'));

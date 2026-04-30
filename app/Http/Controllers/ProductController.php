@@ -103,6 +103,7 @@ class ProductController extends Controller
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'sub_product_id' => 'nullable|exists:products,id',
                 'conversion_factor' => 'nullable|numeric|min:0.001',
+                'is_weighted' => 'nullable|boolean',
             ]);
         }
 
@@ -230,6 +231,7 @@ class ProductController extends Controller
             }
 
             // Create the new product
+            $validatedData['is_weighted'] = $request->has('is_weighted');
             $product = Product::create($validatedData);
 
             // Handle Sub-units relationship if provided
@@ -338,6 +340,7 @@ class ProductController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'sub_product_id' => 'nullable|exists:products,id',
             'conversion_factor' => 'nullable|numeric|min:0.001',
+            'is_weighted' => 'nullable|boolean',
         ], [
             'name.required' => 'يرجى إدخال اسم المنتج.',
             'name.max' => 'اسم المنتج لا يمكن أن يتجاوز 255 حرفاً.',
@@ -398,6 +401,7 @@ class ProductController extends Controller
             }
 
             // Update the remaining product details (excluding quantity)
+            $validated['is_weighted'] = $request->has('is_weighted');
             $product->update($validated);
 
             // Variables to store total quantities

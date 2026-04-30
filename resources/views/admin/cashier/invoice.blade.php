@@ -192,7 +192,7 @@
                         @foreach($invoice->sales as $sale)
                             <tr class="service">
                                 <td style="text-align: {{ App::getLocale() == 'ar' ? 'right' : 'left' }}; padding: 0 5px;">{{ $sale->product->name }}</td>
-                                <td>{{ $sale->quantity }}</td>
+                                <td>{{ number_format($sale->quantity, 3) }}</td>
                                 <td>{{ number_format($sale->product->selling_price * $sale->quantity, 2) }} {{ __('app.common.currency') }}</td>
                             </tr>
                         @endforeach

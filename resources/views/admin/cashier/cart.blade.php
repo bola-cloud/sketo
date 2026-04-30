@@ -434,7 +434,26 @@
                     quantity_change: quantityChange
                 },
                 success: function (response) {
-                    location.reload(); // Reload page to update cart
+                    updateCartContent(); // Update cart content via AJAX
+                },
+                error: function (xhr) {
+                    alert('{{ __('app.cashier.update_fail') }}');
+                }
+            });
+        }
+
+        // Function to set absolute cart quantity via AJAX
+        function setCartQuantity(barcode, absoluteQuantity) {
+            $.ajax({
+                url: "{{ route('cashier.updateCartQuantity') }}",
+                type: "POST",
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    barcode: barcode,
+                    absolute_quantity: absoluteQuantity
+                },
+                success: function (response) {
+                    updateCartContent(); // Update cart content via AJAX
                 },
                 error: function (xhr) {
                     alert('{{ __('app.cashier.update_fail') }}');

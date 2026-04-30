@@ -32,18 +32,28 @@
                             </div>
                         </td>
                         <td class="text-center">
-                            <div class="d-flex align-items-center justify-content-center quantity-controls">
-                                <button type="button" class="btn btn-outline-danger btn-sm me-2"
-                                    onclick="updateCartQuantity('{{ $barcode }}', -1)">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <span class="px-3 py-1 rounded fw-bold text-primary" style="background: rgba(16, 185, 129, 0.1);">
-                                    {{ $details['quantity'] }}
-                                </span>
-                                <button type="button" class="btn btn-outline-success btn-sm ms-2"
-                                    onclick="updateCartQuantity('{{ $barcode }}', 1)">
-                                    <i class="fas fa-plus"></i>
-                                </button>
+                            <div class="d-flex flex-column align-items-center justify-content-center quantity-controls">
+                                <div class="d-flex align-items-center mb-1">
+                                    <button type="button" class="btn btn-outline-danger btn-sm me-2"
+                                        onclick="updateCartQuantity('{{ $barcode }}', -1)">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <span class="px-3 py-1 rounded fw-bold text-primary" style="background: rgba(16, 185, 129, 0.1);">
+                                        {{ number_format($details['quantity'], 3) }}
+                                    </span>
+                                    <button type="button" class="btn btn-outline-success btn-sm ms-2"
+                                        onclick="updateCartQuantity('{{ $barcode }}', 1)">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                
+                                @if(isset($details['is_weighted']) && $details['is_weighted'])
+                                    <div class="btn-group btn-group-sm mt-1">
+                                        <button type="button" class="btn btn-secondary py-0" style="font-size: 10px;" onclick="setCartQuantity('{{ $barcode }}', 0.125)">ثمن</button>
+                                        <button type="button" class="btn btn-secondary py-0" style="font-size: 10px;" onclick="setCartQuantity('{{ $barcode }}', 0.250)">ربع</button>
+                                        <button type="button" class="btn btn-secondary py-0" style="font-size: 10px;" onclick="setCartQuantity('{{ $barcode }}', 0.500)">نص</button>
+                                    </div>
+                                @endif
                             </div>
                         </td>
                         <td class="text-center">

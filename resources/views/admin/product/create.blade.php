@@ -111,8 +111,16 @@
                                     <div class="col-md-12">
                                         <div class="form-group mb-2">
                                             <label for="name" class="text-bold-600">{{ __('app.products.name') }} <span class="danger">*</span></label>
-                                            <input type="text" class="form-control round border-primary" id="name" name="name" 
-                                                value="{{ old('name') }}" placeholder="{{ __('app.products.enter_name') }}" required>
+                                            <div class="d-flex align-items-center">
+                                                <input type="text" class="form-control round border-primary" id="name" name="name" 
+                                                    value="{{ old('name') }}" placeholder="{{ __('app.products.enter_name') }}" required>
+                                                <div class="ml-2">
+                                                    <div class="custom-control custom-checkbox" style="white-space: nowrap;">
+                                                        <input type="checkbox" class="custom-control-input" id="is_weighted" name="is_weighted">
+                                                        <label class="custom-control-label text-bold-600 warning" for="is_weighted">بيع بالميزان؟</label>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">

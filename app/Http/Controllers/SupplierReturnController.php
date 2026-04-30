@@ -45,7 +45,7 @@ class SupplierReturnController extends Controller
             'product_id' => 'required|exists:products,id',
             'supplier_id' => 'required|exists:suppliers,id',
             'purchase_product_id' => 'nullable|exists:purchase_products,id',
-            'quantity_returned' => 'required|integer|min:1',
+            'quantity_returned' => 'required|numeric|min:0.001',
             'cost_price' => 'required|numeric|min:0',
             'reason' => 'nullable|string|max:255',
             'notes' => 'nullable|string'
@@ -177,7 +177,7 @@ class SupplierReturnController extends Controller
             'product_id' => 'required|exists:products,id',
             'supplier_id' => 'required|exists:suppliers,id',
             'purchase_id' => 'nullable|exists:purchases,id',
-            'quantity_returned' => 'required|integer|min:1',
+            'quantity_returned' => 'required|numeric|min:0.001',
             'cost_price' => 'required|numeric|min:0',
             'reason' => 'nullable|string|max:255',
             'notes' => 'nullable|string'

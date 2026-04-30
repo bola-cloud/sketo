@@ -72,13 +72,13 @@
                                         <td>
                                             <span
                                                 class="badge {{ $product->quantity <= $product->threshold ? 'badge-danger' : 'badge-soft-success' }}">
-                                                {{ $product->quantity }}
+                                                {{ number_format($product->quantity, 3) }}
                                             </span>
                                         </td>
                                         <td>{{ number_format($product->cost_price, 2) }} {{ __('app.common.currency') }}</td>
                                         <td class="text-bold-700 primary">{{ number_format($product->selling_price, 2) }}
                                             {{ __('app.common.currency') }}</td>
-                                        <td>{{ $product->threshold }}</td>
+                                        <td>{{ number_format($product->threshold, 3) }}</td>
                                     </tr>
                                 @empty
                                     <tr>

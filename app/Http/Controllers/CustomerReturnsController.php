@@ -64,7 +64,7 @@ class CustomerReturnsController extends Controller
         // Filter out items with quantity < 1 before validation
         $filteredReturns = collect($request->input('returns', []))
             ->filter(function($item) {
-                return isset($item['quantity']) && $item['quantity'] >= 1;
+                return isset($item['quantity']) && $item['quantity'] > 0;
             })->values()->all();
 
         // Overwrite the returns input with filtered items
@@ -74,7 +74,7 @@ class CustomerReturnsController extends Controller
             'invoice_id' => 'required|exists:invoices,id',
             'returns' => 'required|array|min:1',
             'returns.*.product_id' => 'required|exists:products,id',
-            'returns.*.quantity' => 'required|integer|min:1',
+            'returns.*.quantity' => 'required|numeric|min:0.001',
             'returns.*.reason' => 'required|string|max:255',
         ]);
 
