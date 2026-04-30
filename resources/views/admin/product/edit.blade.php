@@ -120,6 +120,48 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Sub-units Configuration Section -->
+                                @php 
+                                    $subUnit = $product->subUnits->first(); 
+                                @endphp
+                                <div class="col-md-12 mt-3">
+                                    <div class="card bg-light border-warning p-3" style="border-radius: 18px; border-style: dashed !important;">
+                                        <h5 class="text-bold-700 warning mb-2"><i class="la la-sitemap"></i> إعدادات التجزئة والوحدات</h5>
+                                        <div class="custom-control custom-switch mb-3">
+                                            <input type="checkbox" class="custom-control-input" id="has_sub_units" name="has_sub_units" {{ $subUnit ? 'checked' : '' }}>
+                                            <label class="custom-control-input-label custom-control-label text-bold-600" for="has_sub_units">هل هذا المنتج له وحدة أصغر؟ (مثل علبة تحتوي على أكياس)</label>
+                                        </div>
+                                        
+                                        <div id="sub_units_fields" style="display: {{ $subUnit ? 'block' : 'none' }};">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="sub_product_id" class="text-bold-600">اختر المنتج الصغير (القطاعي)</label>
+                                                        <select class="form-control round border-warning select2-single" id="sub_product_id" name="sub_product_id">
+                                                            <option value="" disabled>اختر الصنف الأصغر...</option>
+                                                            @foreach($all_products as $p)
+                                                                <option value="{{ $p->id }}" {{ ($subUnit && $subUnit->sub_product_id == $p->id) ? 'selected' : '' }}>
+                                                                    {{ $p->name }} ({{ $p->barcode }})
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="conversion_factor" class="text-bold-600">معامل التحويل (العلبة فيها كام قطعة؟)</label>
+                                                        <input type="number" step="0.001" class="form-control round border-warning" id="conversion_factor" name="conversion_factor" 
+                                                            value="{{ $subUnit ? $subUnit->conversion_factor : '' }}" placeholder="مثلاً 12">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="alert alert-warning py-1 mb-0 mt-2">
+                                                <small><i class="la la-info-circle"></i> عند نفاذ كمية المنتج الصغير، سيقوم النظام تلقائياً بخصم (1) من هذا المنتج الكبير وإضافة (معامل التحويل) للمنتج الصغير.</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="form-actions mt-4 text-center">
@@ -194,4 +236,27 @@
     .table-premium th { font-weight: 700; color: #1e293b; border-top: none; }
     .table-premium td { vertical-align: middle; border-bottom: 1px solid #f1f5f9; padding: 0.8rem 0.5rem; }
 </style>
+
+@push('scripts')
+<link href="{{asset('css/select2.min.css')}}" rel="stylesheet" />
+<script src="{{asset('js/select2.min.js')}}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.select2-single').select2({
+            width: '100%'
+        });
+
+        // Toggle sub-units fields
+        $('#has_sub_units').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('#sub_units_fields').slideDown();
+            } else {
+                $('#sub_units_fields').slideUp();
+                $('#sub_product_id').val(null).trigger('change');
+                $('#conversion_factor').val('');
+            }
+        });
+    });
+</script>
+@endpush
 @endsection

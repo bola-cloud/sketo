@@ -95,16 +95,18 @@ class ProductController extends Controller
                 'purchase_id' => 'required|exists:purchases,id',
                 'cost_price' => 'required|numeric|min:0',
                 'selling_price' => 'required|numeric|min:0',
-                'quantity' => 'required|integer|min:1',
+                'quantity' => 'required|numeric|min:0',
                 'color' => 'required|string|max:255',
-                'threshold' => 'required|integer|min:1',
+                'threshold' => 'required|numeric|min:0',
                 'expiry_date' => 'nullable|date',
                 'expiry_alert_days' => 'required|integer|min:0',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'sub_product_id' => 'nullable|exists:products,id',
+                'conversion_factor' => 'nullable|numeric|min:0.001',
             ]);
         }
 
-
+        $user = auth()->user();
         DB::beginTransaction();
 
         try {
@@ -230,6 +232,16 @@ class ProductController extends Controller
             // Create the new product
             $product = Product::create($validatedData);
 
+            // Handle Sub-units relationship if provided
+            if ($request->filled('sub_product_id') && $request->filled('conversion_factor')) {
+                \App\Models\ProductSubUnit::create([
+                    'vendor_id' => auth()->user()->vendor_id,
+                    'main_product_id' => $product->id,
+                    'sub_product_id' => $request->sub_product_id,
+                    'conversion_factor' => $request->conversion_factor
+                ]);
+            }
+
             // Generate the barcode string based on the 'color' field
             $barcodeString = $request->color;
 
@@ -302,7 +314,9 @@ class ProductController extends Controller
         // Calculate total quantity across all purchases
         $totalQuantity = $purchases->sum('pivot.quantity');
 
-        return view('admin.product.edit', compact('product', 'categories', 'brands', 'purchases', 'totalQuantity'));
+        $all_products = Product::where('id', '!=', $product->id)->get();
+
+        return view('admin.product.edit', compact('product', 'categories', 'brands', 'purchases', 'totalQuantity', 'all_products'));
     }
 
 
@@ -318,10 +332,12 @@ class ProductController extends Controller
             'cost_price' => 'required|numeric',
             'selling_price' => 'required|numeric',
             'color' => 'required|string|max:255',
-            'threshold' => 'required|integer|min:1',
+            'threshold' => 'required|numeric|min:0',
             'expiry_date' => 'nullable|date',
             'expiry_alert_days' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'sub_product_id' => 'nullable|exists:products,id',
+            'conversion_factor' => 'nullable|numeric|min:0.001',
         ], [
             'name.required' => 'يرجى إدخال اسم المنتج.',
             'name.max' => 'اسم المنتج لا يمكن أن يتجاوز 255 حرفاً.',
@@ -344,7 +360,7 @@ class ProductController extends Controller
             'threshold.integer' => 'الحد الأدنى للكمية يجب أن يكون عدداً صحيحاً.',
             'threshold.min' => 'الحد الأدنى للكمية يجب أن يكون أكبر من أو يساوي 1.',
         ]);
-
+        $user = auth()->user();
         DB::beginTransaction();
 
         try {
@@ -438,6 +454,21 @@ class ProductController extends Controller
                 // Update the total quantity in the products table
                 $updatedQuantity = $totalPurchasedQuantity - $totalSoldQuantity;
                 $product->update(['quantity' => max($updatedQuantity, 0)]); // Ensure quantity doesn't go below zero
+            }
+
+            // Update or Create Sub-units relationship
+            if ($request->has('sub_product_id') && $request->filled('conversion_factor')) {
+                \App\Models\ProductSubUnit::updateOrCreate(
+                    ['main_product_id' => $product->id],
+                    [
+                        'vendor_id' => auth()->user()->vendor_id,
+                        'sub_product_id' => $request->sub_product_id,
+                        'conversion_factor' => $request->conversion_factor
+                    ]
+                );
+            } elseif ($request->has('has_sub_units') && !$request->has('sub_product_id')) {
+                // If the user unchecked or cleared it, we might want to delete it, 
+                // but usually better to just updateOrCreate if data is present.
             }
 
             DB::commit();

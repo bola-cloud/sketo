@@ -223,6 +223,42 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <!-- Sub-units Configuration Section -->
+                                    <div class="col-md-12 mt-3">
+                                        <div class="card bg-light border-primary p-3" style="border-radius: 18px; border-style: dashed !important;">
+                                            <h5 class="text-bold-700 primary mb-2"><i class="la la-sitemap"></i> إعدادات التجزئة والوحدات (اختياري)</h5>
+                                            <div class="custom-control custom-switch mb-3">
+                                                <input type="checkbox" class="custom-control-input" id="has_sub_units" name="has_sub_units">
+                                                <label class="custom-control-input-label custom-control-label text-bold-600" for="has_sub_units">هل هذا المنتج له وحدة أصغر؟ (مثل علبة تحتوي على أكياس)</label>
+                                            </div>
+                                            
+                                            <div id="sub_units_fields" style="display: none;">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="sub_product_id" class="text-bold-600">اختر المنتج الصغير (القطاعي)</label>
+                                                            <select class="form-control select2-single border-primary" id="sub_product_id" name="sub_product_id">
+                                                                <option value="" selected disabled>اختر الصنف الأصغر...</option>
+                                                                @foreach($products as $p)
+                                                                    <option value="{{ $p->id }}">{{ $p->name }} ({{ $p->barcode }})</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="conversion_factor" class="text-bold-600">معامل التحويل (العلبة فيها كام قطعة؟)</label>
+                                                            <input type="number" step="0.001" class="form-control round border-primary" id="conversion_factor" name="conversion_factor" placeholder="مثلاً 12">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="alert alert-info py-1 mb-0 mt-2">
+                                                    <small><i class="la la-info-circle"></i> عند نفاذ كمية المنتج الصغير، سيقوم النظام تلقائياً بخصم (1) من هذا المنتج الكبير وإضافة (معامل التحويل) للمنتج الصغير.</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="form-actions mt-4 text-center">
@@ -304,6 +340,17 @@
             } else {
                 $('#existing_product_form').hide();
                 $('#new_product_form').show();
+            }
+        });
+
+        // Toggle sub-units fields
+        $('#has_sub_units').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('#sub_units_fields').slideDown();
+            } else {
+                $('#sub_units_fields').slideUp();
+                $('#sub_product_id').val(null).trigger('change');
+                $('#conversion_factor').val('');
             }
         });
 

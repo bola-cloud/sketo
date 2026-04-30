@@ -16,11 +16,9 @@
         </div>
         <div class="content-header-right col-md-6 col-12">
             <div class="btn-group float-md-right">
-                @if(auth()->user()->hasRole('admin') || auth()->user()->can('create-categories'))
-                    <a href="{{ route('categories.create') }}" class="btn btn-primary round px-2 shadow">
-                        <i class="la la-plus"></i> {{ __('app.categories.add_new') }}
-                    </a>
-                @endif
+                <a href="{{ route('categories.create') }}" class="btn btn-primary round px-2 shadow">
+                    <i class="la la-plus"></i> {{ __('app.categories.add_new') }}
+                </a>
             </div>
         </div>
     </div>
@@ -60,21 +58,19 @@
                                             </div>
                                         </td>
                                         <td class="text-right">
-                                            @if(auth()->user()->hasRole('admin') || auth()->user()->can('create-categories'))
-                                                <a href="{{ route('categories.edit', $category->id) }}"
-                                                    class="btn btn-sm btn-soft-warning mr-1">
-                                                    <i class="la la-edit"></i> {{ __('app.common.edit') }}
-                                                </a>
-                                                <form action="{{ route('categories.destroy', $category->id) }}" method="POST"
-                                                    style="display:inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-soft-danger"
-                                                        onclick="return confirm('{{ __('app.categories.delete_confirm') }}')">
-                                                        <i class="la la-trash"></i> {{ __('app.common.delete') }}
-                                                    </button>
-                                                </form>
-                                            @endif
+                                            <a href="{{ route('categories.edit', $category->id) }}"
+                                                class="btn btn-sm btn-soft-warning mr-1">
+                                                <i class="la la-edit"></i> {{ __('app.common.edit') }}
+                                            </a>
+                                            <form action="{{ route('categories.destroy', $category->id) }}" method="POST"
+                                                style="display:inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-soft-danger"
+                                                    onclick="return confirm('{{ __('app.categories.delete_confirm') }}')">
+                                                    <i class="la la-trash"></i> {{ __('app.common.delete') }}
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach
