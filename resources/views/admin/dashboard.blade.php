@@ -5,64 +5,108 @@
 @section('content')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
+    <style>
         .flatpickr-calendar {
             z-index: 10000;
             width: auto;
             max-width: 300px;
         }
 
+        /* Premium Glassmorphism Design System */
+        .premium-card {
+            background: rgba(30, 41, 59, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+        }
+
+        .premium-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.6);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4);
+        }
+
+        .premium-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            transition: 0.5s;
+        }
+
+        .premium-card:hover::after {
+            left: 100%;
+        }
+
+        .card-icon-wrapper {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 16px -4px rgba(0,0,0,0.2);
+        }
+
+        .card-icon-wrapper i {
+            font-size: 1.5rem !important;
+            display: block !important;
+        }
+
+        .premium-card:hover .card-icon-wrapper {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        /* Light Mode Overrides */
+        body.light-mode .premium-card {
+            background: rgba(255, 255, 255, 0.7);
+            border-color: rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-mode .premium-card:hover {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode .text-white { color: #1e293b !important; }
+        body.light-mode .text-muted { color: #64748b !important; }
+
         .bg-gradient-x-indigo-blue {
-            background: linear-gradient(135deg, var(--p-indigo-dark), var(--p-indigo));
+            background: linear-gradient(135deg, #4f46e5, #3b82f6);
         }
 
         .bg-white-10 {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
         }
-
-        /* Default (Dark Mode) Alerts */
-        .alert-stock-card { background: rgba(225, 29, 72, 0.15) !important; }
-        .alert-stock-card h5, .alert-stock-card p { color: #fda4af !important; }
-        .alert-stock-card .icon-wrapper { background: rgba(225, 29, 72, 0.25) !important; }
-        .alert-stock-card .icon-wrapper i { color: #f43f5e !important; }
-
-        .alert-expiry-card { background: rgba(217, 119, 6, 0.15) !important; }
-        .alert-expiry-card h5, .alert-expiry-card p { color: #fde68a !important; }
-        .alert-expiry-card .icon-wrapper { background: rgba(217, 119, 6, 0.25) !important; }
-        .alert-expiry-card .icon-wrapper i { color: #fbbf24 !important; }
-
-        /* Light Mode Alerts */
-        body.light-mode .alert-stock-card { background: #fff1f2 !important; }
-        body.light-mode .alert-stock-card h5 { color: #9f1239 !important; }
-        body.light-mode .alert-stock-card p { color: #be123c !important; }
-        body.light-mode .alert-stock-card .icon-wrapper { background: #ffe4e6 !important; }
-        body.light-mode .alert-stock-card .icon-wrapper i { color: #e11d48 !important; }
-
-        body.light-mode .alert-expiry-card { background: #fffbeb !important; }
-        body.light-mode .alert-expiry-card h5 { color: #92400e !important; }
-        body.light-mode .alert-expiry-card p { color: #b45309 !important; }
-        body.light-mode .alert-expiry-card .icon-wrapper { background: #fef3c7 !important; }
-        body.light-mode .alert-expiry-card .icon-wrapper i { color: #d97706 !important; }
 
         /* Alert Action Buttons */
         .alert-action-btn {
             background: rgba(255,255,255,0.15) !important;
             color: #e2e8f0 !important;
             border: 1px solid rgba(255,255,255,0.2) !important;
-            border-radius: 8px;
+            border-radius: 12px;
+            padding: 8px 16px;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
         }
+
         .alert-action-btn:hover {
             background: rgba(255,255,255,0.25) !important;
             color: #fff !important;
-        }
-        body.light-mode .alert-action-btn {
-            background: #fff !important;
-            color: #1e293b !important;
-            border: 1px solid rgba(0,0,0,0.1) !important;
-        }
-        body.light-mode .alert-action-btn:hover {
-            background: #f1f5f9 !important;
+            transform: scale(1.05);
         }
     </style>
 
@@ -74,8 +118,8 @@
         {{-- Welcome Header --}}
         <div class="row mb-5 animate-fade-in-up">
             <div class="col-12">
-                <div class="premium-card welcome-banner"
-                    style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(255,255,255,0.1);">
+                <div class="premium-card welcome-banner border-0"
+                    style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.15));">
                     <div class="row align-items-center">
                         <div class="col-md-7">
                             <h1 class="display-5 font-weight-bold mb-2 text-gradient-premium">
@@ -86,15 +130,13 @@
                             </p>
                         </div>
                         <div class="col-md-5 text-right d-none d-md-block">
-                            <div class="d-inline-flex align-items-center p-3 rounded-20 bg-glass shadow-sm">
-                                <div class="bg-emerald p-3 rounded-lg mr-3 shadow-glow">
-                                    <i class="la la-check text-white h4 mb-0"></i>
+                            <div class="d-inline-flex align-items-center p-3 rounded-24 bg-glass shadow-lg border border-white-10">
+                                <div class="bg-emerald p-3 rounded-xl mr-3 shadow-glow-emerald">
+                                    <i class="fas fa-check text-white h4 mb-0"></i>
                                 </div>
                                 <div class="text-left">
-                                    <small
-                                        class="text-muted d-block uppercase font-weight-bold">{{ __('app.dashboard.store_health') }}</small>
-                                    <span
-                                        class="text-emerald font-weight-bold h5 mb-0">{{ __('app.dashboard.optimized') }}</span>
+                                    <small class="text-muted d-block uppercase font-weight-bold">{{ __('app.dashboard.store_health') }}</small>
+                                    <span class="text-emerald font-weight-bold h5 mb-0">{{ __('app.dashboard.optimized') }}</span>
                                 </div>
                             </div>
                         </div>
@@ -103,152 +145,120 @@
             </div>
         </div>
 
-        @if($lowStockProducts->count() > 0)
-            <div class="row animate-fade-in-up" style="animation-delay: 0.1s;">
-                <div class="col-12 mb-4">
-                    <div class="premium-card border-0 alert-stock-card" style="--card-accent: var(--p-rose);">
+        {{-- Alerts Section --}}
+        <div class="row mb-4">
+            @if($lowStockProducts->count() > 0)
+                <div class="col-md-6 mb-4 animate-fade-in-up">
+                    <div class="premium-card border-0 alert-stock-card h-100" style="background: rgba(225, 29, 72, 0.12);">
                         <div class="d-flex align-items-center">
-                            <div class="icon-wrapper p-3 rounded-xl mr-3">
-                                <i class="la la-exclamation-triangle h4 mb-0"></i>
+                            <div class="card-icon-wrapper mr-3 mb-0" style="background: rgba(225, 29, 72, 0.2); color: #fb7185;">
+                                <i class="fas fa-exclamation-triangle"></i>
                             </div>
                             <div>
-                                <h5 class="font-weight-bold mb-1">
-                                    {{ __('app.dashboard.low_stock_alert') }}
-                                </h5>
-                                <p class="mb-0 small">
-                                    @foreach($lowStockProducts->take(2) as $p)
-                                        {{ $p->name }} ({{ $p->quantity }}){{ !$loop->last ? ',' : '' }}
-                                    @endforeach
-                                    @if($lowStockProducts->count() > 2) +{{ $lowStockProducts->count() - 2 }} more @endif
+                                <h5 class="font-weight-bold mb-1 text-white">{{ __('app.dashboard.low_stock_alert') }}</h5>
+                                <p class="mb-0 small text-muted">
+                                    {{ $lowStockProducts->count() }} {{ __('app.dashboard.product_reached_min_choice') }}
                                 </p>
                             </div>
-                            <a href="{{ route('products.index') }}" class="btn btn-sm alert-action-btn ml-auto shadow-sm">{{ __('app.dashboard.restock_now') }}</a>
+                            <a href="{{ route('products.index') }}" class="btn btn-sm alert-action-btn ml-auto">{{ __('app.dashboard.restock_now') }}</a>
                         </div>
                     </div>
                 </div>
-            </div>
-        @endif
+            @endif
 
-        @if($expiringProducts->count() > 0)
-            <div class="row animate-fade-in-up" style="animation-delay: 0.15s;">
-                <div class="col-12 mb-4">
-                    <div class="premium-card border-0 alert-expiry-card" style="--card-accent: #f59e0b;">
+            @if($expiringProducts->count() > 0)
+                <div class="col-md-6 mb-4 animate-fade-in-up">
+                    <div class="premium-card border-0 alert-expiry-card h-100" style="background: rgba(245, 158, 11, 0.12);">
                         <div class="d-flex align-items-center">
-                            <div class="icon-wrapper p-3 rounded-xl mr-3">
-                                <i class="la la-clock h4 mb-0"></i>
+                            <div class="card-icon-wrapper mr-3 mb-0" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">
+                                <i class="fas fa-clock"></i>
                             </div>
                             <div>
-                                <h5 class="font-weight-bold mb-1">
-                                    {{ __('app.dashboard.expiry_alert') }}
-                                </h5>
-                                <p class="mb-0 small">
-                                    @foreach($expiringProducts->take(2) as $p)
-                                        {{ $p->name }} ({{ $p->expiry_date }}){{ !$loop->last ? ',' : '' }}
-                                    @endforeach
-                                    @if($expiringProducts->count() > 2) +{{ $expiringProducts->count() - 2 }} more @endif
+                                <h5 class="font-weight-bold mb-1 text-white">{{ __('app.dashboard.expiry_alert') }}</h5>
+                                <p class="mb-0 small text-muted">
+                                    {{ $expiringProducts->count() }} {{ __('app.dashboard.product_expiring_soon_choice') }}
                                 </p>
                             </div>
-                            <a href="{{ route('products.index') }}" class="btn btn-sm alert-action-btn ml-auto shadow-sm">{{ __('app.sidebar.view_products') }}</a>
+                            <a href="{{ route('products.index') }}" class="btn btn-sm alert-action-btn ml-auto">{{ __('app.sidebar.view_products') }}</a>
                         </div>
                     </div>
                 </div>
-            </div>
-        @endif
+            @endif
+        </div>
 
         {{-- Top KPI Row --}}
-        <div class="row mb-4 animate-fade-in-up" style="animation-delay: 0.1s;">
+        <div class="row mb-4 animate-fade-in-up">
             <div class="col-xl-3 col-md-6 mb-4">
-                <a href="{{ route('reports.statistics.products_sold') }}" id="linkProductsSold"
-                    class="text-decoration-none">
-                    <div class="premium-card h-100" style="--card-accent: var(--p-emerald);">
-                        <div class="card-icon-wrapper"
-                            style="background: rgba(16, 185, 129, 0.1); color: var(--p-emerald);">
-                            <i class="la la-shopping-cart"></i>
+                <a href="{{ route('reports.statistics.products_sold') }}" class="text-decoration-none">
+                    <div class="premium-card h-100">
+                        <div class="card-icon-wrapper" style="background: rgba(16, 185, 129, 0.15); color: #34d399; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);">
+                            <i class="fas fa-shopping-basket"></i>
                         </div>
-                        <p class="text-muted small font-weight-bold mb-1 uppercase">{{ __('app.dashboard.products_sold') }}
-                        </p>
-                        <h2 class="font-weight-bold mb-0 text-white" id="productsSold">{{ number_format($productsSold) }}
-                        </h2>
+                        <p class="text-muted small font-weight-bold mb-1 uppercase">{{ __('app.dashboard.products_sold') }}</p>
+                        <h2 class="font-weight-bold mb-0 text-white" id="productsSold">{{ number_format($productsSold) }}</h2>
                     </div>
                 </a>
             </div>
 
             <div class="col-xl-3 col-md-6 mb-4">
-                <a href="{{ route('reports.statistics.revenue') }}" id="linkRevenue" class="text-decoration-none">
-                    <div class="premium-card h-100" style="--card-accent: var(--p-indigo);">
-                        <div class="card-icon-wrapper" style="background: rgba(99, 102, 241, 0.1); color: var(--p-indigo);">
-                            <i class="la la-wallet"></i>
+                <a href="{{ route('reports.statistics.revenue') }}" class="text-decoration-none">
+                    <div class="premium-card h-100">
+                        <div class="card-icon-wrapper" style="background: rgba(99, 102, 241, 0.15); color: #818cf8; box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);">
+                            <i class="fas fa-money-bill-wave"></i>
                         </div>
-                        <p class="text-muted small font-weight-bold mb-1 uppercase">{{ __('app.dashboard.total_revenue') }}
-                        </p>
-                        <h2 class="font-weight-bold mb-0 text-white" id="totalRevenue">{{ number_format($totalRevenue, 2) }}
-                        </h2>
+                        <p class="text-muted small font-weight-bold mb-1 uppercase">{{ __('app.dashboard.total_revenue') }}</p>
+                        <h2 class="font-weight-bold mb-0 text-white" id="totalRevenue">{{ number_format($totalRevenue, 2) }}</h2>
                     </div>
                 </a>
             </div>
 
             <div class="col-xl-3 col-md-6 mb-4">
-                <a href="{{ route('reports.statistics.profit') }}" id="linkProfit" class="text-decoration-none">
-                    <div class="premium-card h-100" style="--card-accent: var(--p-purple);">
-                        <div class="card-icon-wrapper" style="background: rgba(168, 85, 247, 0.1); color: var(--p-purple);">
-                            <i class="la la-chart-pie"></i>
+                <a href="{{ route('reports.statistics.profit') }}" class="text-decoration-none">
+                    <div class="premium-card h-100">
+                        <div class="card-icon-wrapper" style="background: rgba(168, 85, 247, 0.15); color: #a78bfa; box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);">
+                            <i class="fas fa-chart-line"></i>
                         </div>
-                        <p class="text-muted small font-weight-bold mb-1 uppercase">{{ __('app.dashboard.total_profit') }}
-                        </p>
-                        <h2 class="font-weight-bold mb-0 text-white" id="totalProfit">{{ number_format($totalProfit, 2) }}
-                        </h2>
+                        <p class="text-muted small font-weight-bold mb-1 uppercase">{{ __('app.dashboard.total_profit') }}</p>
+                        <h2 class="font-weight-bold mb-0 text-white" id="totalProfit">{{ number_format($totalProfit, 2) }}</h2>
                     </div>
                 </a>
             </div>
 
             <div class="col-xl-3 col-md-6 mb-4">
                 <a href="{{ route('products.index') }}" class="text-decoration-none">
-                    <div class="premium-card h-100" style="--card-accent: #f59e0b;">
-                        <div class="card-icon-wrapper" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                            <i class="la la-box"></i>
+                    <div class="premium-card h-100">
+                        <div class="card-icon-wrapper" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);">
+                            <i class="fas fa-box-open"></i>
                         </div>
-                        <p class="text-muted small font-weight-bold mb-1 uppercase">{{ __('app.dashboard.total_products') }}
-                        </p>
-                        <h2 class="font-weight-bold mb-0 text-white" id="totalUnsoldProducts">
-                            {{ number_format($totalUnsoldProducts) }}
-                        </h2>
+                        <p class="text-muted small font-weight-bold mb-1 uppercase">{{ __('app.dashboard.total_products') }}</p>
+                        <h2 class="font-weight-bold mb-0 text-white" id="totalUnsoldProducts">{{ number_format($totalUnsoldProducts) }}</h2>
                     </div>
                 </a>
             </div>
         </div>
 
-        {{-- Bottom KPI and Filter Row --}}
-        <div class="row mb-4 animate-fade-in-up" style="animation-delay: 0.2s;">
-            <!-- Total Purchases -->
-            <div class="col-xl-3 col-lg-6 col-12 mb-4">
-                <a href="{{ route('reports.statistics.purchases') }}" id="linkPurchases" class="text-decoration-none">
-                    <div class="premium-card h-100" style="--card-accent: var(--p-rose); --bg-accent: #fff1f2;">
-                        <div class="card-icon-wrapper">
-                            <i class="la la-wallet"></i>
+        {{-- Bottom KPI Row --}}
+        <div class="row mb-4 animate-fade-in-up" style="animation-delay: 0.1s;">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <a href="{{ route('reports.statistics.purchases') }}" class="text-decoration-none">
+                    <div class="premium-card h-100">
+                        <div class="card-icon-wrapper" style="background: rgba(244, 63, 94, 0.15); color: #fb7185; box-shadow: 0 0 20px rgba(244, 63, 94, 0.2);">
+                            <i class="fas fa-shopping-cart"></i>
                         </div>
-                        <p class="text-muted small font-weight-bold mb-1 uppercase">
-                            {{ __('app.dashboard.total_purchases') }}
-                        </p>
-                        <h2 class="font-weight-bold mb-0 text-white" id="totalPurchases">
-                            {{ number_format($totalPurchases, 2) }}
-                        </h2>
+                        <p class="text-muted small font-weight-bold mb-1 uppercase">{{ __('app.dashboard.total_purchases') }}</p>
+                        <h2 class="font-weight-bold mb-0 text-white" id="totalPurchases">{{ number_format($totalPurchases, 2) }}</h2>
                     </div>
                 </a>
             </div>
 
-            <!-- Available Money -->
-            <div class="col-xl-3 col-lg-6 col-12 mb-4">
-                <a href="{{ route('reports.statistics.cash_flow') }}" id="linkCashFlow" class="text-decoration-none">
-                    <div class="premium-card h-100" style="--card-accent: var(--p-indigo); --bg-accent: #eef2ff;">
-                        <div class="card-icon-wrapper">
-                            <i class="la la-money-bill-wave"></i>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <a href="{{ route('reports.statistics.cash_flow') }}" class="text-decoration-none">
+                    <div class="premium-card h-100">
+                        <div class="card-icon-wrapper" style="background: rgba(14, 165, 233, 0.15); color: #38bdf8; box-shadow: 0 0 20px rgba(14, 165, 233, 0.2);">
+                            <i class="fas fa-wallet"></i>
                         </div>
-                        <p class="text-muted small font-weight-bold mb-1 uppercase">
-                            {{ __('app.dashboard.available_money') }}
-                        </p>
-                        <h2 class="font-weight-bold mb-0 text-white" id="availableMoney">
-                            {{ number_format($availableMoney, 2) }}
-                        </h2>
+                        <p class="text-muted small font-weight-bold mb-1 uppercase">{{ __('app.dashboard.available_money') }}</p>
+                        <h2 class="font-weight-bold mb-0 text-white" id="availableMoney">{{ number_format($availableMoney, 2) }}</h2>
                     </div>
                 </a>
             </div>
@@ -256,130 +266,123 @@
             <!-- Date Filter Card -->
             <div class="col-xl-6 col-12 mb-4">
                 <div class="premium-card h-100 p-4">
-                    <h5 class="mb-4 font-weight-bold text-white"><i class="la la-calendar-alt text-indigo mr-2"></i>
-                        {{ __('app.dashboard.filter_by_date') }}</h5>
+                    <h5 class="mb-4 font-weight-bold text-white">
+                        <i class="fas fa-calendar-alt mr-2" style="color: #818cf8;"></i>
+                        {{ __('app.dashboard.filter_by_date') }}
+                    </h5>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="start_date"
-                                class="text-muted small font-weight-bold uppercase mb-2 d-block">{{ __('app.dashboard.start_date') }}</label>
+                            <label class="text-muted small font-weight-bold uppercase mb-2 d-block">{{ __('app.dashboard.start_date') }}</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text bg-slate-50 border-right-0"
-                                        style="border-radius: 12px 0 0 12px; border-color: var(--p-slate-200);"><i
-                                            class="la la-calendar"></i></span>
+                                    <span class="input-group-text bg-white-10 border-0 text-muted" style="border-radius: 12px 0 0 12px;">
+                                        <i class="fas fa-calendar"></i>
+                                    </span>
                                 </div>
-                                <input type="text" id="start_date" name="start_date"
-                                    class="form-control datepicker bg-slate-50"
-                                    style="border-radius: 0 12px 12px 0; border-left: none; border-color: var(--p-slate-200);"
-                                    placeholder="{{ __('app.common.select_date') }}">
+                                <input type="text" id="start_date" name="start_date" class="form-control datepicker bg-white-10 border-0 text-white" 
+                                    style="border-radius: 0 12px 12px 0;" placeholder="{{ __('app.common.select_date') }}">
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="end_date"
-                                class="text-muted small font-weight-bold uppercase mb-2 d-block">{{ __('app.dashboard.end_date') }}</label>
+                            <label class="text-muted small font-weight-bold uppercase mb-2 d-block">{{ __('app.dashboard.end_date') }}</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text bg-slate-50 border-right-0"
-                                        style="border-radius: 12px 0 0 12px; border-color: var(--p-slate-200);"><i
-                                            class="la la-calendar"></i></span>
+                                    <span class="input-group-text bg-white-10 border-0 text-muted" style="border-radius: 12px 0 0 12px;">
+                                        <i class="fas fa-calendar"></i>
+                                    </span>
                                 </div>
-                                <input type="text" id="end_date" name="end_date" class="form-control datepicker bg-slate-50"
-                                    style="border-radius: 0 12px 12px 0; border-left: none; border-color: var(--p-slate-200);"
-                                    placeholder="{{ __('app.common.select_date') }}">
+                                <input type="text" id="end_date" name="end_date" class="form-control datepicker bg-white-10 border-0 text-white" 
+                                    style="border-radius: 0 12px 12px 0;" placeholder="{{ __('app.common.select_date') }}">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- Keyboard Shortcuts Note -->
-    <div class="row mb-4 animate-fade-in-up" style="animation-delay: 0.25s;">
-        <div class="col-12">
-            <div class="premium-card bg-gradient-x-indigo-blue border-0 text-white shadow-lg">
-                <div class="d-flex align-items-center">
-                    <div class="p-3 bg-white-10 rounded-xl mr-4 shadow-sm">
-                        <i class="la la-keyboard h2 mb-0"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-weight-bold mb-1">اختصارات الكيبورد السريعة</h4>
-                        <p class="mb-0 opacity-75 h6">
-                            <span class="badge badge-pill badge-light text-dark mr-2">F1</span> الكاشير |
-                            <span class="badge badge-pill badge-light text-dark mx-2">F2</span> المنتجات |
-                            <span class="badge badge-pill badge-light text-dark mx-2">F4</span> الخزينة |
-                            <span class="badge badge-pill badge-light text-dark mx-2">F10</span> (في الكاشير) حفظ وطباعة الفاتورة
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Line Chart for Monthly Products Sold -->
-    <div class="row animate-fade-in-up" style="animation-delay: 0.4s;">
-        <div class="col-xl-6 col-12 mb-4">
-            <div class="premium-card">
-                <div class="d-flex align-items-center mb-4">
-                    <div class="bg-indigo-gradient p-2 rounded-xl mr-3"
-                        style="background: linear-gradient(135deg, var(--p-indigo), var(--p-blue)); line-height: 1;">
-                        <i class="la la-chart-bar text-white"></i>
+        <!-- Keyboard Shortcuts Note -->
+        <div class="row mb-5 animate-fade-in-up">
+            <div class="col-12">
+                <div class="premium-card bg-gradient-x-indigo-blue border-0 text-white shadow-lg shadow-glow-indigo">
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon-wrapper mb-0 mr-4" style="background: rgba(255, 255, 255, 0.2); color: #fff;">
+                            <i class="fas fa-keyboard"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-weight-bold mb-1">اختصارات الكيبورد السريعة</h4>
+                            <p class="mb-0 opacity-75 h6">
+                                <span class="badge badge-pill badge-light text-dark px-3 py-2 mr-2">F1</span> الكاشير |
+                                <span class="badge badge-pill badge-light text-dark px-3 py-2 mx-2">F2</span> المنتجات |
+                                <span class="badge badge-pill badge-light text-dark px-3 py-2 mx-2">F4</span> الخزينة |
+                                <span class="badge badge-pill badge-light text-dark px-3 py-2 mx-2">F10</span> (في الكاشير) حفظ وطباعة الفاتورة
+                            </p>
+                        </div>
                     </div>
-                    <h5 class="font-weight-bold text-white mb-0">
-                        {{ __('app.dashboard.monthly_sales_chart') ?? 'Monthly Sales Performance' }}
-                    </h5>
-                </div>
-                <div style="height: 300px;">
-                    <canvas id="productsSoldChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Line Chart for Monthly Profit -->
-        <div class="col-xl-6 col-12 mb-4">
-            <div class="premium-card">
-                <div class="d-flex align-items-center mb-4">
-                    <div class="bg-emerald-gradient p-2 rounded-xl mr-3"
-                        style="background: linear-gradient(135deg, var(--p-emerald), var(--p-teal)); line-height: 1;">
-                        <i class="la la-chart-line text-white"></i>
+        <!-- Charts Section -->
+        <div class="row">
+            <div class="col-xl-6 col-12 mb-4 animate-fade-in-up">
+                <div class="premium-card">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="card-icon-wrapper mb-0 mr-3" style="width: 45px; height: 45px; background: rgba(99, 102, 241, 0.2); color: #818cf8;">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h5 class="font-weight-bold text-white mb-0">
+                            {{ __('app.dashboard.monthly_sales_chart') ?? 'Monthly Sales Performance' }}
+                        </h5>
                     </div>
-                    <h5 class="font-weight-bold text-white mb-0">
-                        {{ __('app.dashboard.monthly_revenue_chart') ?? 'Monthly Revenue Analysis' }}
-                    </h5>
-                </div>
-                <div style="height: 300px;">
-                    <canvas id="profitChart"></canvas>
+                    <div style="height: 300px;">
+                        <canvas id="productsSoldChart"></canvas>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Top Selling and Most Profitable Products -->
-    <div class="row animate-fade-in-up" style="animation-delay: 0.5s;">
-        <div class="col-xl-6 col-12 mb-4">
-            <div class="premium-card">
-                <div class="d-flex align-items-center mb-4">
-                    <div class="bg-purple-gradient p-2 rounded-xl mr-3"
-                        style="background: linear-gradient(135deg, var(--p-purple), var(--p-indigo)); line-height: 1;">
-                        <i class="la la-trophy text-white"></i>
+            <div class="col-xl-6 col-12 mb-4 animate-fade-in-up">
+                <div class="premium-card">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="card-icon-wrapper mb-0 mr-3" style="width: 45px; height: 45px; background: rgba(16, 185, 129, 0.2); color: #34d399;">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h5 class="font-weight-bold text-white mb-0">
+                            {{ __('app.dashboard.monthly_revenue_chart') ?? 'Monthly Revenue Analysis' }}
+                        </h5>
                     </div>
-                    <h5 class="font-weight-bold text-white mb-0">أكثر 5 منتجات مبيعاً</h5>
-                </div>
-                <div style="height: 300px;">
-                    <canvas id="topSellingChart"></canvas>
+                    <div style="height: 300px;">
+                        <canvas id="profitChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-6 col-12 mb-4">
-            <div class="premium-card">
-                <div class="d-flex align-items-center mb-4">
-                    <div class="bg-amber-gradient p-2 rounded-xl mr-3"
-                        style="background: linear-gradient(135deg, #f59e0b, #d97706); line-height: 1;">
-                        <i class="la la-money text-white"></i>
+
+        <div class="row">
+            <div class="col-xl-6 col-12 mb-4 animate-fade-in-up">
+                <div class="premium-card">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="card-icon-wrapper mb-0 mr-3" style="width: 45px; height: 45px; background: rgba(168, 85, 247, 0.2); color: #a78bfa;">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h5 class="font-weight-bold text-white mb-0">أكثر 5 منتجات مبيعاً</h5>
                     </div>
-                    <h5 class="font-weight-bold text-white mb-0">أكثر 5 منتجات ربحاً</h5>
+                    <div style="height: 300px;">
+                        <canvas id="topSellingChart"></canvas>
+                    </div>
                 </div>
-                <div style="height: 300px;">
-                    <canvas id="topProfitableChart"></canvas>
+            </div>
+            
+            <div class="col-xl-6 col-12 mb-4 animate-fade-in-up">
+                <div class="premium-card">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="card-icon-wrapper mb-0 mr-3" style="width: 45px; height: 45px; background: rgba(245, 158, 11, 0.2); color: #fbbf24;">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <h5 class="font-weight-bold text-white mb-0">أكثر 5 منتجات ربحاً</h5>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="topProfitableChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
