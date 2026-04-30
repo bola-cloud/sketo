@@ -102,6 +102,7 @@
                                     <th>{{ __('app.invoices.client') }}</th>
                                     <th>{{ __('app.invoices.seller') }}</th>
                                     <th>{{ __('app.invoices.date') }}</th>
+                                    <th>{{ __('app.invoices.total') }}</th>
                                     <th>{{ __('app.invoices.status') }}</th>
                                     <th>{{ __('app.invoices.installments') }}</th>
                                     <th class="text-right">{{ __('app.invoices.actions') }}</th>
@@ -137,6 +138,9 @@
                                         <td>
                                             <span class="text-muted small"><i class="la la-calendar"></i>
                                                 {{ $invoice->created_at->format('Y-m-d') }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-bold-700 text-primary">{{ number_format($invoice->total_amount, 2) }} {{ __('app.common.currency') }}</span>
                                         </td>
                                         <td>
                                             @if($hasUnpaidAmount)
