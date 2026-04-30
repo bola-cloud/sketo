@@ -293,6 +293,28 @@
             </div>
         </div>
     </div>
+    <!-- Keyboard Shortcuts Note -->
+    <div class="row mb-4 animate-fade-in-up" style="animation-delay: 0.25s;">
+        <div class="col-12">
+            <div class="premium-card bg-gradient-x-indigo-blue border-0 text-white shadow-lg">
+                <div class="d-flex align-items-center">
+                    <div class="p-3 bg-white-10 rounded-xl mr-4 shadow-sm">
+                        <i class="la la-keyboard h2 mb-0"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-weight-bold mb-1">اختصارات الكيبورد السريعة</h4>
+                        <p class="mb-0 opacity-75 h6">
+                            <span class="badge badge-pill badge-light text-dark mr-2">F1</span> الكاشير |
+                            <span class="badge badge-pill badge-light text-dark mx-2">F2</span> المنتجات |
+                            <span class="badge badge-pill badge-light text-dark mx-2">F4</span> الخزينة |
+                            <span class="badge badge-pill badge-light text-dark mx-2">F10</span> (في الكاشير) حفظ وطباعة الفاتورة
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Line Chart for Monthly Products Sold -->
     <div class="row animate-fade-in-up" style="animation-delay: 0.4s;">
         <div class="col-xl-6 col-12 mb-4">
@@ -329,6 +351,39 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Top Selling and Most Profitable Products -->
+    <div class="row animate-fade-in-up" style="animation-delay: 0.5s;">
+        <div class="col-xl-6 col-12 mb-4">
+            <div class="premium-card">
+                <div class="d-flex align-items-center mb-4">
+                    <div class="bg-purple-gradient p-2 rounded-xl mr-3"
+                        style="background: linear-gradient(135deg, var(--p-purple), var(--p-indigo)); line-height: 1;">
+                        <i class="la la-trophy text-white"></i>
+                    </div>
+                    <h5 class="font-weight-bold text-white mb-0">أكثر 5 منتجات مبيعاً</h5>
+                </div>
+                <div style="height: 300px;">
+                    <canvas id="topSellingChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6 col-12 mb-4">
+            <div class="premium-card">
+                <div class="d-flex align-items-center mb-4">
+                    <div class="bg-amber-gradient p-2 rounded-xl mr-3"
+                        style="background: linear-gradient(135deg, #f59e0b, #d97706); line-height: 1;">
+                        <i class="la la-money text-white"></i>
+                    </div>
+                    <h5 class="font-weight-bold text-white mb-0">أكثر 5 منتجات ربحاً</h5>
+                </div>
+                <div style="height: 300px;">
+                    <canvas id="topProfitableChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
     @push('scripts')
@@ -389,12 +444,9 @@
                     $('#totalUnsoldProducts').text(data.totalUnsoldProducts);
                     $('#totalPurchases').text(data.totalPurchases);
                     $('#totalProfit').text(data.totalProfit);
-                    $('#availableMoney').text(data.availableMoney); // Update available money
+                    $('#availableMoney').text(data.availableMoney);
                 }
-
-
             });
-
 
             var chartOptions = {
                 responsive: true,
@@ -463,6 +515,52 @@
                     }]
                 },
                 options: chartOptions
+            });
+
+            // Top Selling Chart
+            var topSellingCtx = document.getElementById('topSellingChart').getContext('2d');
+            new Chart(topSellingCtx, {
+                type: 'bar',
+                data: {
+                    labels: {!! json_encode($topSellingProducts->map(fn($s) => $s->product->name ?? 'Unknown')->toArray()) !!},
+                    datasets: [{
+                        data: {!! json_encode($topSellingProducts->pluck('total_quantity')->toArray()) !!},
+                        backgroundColor: ['#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+
+            // Top Profitable Chart
+            var topProfitableCtx = document.getElementById('topProfitableChart').getContext('2d');
+            new Chart(topProfitableCtx, {
+                type: 'bar',
+                data: {
+                    labels: {!! json_encode($topProfitableProducts->map(fn($p) => $p->product->name ?? 'Unknown')->toArray()) !!},
+                    datasets: [{
+                        data: {!! json_encode($topProfitableProducts->pluck('total_profit')->toArray()) !!},
+                        backgroundColor: ['#10b981', '#059669', '#047857', '#065f46', '#064e3b'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    }
+                }
             });
         </script>
     @endpush

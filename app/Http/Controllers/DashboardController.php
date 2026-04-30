@@ -91,6 +91,23 @@ class DashboardController extends Controller
                     ->get();
             }
 
+            // Top 5 Most Sold Products
+            $topSellingProducts = Sales::select('product_id', DB::raw('SUM(quantity) as total_quantity'))
+                ->with('product')
+                ->groupBy('product_id')
+                ->orderByDesc('total_quantity')
+                ->limit(5)
+                ->get();
+
+            // Top 5 Most Profitable Products
+            $topProfitableProducts = Sales::join('purchase_products', 'sales.purchase_product_id', '=', 'purchase_products.id')
+                ->select('sales.product_id', DB::raw('SUM(sales.total_price - (sales.quantity * purchase_products.cost_price)) as total_profit'))
+                ->with('product')
+                ->groupBy('sales.product_id')
+                ->orderByDesc('total_profit')
+                ->limit(5)
+                ->get();
+
             if ($request->ajax()) {
                 return response()->json([
                     'productsSold' => $productsSold,
@@ -100,7 +117,9 @@ class DashboardController extends Controller
                     'totalProfit' => $totalProfit ?? 0,
                     'lowStockProducts' => $lowStockProducts,
                     'expiringProducts' => $expiringProducts,
-                    'availableMoney' => $availableMoney, // Include available money
+                    'availableMoney' => $availableMoney,
+                    'topSellingProducts' => $topSellingProducts,
+                    'topProfitableProducts' => $topProfitableProducts,
                 ]);
             }
 
@@ -114,7 +133,9 @@ class DashboardController extends Controller
                 'monthlyData',
                 'lowStockProducts',
                 'expiringProducts',
-                'availableMoney' // Include available money
+                'availableMoney',
+                'topSellingProducts',
+                'topProfitableProducts'
             ));
         } catch (\Exception $e) {
             \Log::error('DashboardController Error: ' . $e->getMessage(), [

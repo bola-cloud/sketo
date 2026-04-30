@@ -460,6 +460,27 @@
                 if (mainToggle) mainToggle.click();
                 else body.classList.remove('menu-open');
             }
+        // Global Keyboard Shortcuts
+        document.addEventListener('keydown', function(e) {
+            // F1: Cashier
+            if (e.key === 'F1') {
+                e.preventDefault();
+                window.location.href = "{{ route('cashier.viewCart') }}";
+            }
+            // F2: Products
+            if (e.key === 'F2') {
+                e.preventDefault();
+                window.location.href = "{{ route('products.index') }}";
+            }
+            // F4: Treasury
+            if (e.key === 'F4') {
+                e.preventDefault();
+                window.location.href = "{{ route('treasury') }}";
+            }
+            // Escape: Close modals (Bootstrap 4 handles this by default, but let's be sure for custom ones)
+            if (e.key === 'Escape') {
+                $('.modal').modal('hide');
+            }
         });
     </script>
 

@@ -461,6 +461,19 @@
             });
         }
 
+        // Function to prompt for grams and convert to Kg
+        function promptGramInput(barcode) {
+            let grams = prompt("أدخل الوزن بالجرام (مثلاً: 150):", "");
+            if (grams !== null && grams !== "") {
+                let kg = parseFloat(grams) / 1000;
+                if (!isNaN(kg)) {
+                    setCartQuantity(barcode, kg);
+                } else {
+                    alert("برجاء إدخال رقم صحيح.");
+                }
+            }
+        }
+
         // Function to initialize cart scripts
         function initializeCartScripts() {
             // Barcode input handling with loading indicator
@@ -748,6 +761,13 @@
             else if (e.which === 114) { // F3
                 e.preventDefault();
                 $('#paid_amount').focus();
+            }
+            // F10 - Complete Payment & Print
+            else if (e.which === 121) { // F10
+                e.preventDefault();
+                if ($('#checkout-form').length) {
+                    $('#checkout-form').submit();
+                }
             }
         });
     </script>

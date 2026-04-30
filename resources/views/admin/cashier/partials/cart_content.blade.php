@@ -38,9 +38,10 @@
                                         onclick="updateCartQuantity('{{ $barcode }}', -1)">
                                         <i class="fas fa-minus"></i>
                                     </button>
-                                    <span class="px-3 py-1 rounded fw-bold text-primary" style="background: rgba(16, 185, 129, 0.1);">
-                                        {{ number_format($details['quantity'], 3) }}
-                                    </span>
+                                    <input type="number" step="0.001" class="form-control form-control-sm text-center fw-bold text-primary cart-qty-input" 
+                                        value="{{ number_format($details['quantity'], 3, '.', '') }}"
+                                        style="width: 80px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);"
+                                        onchange="setCartQuantity('{{ $barcode }}', this.value)">
                                     <button type="button" class="btn btn-outline-success btn-sm ms-2"
                                         onclick="updateCartQuantity('{{ $barcode }}', 1)">
                                         <i class="fas fa-plus"></i>
@@ -52,6 +53,7 @@
                                         <button type="button" class="btn btn-secondary py-0" style="font-size: 10px;" onclick="setCartQuantity('{{ $barcode }}', 0.125)">ثمن</button>
                                         <button type="button" class="btn btn-secondary py-0" style="font-size: 10px;" onclick="setCartQuantity('{{ $barcode }}', 0.250)">ربع</button>
                                         <button type="button" class="btn btn-secondary py-0" style="font-size: 10px;" onclick="setCartQuantity('{{ $barcode }}', 0.500)">نص</button>
+                                        <button type="button" class="btn btn-info text-white py-0" style="font-size: 10px;" onclick="promptGramInput('{{ $barcode }}')">جرام</button>
                                     </div>
                                 @endif
                             </div>
