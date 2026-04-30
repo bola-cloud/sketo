@@ -204,6 +204,25 @@ html[data-textdirection="rtl"] .ai-panel { right: auto; left: 30px; flex-directi
 html[data-textdirection="rtl"] .ai-sidebar { border-right: none; border-left: 1px solid rgba(255,255,255,0.05); }
 html[data-textdirection="rtl"] .premium-ai-submit { margin-left: 0; margin-right: 10px; transform: scaleX(-1); }
 html[data-textdirection="rtl"] #sketo-ai-widget { right: auto; left: 30px; }
+
+/* Light Mode Overrides */
+html.light-mode .ai-panel {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(0,0,0,0.1);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+html.light-mode .ai-sidebar { background: #f8fafc; border-color: rgba(0,0,0,0.05); }
+html.light-mode .chat-item { color: #475569; }
+html.light-mode .chat-item:hover { background: rgba(16, 185, 129, 0.1); }
+html.light-mode .ai-header { background: #ffffff; border-bottom-color: rgba(0,0,0,0.05); }
+html.light-mode .ai-header h5 { color: #1e293b !important; }
+html.light-mode .ai-header button { color: #64748b !important; }
+html.light-mode .ai-footer { background: #ffffff; border-top-color: rgba(0,0,0,0.05); }
+html.light-mode #ai-chat-input { background-color: #f1f5f9 !important; border-color: #e2e8f0 !important; color: #1e293b !important; }
+html.light-mode .ai-system .ai-bubble { background: #f1f5f9; color: #334155; border-color: #e2e8f0; }
+html.light-mode .ai-typing { background: #f1f5f9; }
+html.light-mode .ai-bubble { color: #334155; }
+html.light-mode .ai-user .ai-bubble { color: #ffffff; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>

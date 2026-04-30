@@ -49,7 +49,7 @@ class AiAgentService
                     'description' => 'Get a list of product categories to help assign the right category_id when creating a product.',
                     'parameters' => [
                         'type' => 'object',
-                        'properties' => []
+                        'properties' => (object)[]
                     ]
                 ]
             ],
@@ -77,6 +77,10 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_today_summary',
                     'description' => 'Get a quick financial summary for ONLY today.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[]
+                    ]
                 ]
             ],
             [
@@ -84,6 +88,10 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_low_stock_products',
                     'description' => 'Get a list of products that have reached or dropped below their minimum allowed stock threshold.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[]
+                    ]
                 ]
             ],
             [
@@ -91,6 +99,10 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_expiring_products',
                     'description' => 'Get a list of products that are about to expire within their defined expiry alert period.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[]
+                    ]
                 ]
             ],
             [
@@ -98,6 +110,10 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_recent_clients',
                     'description' => 'Get a list of the 5 most recently added clients.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[]
+                    ]
                 ]
             ],
             [
