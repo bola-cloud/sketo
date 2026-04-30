@@ -208,7 +208,8 @@ class AiAgentService
                         'selling_price' => $args['selling_price'],
                         'quantity' => $args['quantity'],
                         'barcode' => $args['barcode'] ?? 'AI-'.time(),
-                        'threshold' => 5
+                        'threshold' => 5,
+                        'color' => '' // Added to satisfy DB constraint
                     ]);
                     return json_encode(['status' => 'success', 'message' => "تم إضافة المنتج ({$product->name}) بنجاح."]);
                     break;
@@ -406,6 +407,12 @@ class AiAgentService
         ]);
 
         $finalData = $finalResponse->json();
+        
+        if (!isset($finalData['choices'][0]['message'])) {
+            Log::error('AI API Error Response: ' . json_encode($finalData));
+            throw new \Exception('Unexpected AI Response Format');
+        }
+
         return $finalData['choices'][0]['message'];
     }
 
