@@ -19,7 +19,7 @@ class AiChatController extends Controller
         $request->validate([
             'message' => 'required|string',
             'history' => 'nullable|array',
-            'proactive' => 'nullable|boolean', // Used if we just want a daily summary
+            'proactive' => 'nullable|boolean',
         ]);
 
         $userMessage = $request->input('message');
@@ -27,53 +27,53 @@ class AiChatController extends Controller
         $isProactive = $request->input('proactive', false);
 
         $user = auth()->user();
-        $vendorName = $user->vendor->name ?? 'متجرنا';
+        $vendorName = optional($user->vendor)->name ?? 'متجرنا';
 
         // Build System Prompt
         $systemPrompt = [
             'role' => 'system',
-            'content' => "أنت Sketo AI، مساعد أعمال ذكي وخبير في نظام SKETO POS. أنت تعمل الآن كمستشار خاص لمتجر ($vendorName). دورك هو مساعدة صاحب المتجر في تحليل المبيعات، ومراقبة المخزون، وتقديم نصائح تجارية احترافية.
-            
-            قواعد هامة:
-            1. لغة التواصل: يجب أن تكون جميع ردودك باللغة العربية الفصحى البسيطة والمهنية.
-            2. تنسيق النصوص: استخدم Markdown لتنسيق الردود بشكل جميل. تجنب وضع علامات الترقيم الإنجليزية في نهاية السطور العربية لتجنب مشاكل العرض (RTL).
-            3. استخدام الأدوات: استخدم الأدوات فقط عندما يطلب المستخدم بيانات محددة. أنت تعمل فقط على بيانات متجر ($vendorName) ولا يمكنك الوصول لأي بيانات أخرى في النظام.
-            4. شفافية البيانات: إذا كانت مبيعات 'اليوم' صفر، وضح للمستخدم أنك تفحص بيانات اليوم الحالي (بتاريخ اليوم) واقترح عليه فحص فترة أطول (أسبوع مثلاً) باستخدام أداة (get_sales_overview).
-            5. التفاعل: إذا قام المستخدم بتحيتك، رد بترحيب مهني واسأله كيف يمكنك مساعدته في تحليل تجارته اليوم في ($vendorName)."
+            'content' => "أنت Sketo AI، مساعد أعمال ذكي وخبير في نظام SKETO POS لمتجر ($vendorName). 
+            قواعدك:
+            1. لغة التواصل العربية الفصحى البسيطة والمهنية دائماً.
+            2. استخدم Markdown في التنسيق وتجنب علامات الترقيم الإنجليزية في نهاية السطور.
+            3. استخدم الأدوات فقط عند الحاجة لبيانات.
+            4. ممنوع ذكر أسماء الأدوات التقنية (مثل get_sales_overview).
+            5. إذا كانت مبيعات اليوم صفر، اقترح فحص فترة أطول بلباقة.
+            6. كلمة 'من ساعة ما بدأت' تعني البحث في كل التاريخ (3650 يوم).
+            7. لا تقلد الأخطاء السابقة في سجل المحادثة."
         ];
 
-        // Format conversation history for OpenAI chat format
         $messages = [$systemPrompt];
         
         foreach ($history as $msg) {
             if (isset($msg['role']) && isset($msg['content'])) {
                 $messages[] = [
                     'role' => $msg['role'] === 'user' ? 'user' : 'assistant',
-                    'content' => $msg['content']
+                    'content' => (string)$msg['content']
                 ];
             }
         }
 
-        // Add the current message
         $messages[] = [
             'role' => 'user',
-            'content' => $isProactive ? "Please give me a quick proactive business brief for today. If numbers are good, encourage me. If items are low, warn me." : $userMessage
+            'content' => $isProactive ? "أعطني ملخصاً تجارياً لليوم." : $userMessage
         ];
 
         try {
-            // Call the AI Service (this handles tool calling natively)
             $aiResponse = $aiAgent->ask($messages);
             
+            $content = $aiResponse['content'] ?? 'عذراً، لم أستطع صياغة رد مناسب حالياً. هل يمكنك المحاولة مرة أخرى؟';
+
             return response()->json([
                 'status' => 'success',
-                'message' => $aiResponse['content'],
+                'message' => $content,
             ]);
             
         } catch (\Exception $e) {
             Log::error('AiChatController Error: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => 'I am currently offline or experiencing a connection issue. Please check your AI API configurations in .env or the proxy server.'
+                'message' => 'عذراً، واجهت مشكلة في الاتصال بالمساعد الذكي. يرجى المحاولة لاحقاً.'
             ], 500);
         }
     }

@@ -8,6 +8,7 @@ use App\Models\Sales;
 use App\Models\Product;
 use App\Models\Invoice;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AiAgentService
 {
@@ -154,7 +155,7 @@ class AiAgentService
 
                 case 'get_top_selling_products':
                     $topProducts = Sales::where('vendor_id', $vendorId)
-                        ->select('product_id', \DB::raw('SUM(quantity) as total_qty'))
+                        ->select('product_id', DB::raw('SUM(quantity) as total_qty'))
                         ->with('product:id,name')
                         ->groupBy('product_id')
                         ->orderByDesc('total_qty')
@@ -333,6 +334,8 @@ class AiAgentService
         ])->timeout(120)->post($this->apiUrl, [
             'model' => $this->model,
             'messages' => $messages,
+            'tools' => !empty($tools) ? $tools : null,
+            'tool_choice' => 'auto'
         ]);
 
         $finalData = $finalResponse->json();
