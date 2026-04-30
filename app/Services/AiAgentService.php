@@ -31,8 +31,21 @@ class AiAgentService
             [
                 'type' => 'function',
                 'function' => [
+                    'name' => 'get_sales_overview',
+                    'description' => 'Get a sales summary for a specific number of days (e.g., last 7 days, last 30 days). Use this when the user asks for sales "before today" or "last week".',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'days' => ['type' => 'integer', 'description' => 'Number of days to look back (default 1 for today)']
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'type' => 'function',
+                'function' => [
                     'name' => 'get_today_summary',
-                    'description' => 'Get a quick financial summary for today, including total revenue and total products sold.',
+                    'description' => 'Get a quick financial summary for ONLY today.',
                 ]
             ],
             [
@@ -112,19 +125,24 @@ class AiAgentService
         try {
             switch ($functionName) {
                 case 'get_today_summary':
-                    $today = Carbon::today();
+                case 'get_sales_overview':
+                    $days = $args['days'] ?? ($functionName === 'get_today_summary' ? 1 : 7);
+                    $startDate = Carbon::now()->subDays($days)->startOfDay();
+                    
                     $totalSold = Sales::where('vendor_id', $vendorId)
-                        ->whereDate('created_at', $today)
+                        ->where('created_at', '>=', $startDate)
                         ->sum('quantity');
+                        
                     $totalRevenue = Invoice::where('vendor_id', $vendorId)
-                        ->whereDate('created_at', $today)
-                        ->sum('paid_amount');
+                        ->where('created_at', '>=', $startDate)
+                        ->sum('total_amount');
                     
                     return json_encode([
                         'status' => 'success', 
-                        'date' => $today->toDateString(),
+                        'period' => $days . ' days',
+                        'start_date' => $startDate->toDateString(),
                         'total_items_sold' => $totalSold, 
-                        'total_cash_revenue' => $totalRevenue
+                        'total_revenue' => $totalRevenue
                     ]);
 
                 case 'get_low_stock_products':
