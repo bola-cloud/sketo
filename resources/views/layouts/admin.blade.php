@@ -257,7 +257,21 @@
                 </li>
                 @endplanFeature
 
-                {{-- 4. Reports & Analytics - التقارير والإحصائيات --}}
+                {{-- 4. System Settings - إعدادات النظام --}}
+                <li class="navigation-header"><span>{{ __('إعدادات النظام') }}</span></li>
+                @planFeature('users')
+                <li class="nav-item has-sub {{ Request::is('admin/users*') || Request::is('roles*') || Request::is('permissions*') || Request::is('admin/role-user*') ? 'open' : '' }}">
+                    <a href="#"><i class="la la-user-secret"></i><span class="menu-title">{{ __('إدارة المستخدمين') }}</span></a>
+                    <ul class="menu-content">
+                        <li class="{{ Route::currentRouteName() == 'role_user.index' ? 'active' : '' }}"><a href="{{route('role_user.index')}}"><i class="la la-users"></i> {{ __('قائمة المستخدمين والمديرين') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'users.create' ? 'active' : '' }}"><a href="{{route('users.create')}}"><i class="la la-user-plus"></i> {{ __('إضافة مدير جديد') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'roles.index' ? 'active' : '' }}"><a href="{{route('roles.index')}}"><i class="la la-key"></i> {{ __('أدوار المستخدمين') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'permissions.index' ? 'active' : '' }}"><a href="{{route('permissions.index')}}"><i class="la la-check-square"></i> {{ __('عرض الصلاحيات') }}</a></li>
+                    </ul>
+                </li>
+                @endplanFeature
+
+                {{-- 5. Reports & Analytics - التقارير والإحصائيات --}}
                 <li class="navigation-header"><span>{{ __('التقارير والإحصائيات') }}</span></li>
                 @planFeature('reports_advanced')
                 <li class="nav-item has-sub {{ Request::is('reports/statistics*') ? 'open' : '' }}">
@@ -286,20 +300,6 @@
                         @endplanFeature
                     </ul>
                 </li>
-
-                {{-- 5. System Settings - إعدادات النظام --}}
-                <li class="navigation-header"><span>{{ __('إعدادات النظام') }}</span></li>
-                @planFeature('users')
-                <li class="nav-item has-sub {{ Request::is('roles*') || Request::is('permissions*') || Request::is('users*') || Request::is('role-user*') ? 'open' : '' }}">
-                    <a href="#"><i class="la la-key"></i><span class="menu-title">{{ __('app.sidebar.permissions') }}</span></a>
-                    <ul class="menu-content">
-                        <li class="{{ Route::currentRouteName() == 'users.create' ? 'active' : '' }}"><a href="{{route('users.create')}}"><i class="la la-user-plus"></i> {{ __('app.sidebar.add_user') }}</a></li>
-                        <li class="{{ Route::currentRouteName() == 'role_user.index' ? 'active' : '' }}"><a href="{{route('role_user.index')}}"><i class="la la-user-secret"></i> {{ __('app.sidebar.user_roles') }}</a></li>
-                        <li class="{{ Route::currentRouteName() == 'roles.index' ? 'active' : '' }}"><a href="{{route('roles.index')}}"><i class="la la-users"></i> {{ __('app.sidebar.view_roles') }}</a></li>
-                        <li class="{{ Route::currentRouteName() == 'permissions.index' ? 'active' : '' }}"><a href="{{route('permissions.index')}}"><i class="la la-check-square"></i> {{ __('app.sidebar.view_permissions') }}</a></li>
-                    </ul>
-                </li>
-                @endplanFeature
 
                 @if($isSuperAdmin)
                 <li class="nav-item has-sub {{ Request::is('super-admin*') ? 'open' : '' }}">
