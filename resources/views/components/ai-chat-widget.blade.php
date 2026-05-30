@@ -41,6 +41,13 @@
             </div>
 
             <div class="ai-footer">
+                <!-- Suggested Quick Prompts -->
+                <div class="ai-suggestions mb-2 d-flex flex-wrap" style="gap: 5px;">
+                    <button class="btn btn-sm btn-outline-success ai-quick-prompt" data-prompt="هل يوجد منتجات نواقص في المخزن اليوم؟">النواقص المخزنية</button>
+                    <button class="btn btn-sm btn-outline-success ai-quick-prompt" data-prompt="اعطني ملخص لأرباح اليوم">أرباح اليوم</button>
+                    <button class="btn btn-sm btn-outline-success ai-quick-prompt" data-prompt="ما هي أكثر 5 منتجات مبيعاً؟">الأكثر مبيعاً</button>
+                    <button class="btn btn-sm btn-outline-success ai-quick-prompt" data-prompt="هل هناك منتجات راكدة لم تُباع منذ 30 يوماً؟">المنتجات الراكدة</button>
+                </div>
                 <form id="ai-chat-form" class="d-flex w-100">
                     <input type="text" id="ai-chat-input" class="form-control premium-ai-input" placeholder="اسأل عن مبيعاتك أو مخزونك..." autocomplete="off" required>
                     <button type="submit" class="btn premium-ai-submit" id="ai-submit-btn">
@@ -205,6 +212,21 @@ html[data-textdirection="rtl"] .ai-sidebar { border-right: none; border-left: 1p
 html[data-textdirection="rtl"] .premium-ai-submit { margin-left: 0; margin-right: 10px; transform: scaleX(-1); }
 html[data-textdirection="rtl"] #sketo-ai-widget { right: auto; left: 30px; }
 
+.ai-quick-prompt {
+    font-size: 11px;
+    border-radius: 15px;
+    padding: 3px 10px;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #10b981;
+    background: transparent;
+    transition: all 0.2s;
+}
+.ai-quick-prompt:hover {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border-color: #10b981;
+}
+
 /* Light Mode Overrides */
 html.light-mode .ai-panel {
     background: rgba(255, 255, 255, 0.98);
@@ -223,6 +245,43 @@ html.light-mode .ai-system .ai-bubble { background: #f1f5f9; color: #334155; bor
 html.light-mode .ai-typing { background: #f1f5f9; }
 html.light-mode .ai-bubble { color: #334155; }
 html.light-mode .ai-user .ai-bubble { color: #ffffff; }
+
+/* Mobile Responsiveness */
+@media (max-width: 576px) {
+    #sketo-ai-widget {
+        bottom: 15px;
+        right: 15px;
+    }
+    html[data-textdirection="rtl"] #sketo-ai-widget {
+        left: 15px;
+        right: auto;
+    }
+    .ai-panel {
+        width: calc(100% - 30px);
+        height: calc(100% - 100px);
+        max-height: 600px;
+        right: 15px;
+        bottom: 85px;
+        border-radius: 20px;
+    }
+    html[data-textdirection="rtl"] .ai-panel {
+        left: 15px;
+        right: auto;
+    }
+    .ai-sidebar.active {
+        position: absolute;
+        height: 100%;
+        z-index: 10;
+        width: 250px;
+        left: 0;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+    }
+    html[data-textdirection="rtl"] .ai-sidebar.active {
+        left: auto;
+        right: 0;
+        box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+    }
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -241,6 +300,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitBtn = document.getElementById('ai-submit-btn');
 
     let currentChatId = null;
+
+    // Quick Prompts Logic
+    document.querySelectorAll('.ai-quick-prompt').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const promptText = this.getAttribute('data-prompt');
+            input.value = promptText;
+            form.dispatchEvent(new Event('submit'));
+        });
+    });
 
     // Toggle Chat Window
     launcher.addEventListener('click', () => {

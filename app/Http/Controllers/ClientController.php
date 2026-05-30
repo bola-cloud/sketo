@@ -39,9 +39,9 @@ class ClientController extends Controller
             'phone' => 'required|string|max:255',
         ]);
 
-        Client::create($validated);
+        $client = Client::create($validated);
 
-        return response()->json(['success' => true, 'message' => 'Client created successfully']);
+        return response()->json(['success' => true, 'message' => 'Client created successfully', 'client' => $client]);
     }
 
     /**

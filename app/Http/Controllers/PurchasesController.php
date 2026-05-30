@@ -54,7 +54,7 @@ class PurchasesController extends Controller
 
         // Conditional validation for 'product' type
         if ($request->type == "product") {
-            $rules['supplier_id'] = 'required|exists:suppliers,id';  // Supplier required for 'product'
+            $rules['supplier_id'] = 'nullable|exists:suppliers,id';  // Supplier optional for 'product'
         }
 
         // Conditional validation for 'expense' type
@@ -72,11 +72,11 @@ class PurchasesController extends Controller
             $purchase = Purchase::create([
                 'invoice_number' => $validatedData['invoice_number'],
                 'type' => $validatedData['type'],
-                'description' => $validatedData['description'],
+                'description' => $validatedData['description'] ?? null,
                 'total_amount' => $totalAmount,
                 'paid_amount' => 0,  // Initial paid amount is 0, installments will adjust this later
                 'change' => -$totalAmount,  // Will be recalculated based on installments
-                'supplier_id' => $request->type == 'product' ? $validatedData['supplier_id'] : null,  // Set supplier for product purchases
+                'supplier_id' => $request->type == 'product' ? ($validatedData['supplier_id'] ?? null) : null,  // Set supplier for product purchases
             ]);
 
             // Save the paid_amount as an installment
@@ -93,8 +93,18 @@ class PurchasesController extends Controller
                 'change' => $purchase->total_amount - $totalPaid,
             ]);
 
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'purchase' => $purchase
+                ]);
+            }
+
             return redirect()->route('purchases.index')->with('success', 'تم إنشاء الفاتورة وإضافة الدفعة بنجاح.');
         } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'error' => $e->getMessage()], 400);
+            }
             return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء الفاتورة: ' . $e->getMessage());
         }
     }

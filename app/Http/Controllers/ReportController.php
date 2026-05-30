@@ -123,7 +123,7 @@ class ReportController extends Controller
 
     public function inventoryDetails()
     {
-        $products = \App\Models\Product::with('brand', 'category')->paginate(20);
+        $products = \App\Models\Product::with('brand', 'category')->where('type', 'product')->paginate(20);
         return view('admin.reports.statistics.inventory', compact('products'));
     }
 
@@ -220,7 +220,7 @@ class ReportController extends Controller
 
     public function inventoryValuation()
     {
-        $products = \App\Models\Product::where('quantity', '>', 0)->get();
+        $products = \App\Models\Product::where('quantity', '>', 0)->where('type', 'product')->get();
 
         $totalCostValue = $products->sum(function ($p) {
             return $p->quantity * $p->cost_price;

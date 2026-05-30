@@ -27,9 +27,14 @@
     </script>
 
 
+    @php
+        $cssDir = App::getLocale() == 'ar' ? 'css-rtl' : 'css';
+        $styleFile = App::getLocale() == 'ar' ? 'style-rtl.css' : 'style.css';
+    @endphp
+
     <link rel="stylesheet" type="text/css" href="{{asset('fontawesome/all.min.css')}}">
     <script src="{{asset('fontawesome/js/all.min.js')}}" type="text/javascript"></script>
-    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css-rtl/vendors.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/' . $cssDir . '/vendors.css')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('app-assets/vendors/css/weather-icons/climacons.min.css')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('app-assets/fonts/meteocons/style.css')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('app-assets/vendors/css/charts/morris.css')}}">
@@ -38,21 +43,22 @@
         href="{{asset('app-assets/vendors/css/charts/chartist-plugin-tooltip.css')}}">
     <!-- END VENDOR CSS-->
     <!-- BEGIN MODERN CSS-->
-    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css-rtl/app.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css-rtl/custom-rtl.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/' . $cssDir . '/app.css')}}">
+    @if(App::getLocale() == 'ar')
+        <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css-rtl/custom-rtl.css')}}">
+    @endif
     <!-- END MODERN CSS-->
     <!-- BEGIN Page Level CSS-->
     <link rel="stylesheet" type="text/css"
-        href="{{asset('app-assets/css-rtl/core/menu/menu-types/vertical-menu-modern.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css-rtl/core/colors/palette-gradient.css')}}">
+        href="{{asset('app-assets/' . $cssDir . '/core/menu/menu-types/vertical-menu-modern.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/' . $cssDir . '/core/colors/palette-gradient.css')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('app-assets/fonts/simple-line-icons/style.css')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('app-assets/fonts/line-awesome/css/line-awesome.min.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css-rtl/core/colors/palette-gradient.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css-rtl/pages/timeline.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css-rtl/pages/dashboard-ecommerce.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/' . $cssDir . '/pages/timeline.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/' . $cssDir . '/pages/dashboard-ecommerce.css')}}">
     <!-- END Page Level CSS-->
     <!-- BEGIN Custom CSS-->
-    <link rel="stylesheet" type="text/css" href="{{asset('assets/css/style-rtl.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('assets/css/' . $styleFile)}}">
     <link rel="stylesheet" type="text/css" href="{{asset('assets/css/new-layout.css')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('assets/css/premium-ui.css')}}">
     <!-- Dexie.js for IndexedDB -->
@@ -199,7 +205,7 @@
 
                 @if($isAdmin)
                 {{-- 1. Daily Operations - العمليات اليومية --}}
-                <li class="navigation-header"><span>{{ __('العمليات اليومية') }}</span></li>
+                <li class="navigation-header"><span>{{ __('app.sidebar.daily_operations') }}</span></li>
                 <li class="{{ Route::currentRouteName() == 'dashboard' ? 'active' : '' }} nav-item">
                     <a href="{{route('dashboard')}}"><i class="la la-home"></i><span class="menu-title">{{ __('app.sidebar.dashboard') }}</span></a>
                 </li>
@@ -219,7 +225,7 @@
                 @endplanFeature
 
                 {{-- 2. Inventory & Purchases - المخازن والمشتريات --}}
-                <li class="navigation-header"><span>{{ __('المخازن والمشتريات') }}</span></li>
+                <li class="navigation-header"><span>{{ __('app.sidebar.inventory_purchases') }}</span></li>
                 <li class="nav-item has-sub {{ Request::is('products*') || Request::is('categories*') || Request::is('brands*') ? 'open' : '' }}">
                     <a href="#"><i class="la la-cube"></i><span class="menu-title">{{ __('app.sidebar.products') }}</span></a>
                     <ul class="menu-content">
@@ -241,7 +247,7 @@
                 </li>
 
                 {{-- 3. Clients & Returns - العملاء والمرتجعات --}}
-                <li class="navigation-header"><span>{{ __('العملاء والمرتجعات') }}</span></li>
+                <li class="navigation-header"><span>{{ __('app.sidebar.clients_returns') }}</span></li>
                 @planFeature('clients')
                 <li class="{{ Route::currentRouteName() == 'clients.index' ? 'active' : '' }} nav-item">
                     <a href="{{route('clients.index')}}"><i class="la la-users"></i><span class="menu-title">{{ __('app.sidebar.manage_clients') }}</span></a>
@@ -249,7 +255,7 @@
                 @endplanFeature
                 @planFeature('returns')
                 <li class="nav-item has-sub {{ Request::is('*-returns*') ? 'open' : '' }}">
-                    <a href="#"><i class="la la-reply-all"></i><span class="menu-title">{{ __('المرتجعات') }}</span></a>
+                    <a href="#"><i class="la la-reply-all"></i><span class="menu-title">{{ __('app.sidebar.returns') }}</span></a>
                     <ul class="menu-content">
                         <li class="{{ Route::currentRouteName() == 'customer-returns.index' ? 'active' : '' }}"><a href="{{route('customer-returns.index')}}"><i class="la la-reply"></i> {{ __('app.sidebar.customer_returns') }}</a></li>
                         <li class="{{ Route::currentRouteName() == 'supplier-returns.index' ? 'active' : '' }}"><a href="{{route('supplier-returns.index')}}"><i class="la la-undo"></i> {{ __('app.sidebar.supplier_returns') }}</a></li>
@@ -258,21 +264,21 @@
                 @endplanFeature
 
                 {{-- 4. System Settings - إعدادات النظام --}}
-                <li class="navigation-header"><span>{{ __('إعدادات النظام') }}</span></li>
+                <li class="navigation-header"><span>{{ __('app.sidebar.system_settings') }}</span></li>
                 @planFeature('users')
                 <li class="nav-item has-sub {{ Request::is('admin/users*') || Request::is('roles*') || Request::is('permissions*') || Request::is('admin/role-user*') ? 'open' : '' }}">
-                    <a href="#"><i class="la la-user-secret"></i><span class="menu-title">{{ __('إدارة المستخدمين') }}</span></a>
+                    <a href="#"><i class="la la-user-secret"></i><span class="menu-title">{{ __('app.sidebar.manage_users') }}</span></a>
                     <ul class="menu-content">
-                        <li class="{{ Route::currentRouteName() == 'role_user.index' ? 'active' : '' }}"><a href="{{route('role_user.index')}}"><i class="la la-users"></i> {{ __('قائمة المستخدمين والمديرين') }}</a></li>
-                        <li class="{{ Route::currentRouteName() == 'users.create' ? 'active' : '' }}"><a href="{{route('users.create')}}"><i class="la la-user-plus"></i> {{ __('إضافة مدير جديد') }}</a></li>
-                        <li class="{{ Route::currentRouteName() == 'roles.index' ? 'active' : '' }}"><a href="{{route('roles.index')}}"><i class="la la-key"></i> {{ __('أدوار المستخدمين') }}</a></li>
-                        <li class="{{ Route::currentRouteName() == 'permissions.index' ? 'active' : '' }}"><a href="{{route('permissions.index')}}"><i class="la la-check-square"></i> {{ __('عرض الصلاحيات') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'role_user.index' ? 'active' : '' }}"><a href="{{route('role_user.index')}}"><i class="la la-users"></i> {{ __('app.sidebar.users_list') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'users.create' ? 'active' : '' }}"><a href="{{route('users.create')}}"><i class="la la-user-plus"></i> {{ __('app.sidebar.add_admin') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'roles.index' ? 'active' : '' }}"><a href="{{route('roles.index')}}"><i class="la la-key"></i> {{ __('app.sidebar.user_roles') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'permissions.index' ? 'active' : '' }}"><a href="{{route('permissions.index')}}"><i class="la la-check-square"></i> {{ __('app.sidebar.view_permissions') }}</a></li>
                     </ul>
                 </li>
                 @endplanFeature
 
                 {{-- 5. Reports & Analytics - التقارير والإحصائيات --}}
-                <li class="navigation-header"><span>{{ __('التقارير والإحصائيات') }}</span></li>
+                <li class="navigation-header"><span>{{ __('app.sidebar.reports_analytics') }}</span></li>
                 @planFeature('reports_advanced')
                 <li class="nav-item has-sub {{ Request::is('reports/statistics*') ? 'open' : '' }}">
                     <a href="#"><i class="la la-pie-chart"></i><span class="menu-title">{{ __('app.sidebar.financial_reports') }}</span></a>
@@ -292,11 +298,11 @@
                 </li>
                 @endplanFeature
                 <li class="nav-item has-sub {{ Request::is('reports/product-transfers*') || Route::currentRouteName() == 'product.transactions' ? 'open' : '' }}">
-                    <a href="#"><i class="la la-exchange"></i><span class="menu-title">{{ __('حركة المنتجات') }}</span></a>
+                    <a href="#"><i class="la la-exchange"></i><span class="menu-title">{{ __('app.sidebar.product_movements') }}</span></a>
                     <ul class="menu-content">
                         <li class="{{ Route::currentRouteName() == 'reports.productTransfers' ? 'active' : '' }}"><a href="{{route('reports.productTransfers')}}"><i class="la la-truck"></i> {{ __('app.sidebar.product_transfer_report') }}</a></li>
                         @planFeature('audit_logs')
-                        <li class="{{ Route::currentRouteName() == 'product.transactions' ? 'active' : '' }}"><a href="{{route('product.transactions')}}"><i class="la la-history"></i> {{ __('app.sidebar.product_transfer_report') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'product.transactions' ? 'active' : '' }}"><a href="{{route('product.transactions')}}"><i class="la la-history"></i> {{ __('app.sidebar.product_movements') }}</a></li>
                         @endplanFeature
                     </ul>
                 </li>

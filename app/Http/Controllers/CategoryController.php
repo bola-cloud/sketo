@@ -31,7 +31,14 @@ class CategoryController extends Controller
             ],
         ]);
 
-        Category::create($validated);
+        $category = Category::create($validated);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'category' => $category
+            ]);
+        }
 
         return redirect()->route('categories.index')->with('success', 'تم إضافة الفئة بنجاح.');
     }
@@ -63,11 +70,11 @@ class CategoryController extends Controller
     {
         // Set category_id to null for all products related to the category
         $category->products()->update(['category_id' => null]);
-        
+
         // Now delete the category
         $category->delete();
-    
+
         return redirect()->route('categories.index')->with('success', 'تم حذف الفئة بنجاح.');
     }
-    
+
 }

@@ -384,6 +384,48 @@
 
 @endsection
 
+@push('modals')
+    <!-- Quick Add Client Modal -->
+    <div class="modal fade text-left" id="quickAddClientModal" tabindex="-1" role="dialog" aria-labelledby="quickAddClientModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="quickAddClientModalLabel">
+                        <i class="fas fa-user-plus me-2"></i>{{ __('app.cashier.add_client') }}
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="quickAddClientForm">
+                    @csrf
+                    <div class="modal-body">
+                        <p>قم بإدخال بيانات العميل ليتم إضافته واختياره فوراً.</p>
+                        <fieldset class="form-group mb-2">
+                            <label for="client_name">{{ __('app.clients.name') }} <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="client_name" name="name" required placeholder="{{ __('app.clients.name') }}...">
+                        </fieldset>
+                        <fieldset class="form-group mb-2">
+                            <label for="client_phone">{{ __('app.clients.phone') }} <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="client_phone" name="phone" required placeholder="{{ __('app.clients.phone') }}...">
+                        </fieldset>
+                        <fieldset class="form-group mb-2">
+                            <label for="client_address">{{ __('app.clients.address') }}</label>
+                            <textarea class="form-control" id="client_address" name="address" rows="2" placeholder="{{ __('app.clients.address') }}..."></textarea>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn grey btn-outline-secondary" data-dismiss="modal">{{ __('app.common.close') }}</button>
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="fas fa-save me-1"></i>{{ __('app.common.save') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endpush
+
 <!-- jQuery must be loaded first -->
 <script src="{{ asset('assets/js/jquery.js') }}"></script>
 
@@ -715,13 +757,30 @@
         }
 
         // Update cart content via AJAX (no reload)
-        function updateCartContent() {
+        function updateCartContent(newClientId = null) {
+            // Preserve current state before update
+            let selectedClient = newClientId || $('#client_id').val();
+            let currentDiscount = $('#discount').val();
+
             $.ajax({
                 url: "{{ route('cashier.cartContent') }}",
                 type: "GET",
                 success: function (html) {
                     $('#cart-content').html(html);
                     
+                    // Restore state
+                    if (selectedClient) {
+                        // Using a timeout to ensure the new HTML is fully parsed and Select2 initialized
+                        setTimeout(() => {
+                            $('#client_id').val(selectedClient).trigger('change');
+                        }, 100);
+                    }
+                    if (currentDiscount) {
+                        $('#discount').val(currentDiscount);
+                        // Trigger input to recalculate totals
+                        setTimeout(() => $('#discount').trigger('input'), 100);
+                    }
+
                     // Re-initialize scripts to attach listeners to new elements
                     initializeCartScripts();
                     
@@ -744,6 +803,44 @@
                 }
             });
         }
+
+        // Quick Add Client AJAX Submission
+        $(document).on('submit', '#quickAddClientForm', function(e) {
+            e.preventDefault();
+            let form = $(this);
+            let submitBtn = form.find('button[type="submit"]');
+            let originalText = submitBtn.html();
+            
+            submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> جاري الإضافة...');
+            
+            $.ajax({
+                url: "{{ route('clients.store') }}", // Using standard clients store route
+                type: "POST",
+                data: form.serialize() + '&ajax=true',
+                success: function(response) {
+                    // Assuming response returns the new client id and name
+                    $('#quickAddClientModal').modal('hide');
+                    form.trigger('reset');
+                    submitBtn.prop('disabled', false).html(originalText);
+                    
+                    // Refresh cart content to fetch updated clients list and auto-select new client
+                    let newClientId = response.client ? response.client.id : null;
+                    updateCartContent(newClientId);
+                    
+                    alert('تم إضافة العميل بنجاح!');
+                },
+                error: function(xhr) {
+                    submitBtn.prop('disabled', false).html(originalText);
+                    let errorMsg = 'حدث خطأ أثناء إضافة العميل.';
+                    if(xhr.responseJSON && xhr.responseJSON.errors) {
+                        errorMsg = Object.values(xhr.responseJSON.errors).flat().join('\n');
+                    } else if(xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    alert(errorMsg);
+                }
+            });
+        });
 
         // Keyboard shortcuts
         $(document).keydown(function (e) {

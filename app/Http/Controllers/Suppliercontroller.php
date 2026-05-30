@@ -48,9 +48,17 @@ class Suppliercontroller extends Controller
             'phone' => 'required|string|max:255',
         ]);
 
-        Supplier::create($validated);
+        $supplier = Supplier::create($validated);
 
-        return response()->json(['success' => true, 'message' => 'Supplier created successfully']);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true, 
+                'message' => 'Supplier created successfully',
+                'supplier' => $supplier
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'تم إنشاء المورد بنجاح.');
     }
 
     public function update(Request $request, Supplier $supplier)

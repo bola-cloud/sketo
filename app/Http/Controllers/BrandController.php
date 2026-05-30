@@ -41,10 +41,17 @@ class BrandController extends Controller
             'description' => 'nullable|string|max:1000',
         ]);
 
-        Brand::create([
+        $brand = Brand::create([
             'name' => $request->name,
             'description' => $request->description,
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'brand' => $brand
+            ]);
+        }
 
         return redirect()->route('brands.index')->with('success', 'تم إنشاء الماركة بنجاح.');
     }

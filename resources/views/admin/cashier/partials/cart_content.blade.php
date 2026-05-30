@@ -125,12 +125,17 @@
                             <!-- Client Selection -->
                             <div class="form-group mb-3">
                                 <label for="client_id" class="form-label">{{ __('app.cashier.client_optional') }}</label>
-                                <select class="form-control select2-client" id="client_id" name="client_id">
-                                    <option value="" selected>{{ __('app.cashier.select_client') }}</option>
-                                    @foreach($clients as $client)
-                                        <option value="{{ $client->id }}">{{ $client->name }}</option>
-                                    @endforeach
-                                </select>
+                                <div class="input-group flex-nowrap">
+                                    <select class="form-control select2-client" id="client_id" name="client_id">
+                                        <option value="" selected>{{ __('app.cashier.select_client') }}</option>
+                                        @foreach($clients as $client)
+                                            <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#quickAddClientModal"><i class="la la-plus"></i></button>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Paid Amount -->

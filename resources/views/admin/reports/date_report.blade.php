@@ -1,83 +1,109 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="container-fluid">
-        <div class="card shadow p-4">
-            <h1 class="text-center mb-4">{{ __('app.reports.title_date_range') }}</h1>
+    <div class="container-fluid py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="font-weight-bold text-white mb-1">{{ __('app.reports.title_date_range') }}</h2>
+                @if(isset($startDate) && isset($endDate))
+                    <p class="text-muted mb-0">{{ $startDate->format('d M, Y') }} - {{ $endDate->format('d M, Y') }}</p>
+                @endif
+            </div>
+            <div class="d-flex gap-2">
+                <button onclick="window.print()" class="btn btn-premium shadow-sm">
+                    <i class="la la-print mr-1"></i> {{ __('app.common.print') }}
+                </button>
+            </div>
+        </div>
 
-            <!-- Date Range Filter -->
-            <form action="{{ route('reports.dateRange') }}" method="GET" class="mb-4">
-                <div class="row">
+        <div class="premium-card bg-glass mb-4 p-4 d-print-none" style="border-radius: 15px;">
+            <form action="{{ route('reports.dateRange') }}" method="GET">
+                <div class="row align-items-end">
                     <div class="col-md-5">
-                        <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}"
-                            required>
+                        <label class="text-white-50 font-weight-bold small">Start Date</label>
+                        <input type="date" name="start_date" class="form-control form-control-lg bg-slate-800 text-white border-0" value="{{ request('start_date') }}" required style="border-radius: 10px;">
                     </div>
                     <div class="col-md-5">
-                        <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}" required>
+                        <label class="text-white-50 font-weight-bold small">End Date</label>
+                        <input type="date" name="end_date" class="form-control form-control-lg bg-slate-800 text-white border-0" value="{{ request('end_date') }}" required style="border-radius: 10px;">
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary">{{ __('app.common.search') }}</button>
+                        <button type="submit" class="btn btn-primary btn-lg w-100" style="border-radius: 10px; font-weight: bold;"><i class="la la-search"></i> {{ __('app.common.search') }}</button>
                     </div>
                 </div>
             </form>
+        </div>
 
+        @if(isset($invoices))
             <div class="row mb-4">
                 <div class="col-md-4">
-                    <div class="card text-white bg-primary mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ __('app.reports.total_quantity_sold') }}</h5>
-                            <p class="card-text">{{ $totalQuantity }}</p>
-                        </div>
+                    <div class="premium-card bg-glass" style="border-radius: 15px;">
+                        <p class="text-muted small font-weight-bold mb-1 uppercase">{{ __('app.reports.total_quantity_sold') }}</p>
+                        <h2 class="font-weight-bold mb-0 text-info">{{ $totalQuantity }}</h2>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card text-white bg-success mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ __('app.reports.total_revenue') }}</h5>
-                            <p class="card-text">{{ number_format($totalRevenue, 2) }} {{ __('app.common.currency') }}</p>
-                        </div>
+                    <div class="premium-card bg-glass" style="border-radius: 15px;">
+                        <p class="text-muted small font-weight-bold mb-1 uppercase">{{ __('app.reports.total_revenue') }}</p>
+                        <h2 class="font-weight-bold mb-0 text-success">{{ number_format($totalRevenue, 2) }} {{ __('app.common.currency') }}</h2>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card text-white bg-info mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ __('app.reports.total_profit') }}</h5>
-                            <p class="card-text">{{ number_format($totalProfit, 2) }} {{ __('app.common.currency') }}</p>
-                        </div>
+                    <div class="premium-card bg-glass" style="border-radius: 15px;">
+                        <p class="text-muted small font-weight-bold mb-1 uppercase">{{ __('app.reports.total_profit') }}</p>
+                        <h2 class="font-weight-bold mb-0 text-warning">{{ number_format($totalProfit, 2) }} {{ __('app.common.currency') }}</h2>
                     </div>
                 </div>
             </div>
 
-            <table class="table table-hover table-bordered text-center">
-                <thead class="thead-dark">
-                    <tr>
-                    <tr>
-                        <th>{{ __('app.reports.invoice_code') }}</th>
-                        <th>{{ __('app.reports.paid_amount') }}</th>
-                        <th>{{ __('app.reports.total_after_discount') }}</th>
-                        <th>{{ __('app.reports.change_remaining') }}</th>
-                        <th>{{ __('app.reports.sales_details') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($invoices as $invoice)
-                        <tr>
-                            <td>{{ $invoice->invoice_code }}</td>
-                            <td>{{ number_format($invoice->paid_amount, 2) }} {{ __('app.common.currency') }}</td>
-                            <td>{{ number_format($invoice->total_amount, 2) }} {{ __('app.common.currency') }}</td>
-                            <td>{{ number_format($invoice->change, 2) }} {{ __('app.common.currency') }}</td>
-                            <td>
-                                <ul>
-                                    @foreach($invoice->sales as $sale)
-                                        <li>{{ $sale->product->name }} - {{ __('app.cashier.quantity') }}: {{ $sale->quantity }} -
-                                            {{ __('app.cashier.price') }}: {{ number_format($sale->product->selling_price, 2) }} {{ __('app.common.currency') }}</li>
-                                    @endforeach
-                                </ul>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+            <div class="premium-card p-0 overflow-hidden shadow-lg border-0 bg-glass" style="border-radius: 20px;">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 custom-table">
+                        <thead class="bg-slate-800 text-white border-0">
+                            <tr>
+                                <th class="border-0">{{ __('app.reports.invoice_code') }}</th>
+                                <th class="border-0">{{ __('app.reports.paid_amount') }}</th>
+                                <th class="border-0">{{ __('app.reports.total_after_discount') }}</th>
+                                <th class="border-0">{{ __('app.reports.change_remaining') }}</th>
+                                <th class="border-0">{{ __('app.reports.sales_details') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-white">
+                            @foreach($invoices as $invoice)
+                                <tr class="border-white-10">
+                                    <td><span class="badge badge-info">{{ $invoice->invoice_code }}</span></td>
+                                    <td>{{ number_format($invoice->paid_amount, 2) }}</td>
+                                    <td>{{ number_format($invoice->total_amount, 2) }}</td>
+                                    <td>{{ number_format($invoice->change, 2) }}</td>
+                                    <td>
+                                        <ul class="list-unstyled mb-0">
+                                            @foreach($invoice->sales as $sale)
+                                                <li><i class="la la-check text-success mr-1"></i>{{ $sale->product->name }} ({{ $sale->quantity }}) - {{ number_format($sale->product->selling_price, 2) }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
     </div>
+
+    <style>
+        .bg-glass { backdrop-filter: blur(10px); background: rgba(30, 41, 59, 0.7); }
+        .border-white-10 { border-color: rgba(255, 255, 255, 0.1) !important; }
+        .custom-table th { padding: 20px; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+        .custom-table td { padding: 15px 20px; vertical-align: middle; }
+        .btn-premium { background: linear-gradient(135deg, var(--p-indigo), var(--p-purple)); color: white; border: none; border-radius: 12px; padding: 10px 20px; font-weight: 600; transition: all 0.3s ease; }
+        @media print {
+            .btn-premium, .sidebar-wrapper, .header-navbar, .footer, .d-print-none { display: none !important; }
+            .premium-card { background: white !important; color: black !important; box-shadow: none !important; border: 1px solid #eee !important; }
+            .text-white, .text-muted, .text-info, .text-success, .text-warning { color: black !important; }
+            .bg-slate-800 { background: #f8fafc !important; color: black !important; border-bottom: 2px solid #000; }
+            .custom-table td, .custom-table th { border: 1px solid #eee !important; color: black !important; }
+            body { background: white !important; }
+        }
+    </style>
 @endsection

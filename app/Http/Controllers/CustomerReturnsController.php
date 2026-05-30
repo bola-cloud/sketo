@@ -63,7 +63,7 @@ class CustomerReturnsController extends Controller
 
         // Filter out items with quantity < 1 before validation
         $filteredReturns = collect($request->input('returns', []))
-            ->filter(function($item) {
+            ->filter(function ($item) {
                 return isset($item['quantity']) && $item['quantity'] > 0;
             })->values()->all();
 
@@ -267,13 +267,13 @@ class CustomerReturnsController extends Controller
         $query = CustomerReturn::with(['invoice', 'product', 'user']);
 
         if ($request->invoice_code) {
-            $query->whereHas('invoice', function($q) use ($request) {
+            $query->whereHas('invoice', function ($q) use ($request) {
                 $q->where('invoice_code', 'like', '%' . $request->invoice_code . '%');
             });
         }
 
         if ($request->product_name) {
-            $query->whereHas('product', function($q) use ($request) {
+            $query->whereHas('product', function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->product_name . '%');
             });
         }

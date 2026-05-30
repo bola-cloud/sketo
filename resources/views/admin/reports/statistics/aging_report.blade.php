@@ -188,6 +188,7 @@
         @media print {
 
             .btn-premium,
+            .btn-success,
             .sidebar-wrapper,
             .header-navbar,
             .footer {

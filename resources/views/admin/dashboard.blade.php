@@ -5,7 +5,6 @@
 @section('content')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
-    <style>
         .flatpickr-calendar {
             z-index: 10000;
             width: auto;
@@ -108,6 +107,105 @@
             color: #fff !important;
             transform: scale(1.05);
         }
+
+        /* Keyboard Shortcuts Layout */
+        .shortcuts-items-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .shortcut-badge-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .shortcut-text {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .shortcut-divider {
+            opacity: 0.5;
+            margin: 0 0.5rem;
+        }
+
+        /* Mobile Responsiveness Optimizations */
+        @media (max-width: 991px) {
+            .shortcuts-flex-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .shortcuts-icon {
+                margin: 0 auto 1.25rem auto !important;
+            }
+            .shortcuts-items-container {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .display-5 {
+                font-size: 1.8rem !important;
+                line-height: 1.3 !important;
+            }
+            .welcome-banner {
+                padding: 1.5rem 1rem !important;
+                text-align: center;
+            }
+            .premium-card {
+                padding: 1.25rem !important;
+                border-radius: 18px !important;
+            }
+            .card-icon-wrapper {
+                width: 48px;
+                height: 48px;
+                margin-bottom: 1rem;
+            }
+            .card-icon-wrapper i {
+                font-size: 1.25rem !important;
+            }
+            .premium-card h2 {
+                font-size: 1.65rem !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .alert-stock-card .d-flex, .alert-expiry-card .d-flex {
+                flex-direction: column;
+                align-items: center !important;
+                text-align: center;
+            }
+            .alert-stock-card .card-icon-wrapper, .alert-expiry-card .card-icon-wrapper {
+                margin: 0 auto 0.75rem auto !important;
+            }
+            .alert-stock-card .alert-action-btn, .alert-expiry-card .alert-action-btn {
+                margin: 0.75rem auto 0 auto !important;
+                width: 100%;
+                display: block;
+            }
+            .shortcuts-items-container {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+                gap: 0.75rem;
+            }
+            .shortcut-badge-item {
+                justify-content: space-between;
+                background: rgba(255, 255, 255, 0.08);
+                padding: 0.6rem 1rem;
+                border-radius: 12px;
+                width: 100%;
+            }
+            body.light-mode .shortcut-badge-item {
+                background: rgba(0, 0, 0, 0.04);
+            }
+            .shortcut-divider {
+                display: none;
+            }
+        }
     </style>
 
     @php
@@ -123,7 +221,7 @@
                     <div class="row align-items-center">
                         <div class="col-md-7">
                             <h1 class="display-5 font-weight-bold mb-2 text-gradient-premium">
-                                {{ __('app.common.welcome') }}, {{ Auth::user()->name }}!
+                                <span>{{ __('app.common.welcome') }},</span> <span dir="auto" class="d-inline-block">{{ Auth::user()->name }}!</span>
                             </h1>
                             <p class="h5 text-muted opacity-75 mb-0">
                                 {{ __('app.dashboard.store_health_msg') }}
@@ -157,7 +255,7 @@
                             <div>
                                 <h5 class="font-weight-bold mb-1 text-white">{{ __('app.dashboard.low_stock_alert') }}</h5>
                                 <p class="mb-0 small text-muted">
-                                    {{ $lowStockProducts->count() }} {{ __('app.dashboard.product_reached_min_choice') }}
+                                    {{ trans_choice('app.dashboard.product_reached_min_choice', $lowStockProducts->count(), ['count' => $lowStockProducts->count()]) }}
                                 </p>
                             </div>
                             <a href="{{ route('products.index') }}" class="btn btn-sm alert-action-btn ml-auto">{{ __('app.dashboard.restock_now') }}</a>
@@ -176,7 +274,7 @@
                             <div>
                                 <h5 class="font-weight-bold mb-1 text-white">{{ __('app.dashboard.expiry_alert') }}</h5>
                                 <p class="mb-0 small text-muted">
-                                    {{ $expiringProducts->count() }} {{ __('app.dashboard.product_expiring_soon_choice') }}
+                                    {{ trans_choice('app.dashboard.product_expiring_soon_choice', $expiringProducts->count(), ['count' => $expiringProducts->count()]) }}
                                 </p>
                             </div>
                             <a href="{{ route('products.index') }}" class="btn btn-sm alert-action-btn ml-auto">{{ __('app.sidebar.view_products') }}</a>
@@ -304,18 +402,33 @@
         <div class="row mb-5 animate-fade-in-up">
             <div class="col-12">
                 <div class="premium-card bg-gradient-x-indigo-blue border-0 text-white shadow-lg shadow-glow-indigo">
-                    <div class="d-flex align-items-center">
-                        <div class="card-icon-wrapper mb-0 mr-4" style="background: rgba(255, 255, 255, 0.2); color: #fff;">
+                    <div class="d-flex align-items-center shortcuts-flex-container">
+                        <div class="card-icon-wrapper mb-0 mr-4 shortcuts-icon" style="background: rgba(255, 255, 255, 0.2); color: #fff;">
                             <i class="fas fa-keyboard"></i>
                         </div>
                         <div>
-                            <h4 class="font-weight-bold mb-1">اختصارات الكيبورد السريعة</h4>
-                            <p class="mb-0 opacity-75 h6">
-                                <span class="badge badge-pill badge-light text-dark px-3 py-2 mr-2">F1</span> الكاشير |
-                                <span class="badge badge-pill badge-light text-dark px-3 py-2 mx-2">F2</span> المنتجات |
-                                <span class="badge badge-pill badge-light text-dark px-3 py-2 mx-2">F4</span> الخزينة |
-                                <span class="badge badge-pill badge-light text-dark px-3 py-2 mx-2">F10</span> (في الكاشير) حفظ وطباعة الفاتورة
-                            </p>
+                            <h4 class="font-weight-bold mb-2">{{ __('app.dashboard.keyboard_shortcuts') }}</h4>
+                            <div class="shortcuts-items-container">
+                                <div class="shortcut-badge-item">
+                                    <span class="badge badge-pill badge-light text-dark px-3 py-2">F1</span>
+                                    <span class="shortcut-text">{{ __('app.dashboard.cashier') }}</span>
+                                </div>
+                                <span class="shortcut-divider">|</span>
+                                <div class="shortcut-badge-item">
+                                    <span class="badge badge-pill badge-light text-dark px-3 py-2">F2</span>
+                                    <span class="shortcut-text">{{ __('app.dashboard.products') }}</span>
+                                </div>
+                                <span class="shortcut-divider">|</span>
+                                <div class="shortcut-badge-item">
+                                    <span class="badge badge-pill badge-light text-dark px-3 py-2">F4</span>
+                                    <span class="shortcut-text">{{ __('app.dashboard.treasury') }}</span>
+                                </div>
+                                <span class="shortcut-divider">|</span>
+                                <div class="shortcut-badge-item">
+                                    <span class="badge badge-pill badge-light text-dark px-3 py-2">F10</span>
+                                    <span class="shortcut-text">{{ __('app.dashboard.save_and_print_invoice') }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -364,7 +477,7 @@
                         <div class="card-icon-wrapper mb-0 mr-3" style="width: 45px; height: 45px; background: rgba(168, 85, 247, 0.2); color: #a78bfa;">
                             <i class="fas fa-trophy"></i>
                         </div>
-                        <h5 class="font-weight-bold text-white mb-0">أكثر 5 منتجات مبيعاً</h5>
+                        <h5 class="font-weight-bold text-white mb-0">{{ __('app.dashboard.top_5_selling') }}</h5>
                     </div>
                     <div style="height: 300px;">
                         <canvas id="topSellingChart"></canvas>
@@ -378,7 +491,7 @@
                         <div class="card-icon-wrapper mb-0 mr-3" style="width: 45px; height: 45px; background: rgba(245, 158, 11, 0.2); color: #fbbf24;">
                             <i class="fas fa-medal"></i>
                         </div>
-                        <h5 class="font-weight-bold text-white mb-0">أكثر 5 منتجات ربحاً</h5>
+                        <h5 class="font-weight-bold text-white mb-0">{{ __('app.dashboard.top_5_profitable') }}</h5>
                     </div>
                     <div style="height: 300px;">
                         <canvas id="topProfitableChart"></canvas>

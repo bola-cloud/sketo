@@ -72,7 +72,7 @@ class CashierController extends Controller
         // Check if the product exists in the cart
         if (isset($cart[$barcode])) {
             if ($absoluteQuantity !== null) {
-                $newQuantity = (float)$absoluteQuantity;
+                $newQuantity = (float) $absoluteQuantity;
             } else {
                 $newQuantity = $cart[$barcode]['quantity'] + $quantityChange;
             }

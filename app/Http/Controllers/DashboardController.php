@@ -78,15 +78,19 @@ class DashboardController extends Controller
                     return $item->year . '-' . str_pad($item->month, 2, '0', STR_PAD_LEFT);
                 });
 
-            $lowStockProducts = Product::whereColumn('quantity', '<=', 'threshold')->get();
+            $lowStockProducts = Product::where('type', '!=', 'service')
+                ->whereColumn('quantity', '<=', 'threshold')
+                ->get();
 
             if ($isSqlite) {
                 // SQLite uses julianday for date differences
-                $expiringProducts = Product::whereNotNull('expiry_date')
+                $expiringProducts = Product::where('type', '!=', 'service')
+                    ->whereNotNull('expiry_date')
                     ->whereRaw('julianday(expiry_date) - julianday(\'now\') <= expiry_alert_days')
                     ->get();
             } else {
-                $expiringProducts = Product::whereNotNull('expiry_date')
+                $expiringProducts = Product::where('type', '!=', 'service')
+                    ->whereNotNull('expiry_date')
                     ->whereRaw('DATEDIFF(expiry_date, CURDATE()) <= expiry_alert_days')
                     ->get();
             }

@@ -9,6 +9,7 @@ use App\Models\PurchaseProduct;
 use App\Models\Category;
 use App\Models\Brand;
 use App\Models\Purchase;
+use App\Models\Supplier;
 use Illuminate\Support\Facades\DB;
 use AgeekDev\Barcode\Facades\Barcode;
 use AgeekDev\Barcode\Enums\Type;
@@ -74,7 +75,8 @@ class ProductController extends Controller
         $categories = Category::all(); // Assuming you have categories to be selected
         $brands = Brand::all(); // Get all brands
         $products = Product::all();
-        return view('admin.product.create', compact('purchases', 'categories', 'brands', 'products'));
+        $suppliers = Supplier::all(); // Get all suppliers for the quick purchase modal
+        return view('admin.product.create', compact('purchases', 'categories', 'brands', 'products', 'suppliers'));
     }
 
     public function store(Request $request)
@@ -89,23 +91,42 @@ class ProductController extends Controller
             ]);
         } else {
             // Validation for new product
-            $validatedData = $request->validate([
+            $isService = $request->input('type') === 'service';
+            
+            $rules = [
                 'name' => 'required|string|max:255',
                 'category_id' => 'required|exists:categories,id',
                 'brand_id' => 'nullable|exists:brands,id',
-                'purchase_id' => 'required|exists:purchases,id',
                 'cost_price' => 'required|numeric|min:0',
                 'selling_price' => 'required|numeric|min:0',
-                'quantity' => 'required|numeric|min:0',
-                'color' => 'required|string|max:255',
-                'threshold' => 'required|numeric|min:0',
-                'expiry_date' => 'nullable|date',
-                'expiry_alert_days' => 'required|integer|min:0',
+                'type' => 'required|in:product,service',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'sub_product_id' => 'nullable|exists:products,id',
-                'conversion_factor' => 'nullable|numeric|min:0.001',
                 'is_weighted' => 'nullable|boolean',
-            ]);
+            ];
+
+            if ($isService) {
+                // If it's a service, ignore physical fields and auto-fill defaults
+                $request->merge([
+                    'purchase_id' => null,
+                    'quantity' => 0,
+                    'threshold' => 0,
+                    'expiry_alert_days' => 0,
+                    'color' => 'SRV-' . time() . rand(10, 99), // Unique auto-barcode for services
+                ]);
+            } else {
+                $rules += [
+                    'purchase_id' => 'required|exists:purchases,id',
+                    'quantity' => 'required|numeric|min:0',
+                    'color' => 'required|string|max:255',
+                    'threshold' => 'required|numeric|min:0',
+                    'expiry_date' => 'nullable|date',
+                    'expiry_alert_days' => 'required|integer|min:0',
+                    'sub_product_id' => 'nullable|exists:products,id',
+                    'conversion_factor' => 'nullable|numeric|min:0.001',
+                ];
+            }
+
+            $validatedData = $request->validate($rules);
         }
 
         $user = auth()->user();
@@ -233,6 +254,14 @@ class ProductController extends Controller
 
             // Create the new product
             $validatedData['is_weighted'] = $request->has('is_weighted');
+            
+            if ($isService) {
+                $validatedData['color'] = $request->input('color');
+                $validatedData['quantity'] = 0;
+                $validatedData['threshold'] = 0;
+                $validatedData['expiry_alert_days'] = 0;
+            }
+            
             $product = Product::create($validatedData);
 
             // Handle Sub-units relationship if provided
@@ -265,35 +294,37 @@ class ProductController extends Controller
             // Update the product with the barcode string and path
             $product->update(['barcode' => $barcodeString, 'barcode_path' => $barcodePath]);
 
-            // Attach the new product to the purchase
-            $purchase = Purchase::find($validatedData['purchase_id']);
-            $purchase->products()->attach($product->id, [
-                'vendor_id' => auth()->user()->vendor_id,
-                'quantity' => $validatedData['quantity'],
-                'cost_price' => $validatedData['cost_price'],
-                'remaining_quantity' => $validatedData['quantity'], // Add remaining_quantity
-            ]);
+            if (!$isService) {
+                // Attach the new product to the purchase
+                $purchase = Purchase::find($validatedData['purchase_id']);
+                $purchase->products()->attach($product->id, [
+                    'vendor_id' => auth()->user()->vendor_id,
+                    'quantity' => $validatedData['quantity'],
+                    'cost_price' => $validatedData['cost_price'],
+                    'remaining_quantity' => $validatedData['quantity'], // Add remaining_quantity
+                ]);
 
-            // Recalculate and update the product's total quantity
-            $product->recalculateProductQuantity();
+                // Recalculate and update the product's total quantity
+                $product->recalculateProductQuantity();
 
-            // Record the quantity update
-            DB::table('quantity_updates')->insert([
-                'product_id' => $product->id,
-                'new_quantity' => $product->quantity,
-                'user_id' => auth()->id(),
-                'action' => 'إضافة',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+                // Record the quantity update
+                DB::table('quantity_updates')->insert([
+                    'product_id' => $product->id,
+                    'new_quantity' => $product->quantity,
+                    'user_id' => auth()->id(),
+                    'action' => 'إضافة',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
 
-            // Update total amount for the purchase
-            $totalAmount = $purchase->products()->sum(DB::raw('purchase_products.quantity * purchase_products.cost_price'));
-            $purchase->update(['total_amount' => $totalAmount]);
+                // Update total amount for the purchase
+                $totalAmount = $purchase->products()->sum(DB::raw('purchase_products.quantity * purchase_products.cost_price'));
+                $purchase->update(['total_amount' => $totalAmount]);
 
-            // Recalculate the change for the purchase
-            $change = $totalAmount - $purchase->paid_amount;
-            $purchase->update(['change' => $change]);
+                // Recalculate the change for the purchase
+                $change = $totalAmount - $purchase->paid_amount;
+                $purchase->update(['change' => $change]);
+            }
 
             DB::commit();
 
@@ -329,21 +360,35 @@ class ProductController extends Controller
         // Uncomment for debugging
         // dd($request->all(), $product->toArray());
 
-        $validated = $request->validate([
+        $isService = $product->type === 'service';
+        
+        $rules = [
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
             'cost_price' => 'required|numeric',
             'selling_price' => 'required|numeric',
-            'color' => 'required|string|max:255',
-            'threshold' => 'required|numeric|min:0',
-            'expiry_date' => 'nullable|date',
-            'expiry_alert_days' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'sub_product_id' => 'nullable|exists:products,id',
-            'conversion_factor' => 'nullable|numeric|min:0.001',
             'is_weighted' => 'nullable|boolean',
-        ], [
+        ];
+
+        if ($isService) {
+            $request->merge([
+                'threshold' => 0,
+                'expiry_alert_days' => 0,
+            ]);
+        } else {
+            $rules += [
+                'color' => 'required|string|max:255',
+                'threshold' => 'required|numeric|min:0',
+                'expiry_date' => 'nullable|date',
+                'expiry_alert_days' => 'required|integer|min:0',
+                'sub_product_id' => 'nullable|exists:products,id',
+                'conversion_factor' => 'nullable|numeric|min:0.001',
+            ];
+        }
+
+        $validated = $request->validate($rules, [
             'name.required' => 'يرجى إدخال اسم المنتج.',
             'name.max' => 'اسم المنتج لا يمكن أن يتجاوز 255 حرفاً.',
             'category_id.required' => 'يرجى اختيار الفئة.',
@@ -501,7 +546,7 @@ class ProductController extends Controller
             try {
                 // Delete related purchase_products dependencies first if any
                 DB::table('purchase_products')->where('product_id', $product->id)->delete();
-                
+
                 // Delete the product
                 $product->delete();
 
@@ -584,11 +629,12 @@ class ProductController extends Controller
         $quantityUpdates = DB::table('quantity_updates')
             ->join('products', 'quantity_updates.product_id', '=', 'products.id')
             ->join('users', 'quantity_updates.user_id', '=', 'users.id')
+            ->where('products.type', '!=', 'service')
             ->select('quantity_updates.*', 'products.name as product_name', 'users.name as user_name')
             ->get();
 
         // Get all products for the select2 dropdown
-        $products = Product::all();
+        $products = Product::where('type', 'product')->get();
 
         return view('admin.quantity_updates.index', compact('quantityUpdates', 'products'));
     }
@@ -601,6 +647,7 @@ class ProductController extends Controller
             ->join('users', 'quantity_updates.user_id', '=', 'users.id')
             ->leftJoin('purchase_products', 'quantity_updates.product_id', '=', 'purchase_products.product_id')
             ->leftJoin('purchases', 'purchase_products.purchase_id', '=', 'purchases.id')
+            ->where('products.type', '!=', 'service')
             ->select(
                 'quantity_updates.product_id',
                 'products.name as product_name',
@@ -618,6 +665,7 @@ class ProductController extends Controller
             ->join('products', 'sales.product_id', '=', 'products.id')
             ->join('invoices', 'sales.invoice_id', '=', 'invoices.id')
             ->join('users', 'invoices.user_id', '=', 'users.id')
+            ->where('products.type', '!=', 'service')
             ->select(
                 'sales.product_id',
                 'products.name as product_name',
@@ -629,7 +677,7 @@ class ProductController extends Controller
             ->get();
 
         // Fetch all products for filtering
-        $products = Product::all();
+        $products = Product::where('type', 'product')->get();
 
         return view('admin.product.transactions', compact('addedQuantities', 'soldQuantities', 'products'));
     }

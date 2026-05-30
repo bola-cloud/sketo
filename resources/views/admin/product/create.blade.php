@@ -14,6 +14,11 @@
             </div>
         </div>
     </div>
+    <div class="content-header-right col-md-6 col-12 d-flex justify-content-end align-items-center">
+        <a href="{{ route('products.index') }}" class="btn btn-secondary round px-3 shadow-sm">
+            <i class="la la-arrow-left"></i> {{ __('app.common.back') ?? 'Back to List' }}
+        </a>
+    </div>
 </div>
 
 <div class="content-body">
@@ -42,14 +47,18 @@
                         <!-- Selection between existing and new product -->
                         <div class="form-group mb-4">
                             <label class="text-bold-700 text-muted small">{{ __('app.products.operation_type') }}</label>
-                            <div class="d-flex gap-2 p-1 bg-glass-light border-white-10" style="border-radius: 18px;">
-                                <div class="custom-control custom-radio custom-control-inline flex-grow-1 text-center m-0">
-                                    <input type="radio" id="choice_new" name="product_choice_radio" value="new" class="custom-control-input" checked>
-                                    <label class="custom-control-label w-100 p-1 round-lg cursor-pointer transition-all" for="choice_new">{{ __('app.products.new_product') }}</label>
+                            <div class="row m-0 p-1 bg-glass-light border-white-10" style="border-radius: 18px;">
+                                <div class="col-12 col-sm-6 p-1">
+                                    <div class="text-center m-0 p-0 w-100">
+                                        <input type="radio" id="choice_new" name="product_choice_radio" value="new" class="d-none" checked>
+                                        <label class="w-100 py-2 m-0 round-lg cursor-pointer transition-all operation-label text-bold-600" for="choice_new">{{ __('app.products.new_product') }}</label>
+                                    </div>
                                 </div>
-                                <div class="custom-control custom-radio custom-control-inline flex-grow-1 text-center m-0">
-                                    <input type="radio" id="choice_existing" name="product_choice_radio" value="existing" class="custom-control-input">
-                                    <label class="custom-control-label w-100 p-1 round-lg cursor-pointer transition-all" for="choice_existing">{{ __('app.products.existing_product') }}</label>
+                                <div class="col-12 col-sm-6 p-1">
+                                    <div class="text-center m-0 p-0 w-100">
+                                        <input type="radio" id="choice_existing" name="product_choice_radio" value="existing" class="d-none">
+                                        <label class="w-100 py-2 m-0 round-lg cursor-pointer transition-all operation-label text-bold-600" for="choice_existing">{{ __('app.products.existing_product') }}</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -109,59 +118,80 @@
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-12">
+                                        <div class="form-group mb-3">
+                                            <label for="type" class="text-bold-600">{{ __('app.products.product_type') }} <span class="danger">*</span></label>
+                                            <select class="form-control select2-single border-primary" id="type" name="type" required>
+                                                <option value="product" {{ old('type') == 'product' ? 'selected' : '' }}>{{ __('app.products.physical_product') }}</option>
+                                                <option value="service" {{ old('type') == 'service' ? 'selected' : '' }}>{{ __('app.products.service_product') }}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
                                         <div class="form-group mb-2">
                                             <label for="name" class="text-bold-600">{{ __('app.products.name') }} <span class="danger">*</span></label>
-                                            <div class="d-flex align-items-center">
-                                                <input type="text" class="form-control round border-primary" id="name" name="name" 
-                                                    value="{{ old('name') }}" placeholder="{{ __('app.products.enter_name') }}" required>
-                                                <div class="ml-2">
-                                                    <div class="custom-control custom-checkbox" style="white-space: nowrap;">
-                                                        <input type="checkbox" class="custom-control-input" id="is_weighted" name="is_weighted" value="1">
-                                                        <label class="custom-control-label text-bold-600 warning" for="is_weighted">بيع بالميزان؟</label>
-                                                    </div>
-                                                </div>
+                                            <input type="text" class="form-control round border-primary" id="name" name="name" 
+                                                value="{{ old('name') }}" placeholder="{{ __('app.products.enter_name') }}" required>
+                                                
+                                            <div class="custom-control custom-checkbox mt-1 weight-checkbox-container">
+                                                <input type="checkbox" class="custom-control-input" id="is_weighted" name="is_weighted" value="1">
+                                                <label class="custom-control-label text-bold-600 warning" for="is_weighted">{{ __('app.products.sell_by_weight') }}</label>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group mb-2">
                                             <label for="category_id" class="text-bold-600">{{ __('app.products.category') }} <span class="danger">*</span></label>
-                                            <select class="form-control select2-single border-primary" id="category_id" name="category_id" required>
-                                                <option value="" disabled selected>{{ __('app.products.select_category') }}</option>
-                                                @foreach($categories as $category)
-                                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                                        {{ $category->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                            <div class="input-group flex-nowrap">
+                                                <select class="form-control select2-single border-primary" id="category_id" name="category_id" required>
+                                                    <option value="" disabled selected>{{ __('app.products.select_category') }}</option>
+                                                    @foreach($categories as $category)
+                                                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                                            {{ $category->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#quickCategoryModal"><i class="la la-plus"></i></button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 physical-only-fields">
                                         <div class="form-group mb-2">
                                             <label for="brand_id" class="text-bold-600">{{ __('app.products.brand') }}</label>
-                                            <select class="form-control select2-single border-primary" id="brand_id" name="brand_id">
-                                                <option value="" disabled selected>{{ __('app.products.select_brand') }}</option>
-                                                @foreach($brands as $brand)
-                                                    <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
-                                                        {{ $brand->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                            <div class="input-group flex-nowrap">
+                                                <select class="form-control select2-single border-primary" id="brand_id" name="brand_id">
+                                                    <option value="" disabled selected>{{ __('app.products.select_brand') }}</option>
+                                                    @foreach($brands as $brand)
+                                                        <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
+                                                            {{ $brand->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#quickBrandModal"><i class="la la-plus"></i></button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-12">
+                                    <div class="col-md-12 physical-only-fields">
                                         <div class="form-group mb-2">
                                             <label for="purchase_id" class="text-bold-600">{{ __('app.products.purchase_invoice') }} <span class="danger">*</span></label>
-                                            <select class="form-control select2-single border-primary" id="purchase_id" name="purchase_id" required>
-                                                <option value="" disabled selected>{{ __('app.products.select_invoice') }}</option>
-                                                @foreach($purchases as $purchase)
-                                                    @if($purchase->type == 'product')
-                                                        <option value="{{ $purchase->id }}" {{ old('purchase_id') == $purchase->id ? 'selected' : '' }}>
-                                                            {{ $purchase->invoice_number }}
-                                                        </option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
+                                            <div class="input-group flex-nowrap">
+                                                <select class="form-control select2-single border-primary" id="purchase_id" name="purchase_id" required>
+                                                    <option value="" disabled selected>{{ __('app.products.select_invoice') }}</option>
+                                                    @foreach($purchases as $purchase)
+                                                        @if($purchase->type == 'product')
+                                                            <option value="{{ $purchase->id }}" {{ old('purchase_id') == $purchase->id ? 'selected' : '' }}>
+                                                                {{ $purchase->invoice_number }}
+                                                            </option>
+                                                        @endif
+                                                    @endforeach
+                                                </select>
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#quickPurchaseModal"><i class="la la-plus"></i></button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -184,7 +214,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-12">
+                                    <div class="col-md-12 physical-only-fields">
                                         <div class="form-group mb-2">
                                             <label for="color" class="text-bold-600">{{ __('app.products.barcode') }} <span class="danger">*</span></label>
                                             <div class="input-group">
@@ -194,28 +224,28 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 physical-only-fields">
                                         <div class="form-group mb-2">
                                             <label for="quantity" class="text-bold-600">{{ __('app.products.initial_quantity') }} <span class="danger">*</span></label>
                                             <input type="number" class="form-control round border-primary" id="quantity" name="quantity" 
                                                 value="{{ old('quantity') }}" placeholder="0" required>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 physical-only-fields">
                                         <div class="form-group mb-2">
                                             <label for="threshold" class="text-bold-600">{{ __('app.products.alert_quantity') }} <span class="danger">*</span></label>
                                             <input type="number" class="form-control round border-primary" id="threshold" name="threshold" 
                                                 value="{{ old('threshold', 5) }}" placeholder="5" required>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 physical-only-fields">
                                         <div class="form-group mb-2">
                                             <label for="expiry_date" class="text-bold-600">{{ __('app.products.expiry_date') }}</label>
                                             <input type="date" class="form-control round border-primary" id="expiry_date" name="expiry_date" 
                                                 value="{{ old('expiry_date') }}">
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 physical-only-fields">
                                         <div class="form-group mb-2">
                                             <label for="expiry_alert_days" class="text-bold-600">{{ __('app.products.expiry_alert_days') }} <span class="danger">*</span></label>
                                             <input type="number" class="form-control round border-primary" id="expiry_alert_days" name="expiry_alert_days" 
@@ -233,21 +263,21 @@
                                     </div>
 
                                     <!-- Sub-units Configuration Section -->
-                                    <div class="col-md-12 mt-3">
+                                    <div class="col-md-12 mt-3 physical-only-fields">
                                         <div class="card bg-light border-primary p-3" style="border-radius: 18px; border-style: dashed !important;">
-                                            <h5 class="text-bold-700 primary mb-2"><i class="la la-sitemap"></i> إعدادات التجزئة والوحدات (اختياري)</h5>
+                                            <h5 class="text-bold-700 primary mb-2"><i class="la la-sitemap"></i> {{ __('app.products.sub_units_settings') }}</h5>
                                             <div class="custom-control custom-switch mb-3">
                                                 <input type="checkbox" class="custom-control-input" id="has_sub_units" name="has_sub_units">
-                                                <label class="custom-control-input-label custom-control-label text-bold-600" for="has_sub_units">هل هذا المنتج له وحدة أصغر؟ (مثل علبة تحتوي على أكياس)</label>
+                                                <label class="custom-control-label text-bold-600" style="line-height: 1.8;" for="has_sub_units">{{ __('app.products.has_smaller_unit') }}</label>
                                             </div>
                                             
                                             <div id="sub_units_fields" style="display: none;">
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="sub_product_id" class="text-bold-600">اختر المنتج الصغير (القطاعي)</label>
+                                                            <label for="sub_product_id" class="text-bold-600">{{ __('app.products.select_sub_product') }}</label>
                                                             <select class="form-control select2-single border-primary" id="sub_product_id" name="sub_product_id">
-                                                                <option value="" selected disabled>اختر الصنف الأصغر...</option>
+                                                                <option value="" selected disabled>{{ __('app.products.choose_sub_product') }}</option>
                                                                 @foreach($products as $p)
                                                                     <option value="{{ $p->id }}">{{ $p->name }} ({{ $p->barcode }})</option>
                                                                 @endforeach
@@ -256,13 +286,13 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="conversion_factor" class="text-bold-600">معامل التحويل (العلبة فيها كام قطعة؟)</label>
-                                                            <input type="number" step="0.001" class="form-control round border-primary" id="conversion_factor" name="conversion_factor" placeholder="مثلاً 12">
+                                                            <label for="conversion_factor" class="text-bold-600">{{ __('app.products.conversion_factor') }}</label>
+                                                            <input type="number" step="0.001" class="form-control round border-primary" id="conversion_factor" name="conversion_factor" placeholder="{{ __('app.products.example_conversion') }}">
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="alert alert-info py-1 mb-0 mt-2">
-                                                    <small><i class="la la-info-circle"></i> عند نفاذ كمية المنتج الصغير، سيقوم النظام تلقائياً بخصم (1) من هذا المنتج الكبير وإضافة (معامل التحويل) للمنتج الصغير.</small>
+                                                    <small><i class="la la-info-circle"></i> {{ __('app.products.sub_units_info') }}</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -284,6 +314,124 @@
     </div>
 </div>
 
+<!-- Modals Stack -->
+@push('modals')
+<!-- Quick Category Modal -->
+<div class="modal fade text-left" id="quickCategoryModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-header bg-primary white" style="border-radius: 15px 15px 0 0;">
+                <h4 class="modal-title"><i class="la la-plus"></i> إضافة قسم سريع</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>اسم القسم <span class="danger">*</span></label>
+                    <input type="text" id="quickCategoryName" class="form-control round border-primary" placeholder="أدخل اسم القسم">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary round" data-dismiss="modal">إلغاء</button>
+                <button type="button" id="btnSaveCategory" class="btn btn-primary round">حفظ وإضافة</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Brand Modal -->
+<div class="modal fade text-left" id="quickBrandModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-header bg-primary white" style="border-radius: 15px 15px 0 0;">
+                <h4 class="modal-title"><i class="la la-plus"></i> إضافة ماركة سريعة</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>اسم الماركة <span class="danger">*</span></label>
+                    <input type="text" id="quickBrandName" class="form-control round border-primary" placeholder="أدخل اسم الماركة">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary round" data-dismiss="modal">إلغاء</button>
+                <button type="button" id="btnSaveBrand" class="btn btn-primary round">حفظ وإضافة</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Purchase Modal -->
+<div class="modal fade text-left" id="quickPurchaseModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-header bg-primary white" style="border-radius: 15px 15px 0 0;">
+                <h4 class="modal-title"><i class="la la-plus"></i> إضافة فاتورة شراء سريعة</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>رقم الفاتورة <span class="danger">*</span></label>
+                    <input type="text" id="quickPurchaseNumber" class="form-control round border-primary" placeholder="أدخل رقم الفاتورة">
+                </div>
+                <div class="form-group">
+                    <label>المورد (اختياري)</label>
+                    <div class="input-group flex-nowrap">
+                        <select id="quickPurchaseSupplier" class="form-control round border-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                            <option value="">اختر المورد...</option>
+                            @foreach($suppliers ?? [] as $supplier)
+                                <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                            @endforeach
+                        </select>
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#quickSupplierModal" style="border-top-left-radius: 14px; border-bottom-left-radius: 14px;"><i class="la la-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary round" data-dismiss="modal">إلغاء</button>
+                <button type="button" id="btnSavePurchase" class="btn btn-primary round">حفظ وإضافة</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Supplier Modal -->
+<div class="modal fade text-left" id="quickSupplierModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-header bg-primary white" style="border-radius: 15px 15px 0 0;">
+                <h4 class="modal-title"><i class="la la-plus"></i> إضافة مورد سريع</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>اسم المورد <span class="danger">*</span></label>
+                    <input type="text" id="quickSupplierName" class="form-control round border-primary" placeholder="أدخل اسم المورد">
+                </div>
+                <div class="form-group">
+                    <label>رقم الهاتف <span class="danger">*</span></label>
+                    <input type="text" id="quickSupplierPhone" class="form-control round border-primary" placeholder="أدخل رقم الهاتف">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary round" data-dismiss="modal">إلغاء</button>
+                <button type="button" id="btnSaveSupplier" class="btn btn-primary round">حفظ وإضافة</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@endpush
+
 <style>
     .round-lg { border-radius: 15px !important; }
     .cursor-pointer { cursor: pointer; }
@@ -296,22 +444,19 @@
         color: white !important;
         box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
     }
-    
-    .select2-container--default .select2-selection--single {
-        border-radius: 14px !important;
-        background: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        height: 45px !important;
-        color: white !important;
+    .input-group > .select2-container--default {
+        width: auto !important;
+        flex: 1 1 auto;
     }
     
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        line-height: 45px !important;
-        color: white !important;
+    html[data-textdirection="rtl"] .input-group > .select2-container--default .select2-selection--single {
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
     }
     
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 43px !important;
+    html[data-textdirection="ltr"] .input-group > .select2-container--default .select2-selection--single {
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
     }
 
     .form-control.round {
@@ -328,6 +473,12 @@
     .card-body {
         padding: 2rem !important;
     }
+    
+    @media (max-width: 576px) {
+        .card-body {
+            padding: 1rem !important;
+        }
+    }
 </style>
 @endsection
 
@@ -338,6 +489,11 @@
     $(document).ready(function() {
         $('.select2-single').select2({
             width: '100%'
+        });
+
+        $('#quickPurchaseSupplier').select2({
+            width: '100%',
+            dropdownParent: $('#quickPurchaseModal')
         });
 
         $('input[name="product_choice_radio"]').on('change', function() {
@@ -362,8 +518,182 @@
             }
         });
 
+        // Toggle fields based on product type (Product vs Service)
+        $('#type').on('change', function() {
+            if ($(this).val() === 'service') {
+                $('.physical-only-fields').slideUp();
+                $('.weight-checkbox-container').hide();
+                $('#cost_price_label').html('تكلفة التشغيل <span class="danger">*</span>');
+                $('#cost_price_help').text('التكلفة المقدرة لتقديم هذه الخدمة (لحساب صافي الربح)');
+                
+                // Remove required attribute from hidden fields to bypass browser HTML5 validation
+                $('#purchase_id').prop('required', false);
+                $('#color').prop('required', false);
+                $('#quantity').prop('required', false);
+                $('#threshold').prop('required', false);
+                $('#expiry_alert_days').prop('required', false);
+            } else {
+                $('.physical-only-fields').slideDown();
+                $('.weight-checkbox-container').show();
+                $('#cost_price_label').html('سعر التكلفة (الشراء) <span class="danger">*</span>');
+                $('#cost_price_help').text('تكلفة الشراء للمنتج أو تكلفة التشغيل للخدمة');
+                
+                // Re-enable required attribute for physical products
+                $('#purchase_id').prop('required', true);
+                $('#color').prop('required', true);
+                $('#quantity').prop('required', true);
+                $('#threshold').prop('required', true);
+                $('#expiry_alert_days').prop('required', true);
+            }
+        });
+
         // Trigger change to set initial state if needed
         $('input[name="product_choice_radio"]:checked').trigger('change');
+        $('#type').trigger('change');
+
+        function handleAjaxError(xhr) {
+            if (xhr.status === 422) {
+                var errors = xhr.responseJSON.errors;
+                var errorMsg = Object.values(errors).flat().join('\n');
+                alert('خطأ:\n' + errorMsg);
+            } else {
+                alert('حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.');
+            }
+        }
+
+        // Quick Add Category
+        $('#btnSaveCategory').click(function() {
+            var name = $('#quickCategoryName').val();
+            if(!name) return alert('يرجى إدخال اسم القسم');
+            var btn = $(this);
+            btn.prop('disabled', true).text('جاري الحفظ...');
+            $.ajax({
+                url: "{{ route('categories.store') }}",
+                type: "POST",
+                dataType: "json",
+                headers: { "Accept": "application/json" },
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    name: name
+                },
+                success: function(response) {
+                    if(response.success) {
+                        var newOption = new Option(response.category.name, response.category.id, true, true);
+                        $('#category_id').append(newOption).trigger('change');
+                        $('#quickCategoryModal').modal('hide');
+                        $('#quickCategoryName').val('');
+                        alert('تم إضافة القسم بنجاح');
+                    }
+                },
+                error: handleAjaxError,
+                complete: function() {
+                    btn.prop('disabled', false).text('حفظ وإضافة');
+                }
+            });
+        });
+
+        // Quick Add Brand
+        $('#btnSaveBrand').click(function() {
+            var name = $('#quickBrandName').val();
+            if(!name) return alert('يرجى إدخال اسم الماركة');
+            var btn = $(this);
+            btn.prop('disabled', true).text('جاري الحفظ...');
+            $.ajax({
+                url: "{{ route('brands.store') }}",
+                type: "POST",
+                dataType: "json",
+                headers: { "Accept": "application/json" },
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    name: name
+                },
+                success: function(response) {
+                    if(response.success) {
+                        var newOption = new Option(response.brand.name, response.brand.id, true, true);
+                        $('#brand_id').append(newOption).trigger('change');
+                        $('#quickBrandModal').modal('hide');
+                        $('#quickBrandName').val('');
+                        alert('تم إضافة الماركة بنجاح');
+                    }
+                },
+                error: handleAjaxError,
+                complete: function() {
+                    btn.prop('disabled', false).text('حفظ وإضافة');
+                }
+            });
+        });
+
+        // Quick Add Purchase Invoice
+        $('#btnSavePurchase').click(function() {
+            var number = $('#quickPurchaseNumber').val();
+            var supplier = $('#quickPurchaseSupplier').val();
+            if(!number) return alert('يرجى إدخال رقم الفاتورة');
+            var btn = $(this);
+            btn.prop('disabled', true).text('جاري الحفظ...');
+            $.ajax({
+                url: "{{ route('purchases.store') }}",
+                type: "POST",
+                dataType: "json",
+                headers: { "Accept": "application/json" },
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    invoice_number: number,
+                    supplier_id: supplier,
+                    type: 'product',
+                    status: 'completed',
+                    date: new Date().toISOString().slice(0,10),
+                    paid_amount: 0
+                },
+                success: function(response) {
+                    if(response.success) {
+                        var newOption = new Option(response.purchase.invoice_number, response.purchase.id, true, true);
+                        $('#purchase_id').append(newOption).trigger('change');
+                        $('#quickPurchaseModal').modal('hide');
+                        $('#quickPurchaseNumber').val('');
+                        alert('تم إضافة الفاتورة بنجاح');
+                    }
+                },
+                error: handleAjaxError,
+                complete: function() {
+                    btn.prop('disabled', false).text('حفظ وإضافة');
+                }
+            });
+        });
+
+        // Quick Add Supplier
+        $('#btnSaveSupplier').click(function() {
+            var name = $('#quickSupplierName').val();
+            var phone = $('#quickSupplierPhone').val();
+            if(!name || !phone) return alert('يرجى إدخال اسم ورقم هاتف المورد');
+            var btn = $(this);
+            btn.prop('disabled', true).text('جاري الحفظ...');
+            $.ajax({
+                url: "{{ route('suppliers.store') }}",
+                type: "POST",
+                dataType: "json",
+                headers: { "Accept": "application/json" },
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    name: name,
+                    phone: phone
+                },
+                success: function(response) {
+                    if(response.success) {
+                        var newOption = new Option(response.supplier.name, response.supplier.id, true, true);
+                        $('#quickPurchaseSupplier').append(newOption).trigger('change');
+                        $('#quickSupplierModal').modal('hide');
+                        $('#quickSupplierName').val('');
+                        $('#quickSupplierPhone').val('');
+                        alert('تم إضافة المورد بنجاح');
+                    }
+                },
+                error: handleAjaxError,
+                complete: function() {
+                    btn.prop('disabled', false).text('حفظ وإضافة');
+                }
+            });
+        });
+
     });
 </script>
 @endpush

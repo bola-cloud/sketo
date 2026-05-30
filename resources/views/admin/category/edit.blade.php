@@ -16,6 +16,11 @@
                 </div>
             </div>
         </div>
+        <div class="content-header-right col-md-6 col-12 d-flex justify-content-end align-items-center">
+            <a href="{{ route('categories.index') }}" class="btn btn-secondary round px-3 shadow-sm">
+                <i class="la la-arrow-left"></i> {{ __('app.common.back') ?? 'Back to List' }}
+            </a>
+        </div>
     </div>
 
     <div class="content-body">
