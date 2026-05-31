@@ -47,6 +47,7 @@ class CashierController extends Controller
                 'barcode' => $product->barcode,
                 'quantity_available' => $product->quantity,
                 'is_weighted' => $product->is_weighted,
+                'type' => $product->type,
             ];
         } else {
             $cart[$barcode]['quantity'] += 1;
@@ -75,6 +76,15 @@ class CashierController extends Controller
                 $newQuantity = (float) $absoluteQuantity;
             } else {
                 $newQuantity = $cart[$barcode]['quantity'] + $quantityChange;
+            }
+
+            // Logic to prevent fractionalizing/splitting of indivisible service items
+            $product = Product::where('barcode', $barcode)->first();
+            $isService = ($product && $product->type === 'service') || (isset($cart[$barcode]['type']) && $cart[$barcode]['type'] === 'service') || str_contains($barcode, 'SRV');
+            if ($isService) {
+                if ($newQuantity != round($newQuantity)) {
+                    $newQuantity = round($newQuantity);
+                }
             }
 
             if ($newQuantity > 0) {
@@ -216,7 +226,22 @@ class CashierController extends Controller
 
             foreach ($cart as $barcode => $details) {
                 $product = Product::where('barcode', $barcode)->first();
-                if (!$product || !$product->ensureStock($details['quantity'])) {
+                if (!$product) {
+                    throw new \Exception("المنتج غير موجود: " . $barcode);
+                }
+
+                if ($product->type === 'service') {
+                    Sales::create([
+                        'product_id' => $product->id,
+                        'quantity' => $details['quantity'],
+                        'total_price' => $details['price'] * $details['quantity'],
+                        'invoice_id' => $invoice->id,
+                        'purchase_product_id' => null,
+                    ]);
+                    continue;
+                }
+
+                if (!$product->ensureStock($details['quantity'])) {
                     throw new \Exception("الكمية غير كافية للمنتج: " . ($product->name ?? $barcode));
                 }
 

@@ -116,16 +116,8 @@
                             <h4 class="text-bold-700 mb-2 primary"><i class="la la-cube"></i> {{ __('app.products.create_new_product') }}</h4>
                             <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
+                                <input type="hidden" name="type" value="product">
                                 <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group mb-3">
-                                            <label for="type" class="text-bold-600">{{ __('app.products.product_type') }} <span class="danger">*</span></label>
-                                            <select class="form-control select2-single border-primary" id="type" name="type" required>
-                                                <option value="product" {{ old('type') == 'product' ? 'selected' : '' }}>{{ __('app.products.physical_product') }}</option>
-                                                <option value="service" {{ old('type') == 'service' ? 'selected' : '' }}>{{ __('app.products.service_product') }}</option>
-                                            </select>
-                                        </div>
-                                    </div>
                                     <div class="col-md-12">
                                         <div class="form-group mb-2">
                                             <label for="name" class="text-bold-600">{{ __('app.products.name') }} <span class="danger">*</span></label>
@@ -321,20 +313,20 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content" style="border-radius: 15px;">
             <div class="modal-header bg-primary white" style="border-radius: 15px 15px 0 0;">
-                <h4 class="modal-title"><i class="la la-plus"></i> إضافة قسم سريع</h4>
+                <h4 class="modal-title"><i class="la la-plus"></i> {{ __('app.products.quick_category_title') }}</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>اسم القسم <span class="danger">*</span></label>
-                    <input type="text" id="quickCategoryName" class="form-control round border-primary" placeholder="أدخل اسم القسم">
+                    <label>{{ __('app.products.quick_category_name') }} <span class="danger">*</span></label>
+                    <input type="text" id="quickCategoryName" class="form-control round border-primary" placeholder="{{ __('app.products.quick_category_placeholder') }}">
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary round" data-dismiss="modal">إلغاء</button>
-                <button type="button" id="btnSaveCategory" class="btn btn-primary round">حفظ وإضافة</button>
+                <button type="button" class="btn btn-secondary round" data-dismiss="modal">{{ __('app.products.cancel') }}</button>
+                <button type="button" id="btnSaveCategory" class="btn btn-primary round">{{ __('app.products.save_and_add') }}</button>
             </div>
         </div>
     </div>
@@ -345,20 +337,20 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content" style="border-radius: 15px;">
             <div class="modal-header bg-primary white" style="border-radius: 15px 15px 0 0;">
-                <h4 class="modal-title"><i class="la la-plus"></i> إضافة ماركة سريعة</h4>
+                <h4 class="modal-title"><i class="la la-plus"></i> {{ __('app.products.quick_brand_title') }}</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>اسم الماركة <span class="danger">*</span></label>
-                    <input type="text" id="quickBrandName" class="form-control round border-primary" placeholder="أدخل اسم الماركة">
+                    <label>{{ __('app.products.quick_brand_name') }} <span class="danger">*</span></label>
+                    <input type="text" id="quickBrandName" class="form-control round border-primary" placeholder="{{ __('app.products.quick_brand_placeholder') }}">
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary round" data-dismiss="modal">إلغاء</button>
-                <button type="button" id="btnSaveBrand" class="btn btn-primary round">حفظ وإضافة</button>
+                <button type="button" class="btn btn-secondary round" data-dismiss="modal">{{ __('app.products.cancel') }}</button>
+                <button type="button" id="btnSaveBrand" class="btn btn-primary round">{{ __('app.products.save_and_add') }}</button>
             </div>
         </div>
     </div>
@@ -369,21 +361,21 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content" style="border-radius: 15px;">
             <div class="modal-header bg-primary white" style="border-radius: 15px 15px 0 0;">
-                <h4 class="modal-title"><i class="la la-plus"></i> إضافة فاتورة شراء سريعة</h4>
+                <h4 class="modal-title"><i class="la la-plus"></i> {{ __('app.products.quick_purchase_title') }}</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>رقم الفاتورة <span class="danger">*</span></label>
-                    <input type="text" id="quickPurchaseNumber" class="form-control round border-primary" placeholder="أدخل رقم الفاتورة">
+                    <label>{{ __('app.products.quick_purchase_number') }} <span class="danger">*</span></label>
+                    <input type="text" id="quickPurchaseNumber" class="form-control round border-primary" placeholder="{{ __('app.products.quick_purchase_placeholder') }}">
                 </div>
                 <div class="form-group">
-                    <label>المورد (اختياري)</label>
+                    <label>{{ __('app.products.quick_purchase_supplier') }}</label>
                     <div class="input-group flex-nowrap">
                         <select id="quickPurchaseSupplier" class="form-control round border-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
-                            <option value="">اختر المورد...</option>
+                            <option value="">{{ __('app.products.quick_purchase_supplier_placeholder') }}</option>
                             @foreach($suppliers ?? [] as $supplier)
                                 <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
                             @endforeach
@@ -395,8 +387,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary round" data-dismiss="modal">إلغاء</button>
-                <button type="button" id="btnSavePurchase" class="btn btn-primary round">حفظ وإضافة</button>
+                <button type="button" class="btn btn-secondary round" data-dismiss="modal">{{ __('app.products.cancel') }}</button>
+                <button type="button" id="btnSavePurchase" class="btn btn-primary round">{{ __('app.products.save_and_add') }}</button>
             </div>
         </div>
     </div>
@@ -407,24 +399,24 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content" style="border-radius: 15px;">
             <div class="modal-header bg-primary white" style="border-radius: 15px 15px 0 0;">
-                <h4 class="modal-title"><i class="la la-plus"></i> إضافة مورد سريع</h4>
+                <h4 class="modal-title"><i class="la la-plus"></i> {{ __('app.products.quick_supplier_title') }}</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>اسم المورد <span class="danger">*</span></label>
-                    <input type="text" id="quickSupplierName" class="form-control round border-primary" placeholder="أدخل اسم المورد">
+                    <label>{{ __('app.products.quick_supplier_name') }} <span class="danger">*</span></label>
+                    <input type="text" id="quickSupplierName" class="form-control round border-primary" placeholder="{{ __('app.products.quick_supplier_name_placeholder') }}">
                 </div>
                 <div class="form-group">
-                    <label>رقم الهاتف <span class="danger">*</span></label>
-                    <input type="text" id="quickSupplierPhone" class="form-control round border-primary" placeholder="أدخل رقم الهاتف">
+                    <label>{{ __('app.products.quick_supplier_phone') }} <span class="danger">*</span></label>
+                    <input type="text" id="quickSupplierPhone" class="form-control round border-primary" placeholder="{{ __('app.products.quick_supplier_phone_placeholder') }}">
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary round" data-dismiss="modal">إلغاء</button>
-                <button type="button" id="btnSaveSupplier" class="btn btn-primary round">حفظ وإضافة</button>
+                <button type="button" class="btn btn-secondary round" data-dismiss="modal">{{ __('app.products.cancel') }}</button>
+                <button type="button" id="btnSaveSupplier" class="btn btn-primary round">{{ __('app.products.save_and_add') }}</button>
             </div>
         </div>
     </div>
@@ -518,55 +510,25 @@
             }
         });
 
-        // Toggle fields based on product type (Product vs Service)
-        $('#type').on('change', function() {
-            if ($(this).val() === 'service') {
-                $('.physical-only-fields').slideUp();
-                $('.weight-checkbox-container').hide();
-                $('#cost_price_label').html('تكلفة التشغيل <span class="danger">*</span>');
-                $('#cost_price_help').text('التكلفة المقدرة لتقديم هذه الخدمة (لحساب صافي الربح)');
-                
-                // Remove required attribute from hidden fields to bypass browser HTML5 validation
-                $('#purchase_id').prop('required', false);
-                $('#color').prop('required', false);
-                $('#quantity').prop('required', false);
-                $('#threshold').prop('required', false);
-                $('#expiry_alert_days').prop('required', false);
-            } else {
-                $('.physical-only-fields').slideDown();
-                $('.weight-checkbox-container').show();
-                $('#cost_price_label').html('سعر التكلفة (الشراء) <span class="danger">*</span>');
-                $('#cost_price_help').text('تكلفة الشراء للمنتج أو تكلفة التشغيل للخدمة');
-                
-                // Re-enable required attribute for physical products
-                $('#purchase_id').prop('required', true);
-                $('#color').prop('required', true);
-                $('#quantity').prop('required', true);
-                $('#threshold').prop('required', true);
-                $('#expiry_alert_days').prop('required', true);
-            }
-        });
-
         // Trigger change to set initial state if needed
         $('input[name="product_choice_radio"]:checked').trigger('change');
-        $('#type').trigger('change');
 
         function handleAjaxError(xhr) {
             if (xhr.status === 422) {
                 var errors = xhr.responseJSON.errors;
                 var errorMsg = Object.values(errors).flat().join('\n');
-                alert('خطأ:\n' + errorMsg);
+                alert("{{ __('app.products.validation_error') }}" + errorMsg);
             } else {
-                alert('حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.');
+                alert("{{ __('app.products.unexpected_error') }}");
             }
         }
 
         // Quick Add Category
         $('#btnSaveCategory').click(function() {
             var name = $('#quickCategoryName').val();
-            if(!name) return alert('يرجى إدخال اسم القسم');
+            if(!name) return alert("{{ __('app.products.enter_category_name_error') }}");
             var btn = $(this);
-            btn.prop('disabled', true).text('جاري الحفظ...');
+            btn.prop('disabled', true).text("{{ __('app.products.saving') }}");
             $.ajax({
                 url: "{{ route('categories.store') }}",
                 type: "POST",
@@ -582,12 +544,12 @@
                         $('#category_id').append(newOption).trigger('change');
                         $('#quickCategoryModal').modal('hide');
                         $('#quickCategoryName').val('');
-                        alert('تم إضافة القسم بنجاح');
+                        alert("{{ __('app.products.category_add_success') }}");
                     }
                 },
                 error: handleAjaxError,
                 complete: function() {
-                    btn.prop('disabled', false).text('حفظ وإضافة');
+                    btn.prop('disabled', false).text("{{ __('app.products.save_and_add') }}");
                 }
             });
         });
@@ -595,9 +557,9 @@
         // Quick Add Brand
         $('#btnSaveBrand').click(function() {
             var name = $('#quickBrandName').val();
-            if(!name) return alert('يرجى إدخال اسم الماركة');
+            if(!name) return alert("{{ __('app.products.enter_brand_name_error') }}");
             var btn = $(this);
-            btn.prop('disabled', true).text('جاري الحفظ...');
+            btn.prop('disabled', true).text("{{ __('app.products.saving') }}");
             $.ajax({
                 url: "{{ route('brands.store') }}",
                 type: "POST",
@@ -613,12 +575,12 @@
                         $('#brand_id').append(newOption).trigger('change');
                         $('#quickBrandModal').modal('hide');
                         $('#quickBrandName').val('');
-                        alert('تم إضافة الماركة بنجاح');
+                        alert("{{ __('app.products.brand_add_success') }}");
                     }
                 },
                 error: handleAjaxError,
                 complete: function() {
-                    btn.prop('disabled', false).text('حفظ وإضافة');
+                    btn.prop('disabled', false).text("{{ __('app.products.save_and_add') }}");
                 }
             });
         });
@@ -627,9 +589,9 @@
         $('#btnSavePurchase').click(function() {
             var number = $('#quickPurchaseNumber').val();
             var supplier = $('#quickPurchaseSupplier').val();
-            if(!number) return alert('يرجى إدخال رقم الفاتورة');
+            if(!number) return alert("{{ __('app.products.enter_purchase_number_error') }}");
             var btn = $(this);
-            btn.prop('disabled', true).text('جاري الحفظ...');
+            btn.prop('disabled', true).text("{{ __('app.products.saving') }}");
             $.ajax({
                 url: "{{ route('purchases.store') }}",
                 type: "POST",
@@ -650,12 +612,12 @@
                         $('#purchase_id').append(newOption).trigger('change');
                         $('#quickPurchaseModal').modal('hide');
                         $('#quickPurchaseNumber').val('');
-                        alert('تم إضافة الفاتورة بنجاح');
+                        alert("{{ __('app.products.purchase_add_success') }}");
                     }
                 },
                 error: handleAjaxError,
                 complete: function() {
-                    btn.prop('disabled', false).text('حفظ وإضافة');
+                    btn.prop('disabled', false).text("{{ __('app.products.save_and_add') }}");
                 }
             });
         });
@@ -664,9 +626,9 @@
         $('#btnSaveSupplier').click(function() {
             var name = $('#quickSupplierName').val();
             var phone = $('#quickSupplierPhone').val();
-            if(!name || !phone) return alert('يرجى إدخال اسم ورقم هاتف المورد');
+            if(!name || !phone) return alert("{{ __('app.products.enter_supplier_info_error') }}");
             var btn = $(this);
-            btn.prop('disabled', true).text('جاري الحفظ...');
+            btn.prop('disabled', true).text("{{ __('app.products.saving') }}");
             $.ajax({
                 url: "{{ route('suppliers.store') }}",
                 type: "POST",
@@ -684,12 +646,12 @@
                         $('#quickSupplierModal').modal('hide');
                         $('#quickSupplierName').val('');
                         $('#quickSupplierPhone').val('');
-                        alert('تم إضافة المورد بنجاح');
+                        alert("{{ __('app.products.supplier_add_success') }}");
                     }
                 },
                 error: handleAjaxError,
                 complete: function() {
-                    btn.prop('disabled', false).text('حفظ وإضافة');
+                    btn.prop('disabled', false).text("{{ __('app.products.save_and_add') }}");
                 }
             });
         });

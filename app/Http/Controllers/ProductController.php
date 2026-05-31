@@ -27,12 +27,14 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $query = Product::query();
+        $query = Product::query()->where('type', 'product');
 
         // Filter by search term
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('barcode', 'like', '%' . $request->search . '%');
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('barcode', 'like', '%' . $request->search . '%');
+            });
         }
 
         // Filter by category
@@ -74,7 +76,7 @@ class ProductController extends Controller
         $purchases = Purchase::where('type', 'product')->get();
         $categories = Category::all(); // Assuming you have categories to be selected
         $brands = Brand::all(); // Get all brands
-        $products = Product::all();
+        $products = Product::where('type', 'product')->get();
         $suppliers = Supplier::all(); // Get all suppliers for the quick purchase modal
         return view('admin.product.create', compact('purchases', 'categories', 'brands', 'products', 'suppliers'));
     }
@@ -253,13 +255,14 @@ class ProductController extends Controller
             }
 
             // Create the new product
-            $validatedData['is_weighted'] = $request->has('is_weighted');
+            $validatedData['is_weighted'] = $isService ? false : $request->has('is_weighted');
             
             if ($isService) {
                 $validatedData['color'] = $request->input('color');
                 $validatedData['quantity'] = 0;
                 $validatedData['threshold'] = 0;
                 $validatedData['expiry_alert_days'] = 0;
+                $validatedData['is_weighted'] = false;
             }
             
             $product = Product::create($validatedData);
@@ -337,6 +340,9 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
+        if ($product->type === 'service') {
+            abort(404);
+        }
         $product->load('purchases');
 
         // Retrieve all purchase invoices of type 'product' that are related to this product
@@ -348,7 +354,7 @@ class ProductController extends Controller
         // Calculate total quantity across all purchases
         $totalQuantity = $purchases->sum('pivot.quantity');
 
-        $all_products = Product::where('id', '!=', $product->id)->get();
+        $all_products = Product::where('id', '!=', $product->id)->where('type', 'product')->get();
 
         return view('admin.product.edit', compact('product', 'categories', 'brands', 'purchases', 'totalQuantity', 'all_products'));
     }
@@ -356,11 +362,14 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
+        if ($product->type === 'service') {
+            abort(404);
+        }
         $request->merge(['is_weighted' => $request->has('is_weighted') ? 1 : 0]);
         // Uncomment for debugging
         // dd($request->all(), $product->toArray());
 
-        $isService = $product->type === 'service';
+        $isService = false;
         
         $rules = [
             'name' => 'required|string|max:255',
@@ -448,7 +457,7 @@ class ProductController extends Controller
             }
 
             // Update the remaining product details (excluding quantity)
-            $validated['is_weighted'] = $request->has('is_weighted');
+            $validated['is_weighted'] = $isService ? false : $request->has('is_weighted');
             $product->update($validated);
 
             // Variables to store total quantities
@@ -533,6 +542,9 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        if ($product->type === 'service') {
+            abort(404);
+        }
         // Check if the product has any sales
         $hasSales = $product->sales()->exists();
 
@@ -692,7 +704,7 @@ class ProductController extends Controller
 
     public function recalculateAllProductQuantities()
     {
-        $products = Product::all();
+        $products = Product::where('type', 'product')->get();
         $updatedCount = 0;
 
         foreach ($products as $product) {

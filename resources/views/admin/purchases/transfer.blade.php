@@ -80,9 +80,9 @@
                             <i class="fas fa-cubes me-1"></i>{{ __('app.purchases.transfer_qty') }} <span
                                 class="text-danger">*</span>
                         </label>
-                        <input type="number" id="transfer_quantity" name="transfer_quantity"
+                        <input type="number" step="any" id="transfer_quantity" name="transfer_quantity"
                             class="form-control @error('transfer_quantity') is-invalid @enderror"
-                            value="{{ old('transfer_quantity', $remainingQuantity) }}" min="1"
+                            value="{{ old('transfer_quantity', $remainingQuantity) }}" min="0.001"
                             max="{{ $remainingQuantity }}" placeholder="{{ __('app.purchases.enter_transfer_qty') }}"
                             required>
                         <small
@@ -242,7 +242,7 @@
             // Real-time summary updates
             function updateSummary() {
                 const newName = $('#new_product_name').val();
-                const quantity = parseInt($('#transfer_quantity').val()) || 0;
+                const quantity = parseFloat($('#transfer_quantity').val()) || 0;
                 const costPrice = parseFloat($('#new_cost_price').val()) || 0;
                 const sellingPrice = parseFloat($('#new_selling_price').val()) || 0;
 

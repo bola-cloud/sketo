@@ -235,6 +235,13 @@
                         <li class="{{ Route::currentRouteName() == 'brands.index' ? 'active' : '' }}"><a href="{{route('brands.index')}}"><i class="la la-certificate"></i> {{ __('app.sidebar.view_brands') }}</a></li>
                     </ul>
                 </li>
+                <li class="nav-item has-sub {{ Request::is('services*') ? 'open' : '' }}">
+                    <a href="#"><i class="la la-bell"></i><span class="menu-title">{{ __('app.sidebar.services') }}</span></a>
+                    <ul class="menu-content">
+                        <li class="{{ Route::currentRouteName() == 'services.index' ? 'active' : '' }}"><a href="{{route('services.index')}}"><i class="la la-list-alt"></i> {{ __('app.sidebar.view_services') }}</a></li>
+                        <li class="{{ Route::currentRouteName() == 'services.create' ? 'active' : '' }}"><a href="{{route('services.create')}}"><i class="la la-plus"></i> {{ __('app.sidebar.add_service') }}</a></li>
+                    </ul>
+                </li>
                 <li class="nav-item has-sub {{ Request::is('purchases*') || Request::is('suppliers*') ? 'open' : '' }}">
                     <a href="#"><i class="la la-shopping-cart"></i><span class="menu-title">{{ __('app.sidebar.purchase_invoices') }}</span></a>
                     <ul class="menu-content">

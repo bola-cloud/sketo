@@ -163,7 +163,7 @@
                                                 @endif
                                                 <div>
                                                     <span class="text-bold-700 block">{{ $product->name }}</span>
-                                                    @if($product->quantity <= ($product->threshold ?? 5))
+                                                    @if($product->type !== 'service' && $product->quantity <= ($product->threshold ?? 5))
                                                         <span class="text-danger small"><i class="la la-exclamation-triangle"></i>
                                                             {{ __('app.products.low_stock_warning') }}</span>
                                                     @endif
@@ -184,12 +184,17 @@
                                         <td class="text-bold-700 primary">{{ number_format($product->selling_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
                                         </td>
                                         <td class="text-center">
-                                            @php
-                                                $qty = $product->total_available_quantity;
-                                                $badgeClass = $qty > ($product->threshold ?? 5) ? 'badge-soft-success' : ($qty > 0 ? 'badge-soft-warning' : 'badge-soft-danger');
-                                            @endphp
-                                            <span class="badge {{ $badgeClass }}"
-                                                style="font-size: 1rem; padding: 0.5rem 0.8rem;">{{ $qty }}</span>
+                                            @if($product->type === 'service')
+                                                <span class="badge badge-soft-info"
+                                                    style="font-size: 0.9rem; padding: 0.5rem 0.8rem;">{{ __('app.products.service') }}</span>
+                                            @else
+                                                @php
+                                                    $qty = $product->total_available_quantity;
+                                                    $badgeClass = $qty > ($product->threshold ?? 5) ? 'badge-soft-success' : ($qty > 0 ? 'badge-soft-warning' : 'badge-soft-danger');
+                                                @endphp
+                                                <span class="badge {{ $badgeClass }}"
+                                                    style="font-size: 1rem; padding: 0.5rem 0.8rem;">{{ $qty }}</span>
+                                            @endif
                                         </td>
                                         <td class="text-center">
                                             @if($product->barcode_path)
@@ -244,7 +249,7 @@
                     </div>
                 </div>
                 <div class="card-footer bg-transparent border-0 text-center">
-                    {{ $products->appends(request()->query())->links() }}
+                    {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
                 </div>
             </div>
         </div>

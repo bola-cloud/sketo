@@ -56,6 +56,10 @@ class Product extends Model
      */
     public function ensureStock($requiredQuantity)
     {
+        if ($this->type === 'service') {
+            return true;
+        }
+
         if ($this->quantity >= $requiredQuantity) {
             return true;
         }

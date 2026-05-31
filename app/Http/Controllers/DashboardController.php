@@ -43,7 +43,7 @@ class DashboardController extends Controller
             $totalRevenue = $invoiceQuery->sum('paid_amount');
 
             // Calculate total unsold products (quantity in stock)
-            $totalUnsoldProducts = Product::where('quantity', '>', 0)->sum('quantity');
+            $totalUnsoldProducts = Product::where('type', 'product')->where('quantity', '>', 0)->sum('quantity');
 
             // Calculate total purchases as sum of total_amount in purchases table
             $totalPurchases = $purchaseQuery->sum('total_amount');

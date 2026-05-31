@@ -160,8 +160,10 @@ class InvoiceController extends Controller
             if ($quantity > 0 && $quantity <= $sale->quantity) {
                 // Return the products to the stock
                 $product = $sale->product;
-                $product->quantity += $quantity;
-                $product->save();
+                if ($product->type !== 'service') {
+                    $product->quantity += $quantity;
+                    $product->save();
+                }
 
                 // Restore quantity to the specific purchase batch
                 if ($sale->purchase_product_id) {
@@ -235,35 +237,37 @@ class InvoiceController extends Controller
                 $sale->save();
             }
 
-            // Handle FIFO inventory deduction
-            $remainingQuantity = $quantity;
-            $purchaseProducts = PurchaseProduct::where('product_id', $product->id)
-                ->where('remaining_quantity', '>', 0)
-                ->orderBy('created_at', 'asc')
-                ->get();
+            if ($product->type !== 'service') {
+                // Handle FIFO inventory deduction
+                $remainingQuantity = $quantity;
+                $purchaseProducts = PurchaseProduct::where('product_id', $product->id)
+                    ->where('remaining_quantity', '>', 0)
+                    ->orderBy('created_at', 'asc')
+                    ->get();
 
-            foreach ($purchaseProducts as $purchaseProduct) {
-                if ($remainingQuantity <= 0)
-                    break;
+                foreach ($purchaseProducts as $purchaseProduct) {
+                    if ($remainingQuantity <= 0)
+                        break;
 
-                $deductQuantity = min($remainingQuantity, $purchaseProduct->remaining_quantity);
-                $purchaseProduct->remaining_quantity -= $deductQuantity;
-                $purchaseProduct->save();
+                    $deductQuantity = min($remainingQuantity, $purchaseProduct->remaining_quantity);
+                    $purchaseProduct->remaining_quantity -= $deductQuantity;
+                    $purchaseProduct->save();
 
-                $remainingQuantity -= $deductQuantity;
+                    $remainingQuantity -= $deductQuantity;
+                }
+
+                // If there's still remaining quantity that couldn't be matched to purchase batches
+                if ($remainingQuantity > 0) {
+                    \DB::rollBack();
+                    return redirect()->back()->withErrors([
+                        'quantity' => 'لا يمكن ربط الكمية بدفعات الشراء. تحقق من سجلات المخزون.'
+                    ]);
+                }
+
+                // Update the product stock
+                $product->quantity -= $quantity;
+                $product->save();
             }
-
-            // If there's still remaining quantity that couldn't be matched to purchase batches
-            if ($remainingQuantity > 0) {
-                \DB::rollBack();
-                return redirect()->back()->withErrors([
-                    'quantity' => 'لا يمكن ربط الكمية بدفعات الشراء. تحقق من سجلات المخزون.'
-                ]);
-            }
-
-            // Update the product stock
-            $product->quantity -= $quantity;
-            $product->save();
 
             // Recalculate the subtotal
             $invoice->subtotal = $invoice->sales->sum('total_price');
@@ -296,8 +300,10 @@ class InvoiceController extends Controller
         foreach ($invoice->sales as $sale) {
             // Return all products sold in this invoice to the stock
             $product = $sale->product;
-            $product->quantity += $sale->quantity;
-            $product->save();
+            if ($product->type !== 'service') {
+                $product->quantity += $sale->quantity;
+                $product->save();
+            }
 
             // Restore quantity to the specific purchase batch
             if ($sale->purchase_product_id) {

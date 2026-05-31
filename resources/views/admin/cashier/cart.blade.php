@@ -127,7 +127,7 @@
 
         /* Search results scroll indicator */
         .search-results-container::after {
-            content: "اسحب لأسفل لمزيد من النتائج";
+            content: "{{ __('app.cashier.scroll_more_results') }}";
             position: absolute;
             bottom: 10px;
             right: 10px;
@@ -400,7 +400,7 @@
                 <form id="quickAddClientForm">
                     @csrf
                     <div class="modal-body">
-                        <p>قم بإدخال بيانات العميل ليتم إضافته واختياره فوراً.</p>
+                        <p>{{ __('app.cashier.add_client_desc') }}</p>
                         <fieldset class="form-group mb-2">
                             <label for="client_name">{{ __('app.clients.name') }} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="client_name" name="name" required placeholder="{{ __('app.clients.name') }}...">
@@ -453,8 +453,8 @@
                         <div class="position-fixed top-0 start-50 translate-middle-x mt-4 z-index-2000">
                             <div class="alert bg-glass-dark text-white border-info shadow-lg p-4 rounded-xl text-center" style="backdrop-filter: blur(20px);">
                                 <i class="la la-cloud-download font-large-2 text-info mb-2 d-block"></i>
-                                <h4>{{ __('app.cashier.saved_offline') ?? 'تم الحفظ أوفلاين' }}</h4>
-                                <p class="mb-0 text-white-50">سيتم المزامنة تلقائياً عند عودة الإنترنت</p>
+                                <h4>{{ __('app.cashier.saved_offline') }}</h4>
+                                <p class="mb-0 text-white-50">{{ __('app.cashier.offline_sync_desc') }}</p>
                             </div>
                         </div>
                     `;
@@ -505,13 +505,13 @@
 
         // Function to prompt for grams and convert to Kg
         function promptGramInput(barcode) {
-            let grams = prompt("أدخل الوزن بالجرام (مثلاً: 150):", "");
+            let grams = prompt("{{ __('app.cashier.prompt_gram_input') }}", "");
             if (grams !== null && grams !== "") {
                 let kg = parseFloat(grams) / 1000;
                 if (!isNaN(kg)) {
                     setCartQuantity(barcode, kg);
                 } else {
-                    alert("برجاء إدخال رقم صحيح.");
+                    alert("{{ __('app.cashier.prompt_valid_number') }}");
                 }
             }
         }
@@ -811,7 +811,7 @@
             let submitBtn = form.find('button[type="submit"]');
             let originalText = submitBtn.html();
             
-            submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> جاري الإضافة...');
+            submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> ' + "{{ __('app.cashier.adding_client') }}");
             
             $.ajax({
                 url: "{{ route('clients.store') }}", // Using standard clients store route
@@ -827,11 +827,11 @@
                     let newClientId = response.client ? response.client.id : null;
                     updateCartContent(newClientId);
                     
-                    alert('تم إضافة العميل بنجاح!');
+                    alert("{{ __('app.cashier.client_added_success') }}");
                 },
                 error: function(xhr) {
                     submitBtn.prop('disabled', false).html(originalText);
-                    let errorMsg = 'حدث خطأ أثناء إضافة العميل.';
+                    let errorMsg = "{{ __('app.cashier.client_added_fail') }}";
                     if(xhr.responseJSON && xhr.responseJSON.errors) {
                         errorMsg = Object.values(xhr.responseJSON.errors).flat().join('\n');
                     } else if(xhr.responseJSON && xhr.responseJSON.message) {

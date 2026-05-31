@@ -32,29 +32,38 @@
                             </div>
                         </td>
                         <td class="text-center">
+                            @php
+                                $isService = (isset($details['type']) && $details['type'] === 'service') || str_contains($barcode, 'SRV');
+                            @endphp
                             <div class="d-flex flex-column align-items-center justify-content-center quantity-controls">
-                                <div class="d-flex align-items-center mb-1">
-                                    <button type="button" class="btn btn-outline-danger btn-sm me-2"
-                                        onclick="updateCartQuantity('{{ $barcode }}', -1)">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <input type="number" step="0.001" class="form-control form-control-sm text-center fw-bold text-primary cart-qty-input" 
-                                        value="{{ number_format($details['quantity'], 3, '.', '') }}"
-                                        style="width: 80px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);"
-                                        onchange="setCartQuantity('{{ $barcode }}', this.value)">
-                                    <button type="button" class="btn btn-outline-success btn-sm ms-2"
-                                        onclick="updateCartQuantity('{{ $barcode }}', 1)">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
-                                
-                                @if(isset($details['is_weighted']) && $details['is_weighted'])
-                                    <div class="btn-group btn-group-sm mt-1">
-                                        <button type="button" class="btn btn-secondary py-0" style="font-size: 10px;" onclick="setCartQuantity('{{ $barcode }}', 0.125)">ثمن</button>
-                                        <button type="button" class="btn btn-secondary py-0" style="font-size: 10px;" onclick="setCartQuantity('{{ $barcode }}', 0.250)">ربع</button>
-                                        <button type="button" class="btn btn-secondary py-0" style="font-size: 10px;" onclick="setCartQuantity('{{ $barcode }}', 0.500)">نص</button>
-                                        <button type="button" class="btn btn-info text-white py-0" style="font-size: 10px;" onclick="promptGramInput('{{ $barcode }}')">جرام</button>
+                                @if($isService)
+                                    <span class="fw-bold text-primary cart-qty-static fs-6" style="padding: 0.25rem 1rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 20px;">
+                                        {{ number_format($details['quantity'], 0) }}
+                                    </span>
+                                @else
+                                    <div class="d-flex align-items-center mb-1">
+                                        <button type="button" class="btn btn-outline-danger btn-sm me-2"
+                                            onclick="updateCartQuantity('{{ $barcode }}', -1)">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" step="0.001" class="form-control form-control-sm text-center fw-bold text-primary cart-qty-input" 
+                                            value="{{ number_format($details['quantity'], 3, '.', '') }}"
+                                            style="width: 80px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);"
+                                            onchange="setCartQuantity('{{ $barcode }}', this.value)">
+                                        <button type="button" class="btn btn-outline-success btn-sm ms-2"
+                                            onclick="updateCartQuantity('{{ $barcode }}', 1)">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
                                     </div>
+                                    
+                                    @if(isset($details['is_weighted']) && $details['is_weighted'])
+                                        <div class="btn-group btn-group-sm mt-1">
+                                            <button type="button" class="btn btn-secondary py-0" style="font-size: 10px;" onclick="setCartQuantity('{{ $barcode }}', 0.125)">ثمن</button>
+                                            <button type="button" class="btn btn-secondary py-0" style="font-size: 10px;" onclick="setCartQuantity('{{ $barcode }}', 0.250)">ربع</button>
+                                            <button type="button" class="btn btn-secondary py-0" style="font-size: 10px;" onclick="setCartQuantity('{{ $barcode }}', 0.500)">نص</button>
+                                            <button type="button" class="btn btn-info text-white py-0" style="font-size: 10px;" onclick="promptGramInput('{{ $barcode }}')">جرام</button>
+                                        </div>
+                                    @endif
                                 @endif
                             </div>
                         </td>

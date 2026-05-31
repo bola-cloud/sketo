@@ -47,6 +47,7 @@ Route::middleware([
     Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     Route::resource('products', App\Http\Controllers\ProductController::class);
+    Route::resource('services', App\Http\Controllers\ServiceController::class);
     Route::get('products-export', [App\Http\Controllers\ProductController::class, 'export'])->name('products.export');
     Route::get('products/search', [App\Http\Controllers\ProductController::class, 'show'])->name('get.search');
     Route::post('products/search', [App\Http\Controllers\ProductController::class, 'search'])->name('products.search');
