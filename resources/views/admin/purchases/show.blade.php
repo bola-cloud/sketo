@@ -7,9 +7,9 @@
         <h3>{{ __('app.purchases.invoice_number') }}: {{ $purchase->invoice_number }}</h3>
         <h4>{{ __('app.purchases.type') }}:
             {{ $purchase->type == 'product' ? __('app.purchases.type_product') : __('app.purchases.type_expense') }}</h4>
-        <h4>{{ __('app.invoices.paid_amount') }}: {{ $purchase->paid_amount }} ج.م</h4>
-        <h4>{{ __('app.invoices.remaining_amount') }}: {{ $purchase->change }} ج.م</h4>
-        <h4>{{ __('app.invoices.total') }}: {{ $purchase->total_amount }} ج.م</h4>
+        <h4>{{ __('app.invoices.paid_amount') }}: {{ $purchase->paid_amount }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</h4>
+        <h4>{{ __('app.invoices.remaining_amount') }}: {{ $purchase->change }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</h4>
+        <h4>{{ __('app.invoices.total') }}: {{ $purchase->total_amount }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</h4>
 
         @if($purchase->type == 'product')
             <div class="mb-3">
@@ -122,10 +122,13 @@
         <a href="{{ route('purchases.index') }}" class="btn btn-primary">{{ __('app.invoices.back_to_invoices') }}</a>
     </div>
 
+@endsection
+
+@push('modals')
     <!-- Transfer History Modal -->
     <div class="modal fade" id="transferHistoryModal" tabindex="-1" aria-labelledby="transferHistoryModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="transferHistoryModalLabel">{{ __('app.purchases.history_title') }}</h5>
@@ -136,19 +139,27 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary"
-                        data-bs-dismiss="modal">{{ __('app.categories.close') }}</button>
+                        data-bs-dismiss="modal">{{ __('app.common.close') }}</button>
                 </div>
             </div>
         </div>
     </div>
+@endpush
 
+@push('scripts')
     <script>
         function showTransferHistory(purchaseId, productId) {
             fetch(`/purchases/${purchaseId}/transfer-history/${productId}`)
                 .then(response => response.json())
                 .then(data => {
+                    if (data.length === 0) {
+                        document.getElementById('transferHistoryContent').innerHTML = '<p class="text-center">{{ __('app.reports.no_transfers') }}</p>';
+                        new bootstrap.Modal(document.getElementById('transferHistoryModal')).show();
+                        return;
+                    }
+
                     let content = '<div class="table-responsive"><table class="table table-bordered">';
-                    content += '<thead><tr><th>{{ __('app.invoices.date') }}</th><th>{{ __('app.purchases.new_product') }}</th><th>{{ __('app.purchases.transferred_qty') }}</th><th>{{ __('app.purchases.new_cost') }}</th><th>{{ __('app.purchases.new_selling') }}</th><th>{{ __('app.purchases.new_invoice_col') }}</th></tr></thead>';
+                    content += '<thead><tr><th>{{ __('app.invoices.date') }}</th><th>{{ __('app.purchases.new_name') }}</th><th>{{ __('app.purchases.transferred_quantity') }}</th><th>{{ __('app.purchases.new_cost') }}</th><th>{{ __('app.purchases.new_selling') }}</th><th>{{ __('app.purchases.new_invoice_col') }}</th></tr></thead>';
                     content += '<tbody>';
 
                     data.forEach(transfer => {
@@ -156,8 +167,8 @@
                         <td>${transfer.formatted_created_at}</td>
                         <td>${transfer.new_product_name}</td>
                         <td>${transfer.transferred_quantity}</td>
-                        <td>${transfer.new_cost_price} ج.م</td>
-                        <td>${transfer.new_selling_price} ج.م</td>
+                        <td>${transfer.new_cost_price} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
+                        <td>${transfer.new_selling_price} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                         <td>${transfer.new_invoice_number}</td>
                     </tr>`;
                     });
@@ -174,4 +185,4 @@
                 });
         }
     </script>
-@endsection
+@endpush

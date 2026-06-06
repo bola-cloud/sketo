@@ -34,7 +34,7 @@
                             <div class="media d-flex">
                                 <div class="media-body text-left">
                                     <h3 class="primary text-bold-700">{{ $totalInvoices }} <small class="text-muted"
-                                            style="font-size: 0.8rem;">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                            style="font-size: 0.8rem;">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</small>
                                     </h3>
                                     <span
                                         class="text-bold-600 text-muted small uppercase">{{ __('app.clients.total_invoices') }}</span>
@@ -55,7 +55,7 @@
                             <div class="media d-flex">
                                 <div class="media-body text-left">
                                     <h3 class="success text-bold-700">{{ $totalPaidAmount }} <small class="text-muted"
-                                            style="font-size: 0.8rem;">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                            style="font-size: 0.8rem;">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</small>
                                     </h3>
                                     <span
                                         class="text-bold-600 text-muted small uppercase">{{ __('app.clients.total_paid') }}</span>
@@ -76,7 +76,7 @@
                             <div class="media d-flex">
                                 <div class="media-body text-left">
                                     <h3 class="danger text-bold-700">{{ $totalChange }} <small class="text-muted"
-                                            style="font-size: 0.8rem;">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                            style="font-size: 0.8rem;">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</small>
                                     </h3>
                                     <span
                                         class="text-bold-600 text-muted small uppercase">{{ __('app.clients.total_due') }}</span>
@@ -122,12 +122,12 @@
                                                 <td><span
                                                         class="text-bold-700 text-dark">{{ number_format($invoice->total_amount, 2) }}</span>
                                                     <small
-                                                        class="text-muted">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                                        class="text-muted">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</small>
                                                 </td>
                                                 <td><span
                                                         class="success text-bold-600">{{ number_format($invoice->paid_amount, 2) }}</span>
                                                     <small
-                                                        class="text-muted">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                                        class="text-muted">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</small>
                                                 </td>
                                                 <td>
                                                     <span
@@ -135,7 +135,7 @@
                                                         {{ number_format($invoice->change, 2) }}
                                                     </span>
                                                     <small
-                                                        class="text-muted">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                                        class="text-muted">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</small>
                                                 </td>
                                                 <td class="text-right">
                                                     <a href="{{ route('invoices.show', $invoice->id) }}"

@@ -127,14 +127,14 @@
                                         </td>
                                         <td><span
                                                 class="success text-bold-600">{{ number_format($purchase->paid_amount, 2) }}</span>
-                                            <small class="text-muted">ج.م</small>
+                                            <small class="text-muted">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</small>
                                         </td>
                                         <td><span class="danger text-bold-600">{{ number_format($purchase->change, 2) }}</span>
-                                            <small class="text-muted">ج.م</small>
+                                            <small class="text-muted">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</small>
                                         </td>
                                         <td><span
                                                 class="text-bold-700 text-dark">{{ number_format($purchase->total_amount, 2) }}</span>
-                                            <small class="text-muted">ج.م</small>
+                                            <small class="text-muted">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</small>
                                         </td>
                                         <td class="text-right">
                                             <div class="btn-group">

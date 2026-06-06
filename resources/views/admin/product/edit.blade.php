@@ -227,7 +227,7 @@
                                             <td class="text-center">
                                                 <span class="badge badge-soft-primary px-1">{{ $purchase->pivot->quantity }}</span>
                                             </td>
-                                            <td class="text-right small">{{ number_format($purchase->total_amount, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                            <td class="text-right small">{{ number_format($purchase->total_amount, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>

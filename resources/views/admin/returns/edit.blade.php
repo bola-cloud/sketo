@@ -68,7 +68,7 @@
                                             <div class="form-group">
                                                 <label>{{ __('app.returns.return_amount') }}</label>
                                                 <input type="text" class="form-control"
-                                                    value="{{ number_format($customerReturn->return_amount, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}"
+                                                    value="{{ number_format($customerReturn->return_amount, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}"
                                                     readonly>
                                             </div>
 

@@ -137,9 +137,9 @@
                                             <span class="text-bold-600">{{ $service->category->name ?? __('app.products.undefined') }}</span>
                                         </td>
                                         @if($user->hasRole('admin'))
-                                            <td class="text-bold-600">{{ number_format($service->cost_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                            <td class="text-bold-600">{{ number_format($service->cost_price, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                                         @endif
-                                        <td class="text-bold-700 primary">{{ number_format($service->selling_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                        <td class="text-bold-700 primary">{{ number_format($service->selling_price, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                                         <td class="text-center">
                                             @if($service->barcode_path)
                                                 <div class="barcode-container py-1">

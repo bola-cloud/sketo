@@ -17,6 +17,7 @@ class Vendor extends Model
         'status',
         'package_id',
         'subscription_ends_at',
+        'currency'
     ];
 
     protected $casts = [

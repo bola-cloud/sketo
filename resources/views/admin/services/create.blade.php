@@ -76,7 +76,7 @@
                                     <div class="input-group">
                                         <input type="number" step="0.01" class="form-control round border-primary" id="cost_price" name="cost_price" 
                                             value="{{ old('cost_price') }}" placeholder="0.00" required>
-                                        <div class="input-group-append"><span class="input-group-text bg-transparent border-0">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span></div>
+                                        <div class="input-group-append"><span class="input-group-text bg-transparent border-0">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</span></div>
                                     </div>
                                 </div>
                             </div>
@@ -87,7 +87,7 @@
                                     <div class="input-group">
                                         <input type="number" step="0.01" class="form-control round border-primary" id="selling_price" name="selling_price" 
                                             value="{{ old('selling_price') }}" placeholder="0.00" required>
-                                        <div class="input-group-append"><span class="input-group-text bg-transparent border-0">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span></div>
+                                        <div class="input-group-append"><span class="input-group-text bg-transparent border-0">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</span></div>
                                     </div>
                                 </div>
                             </div>

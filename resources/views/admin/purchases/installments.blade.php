@@ -7,9 +7,9 @@
         <h3>{{ __('app.purchases.invoice_number') }}: {{ $purchase->invoice_number }}</h3>
         <h4>{{ __('app.purchases.type') }}:
             {{ $purchase->type == 'product' ? __('app.purchases.type_product') : __('app.purchases.type_expense') }}</h4>
-        <h4>{{ __('app.invoices.total') }}: {{ $purchase->total_amount }} ج.م</h4>
-        <h4>{{ __('app.purchases.total_paid') }}: {{ $purchase->total_paid }} ج.م</h4>
-        <h4>{{ __('app.invoices.remaining_amount') }}: {{ $purchase->change }} ج.م</h4>
+        <h4>{{ __('app.invoices.total') }}: {{ $purchase->total_amount }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</h4>
+        <h4>{{ __('app.purchases.total_paid') }}: {{ $purchase->total_paid }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</h4>
+        <h4>{{ __('app.invoices.remaining_amount') }}: {{ $purchase->change }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</h4>
 
         @if($purchase->type == 'product')
             <!-- Product Table (same as before) -->
@@ -29,7 +29,7 @@
                 <tbody>
                     @foreach($purchase->installments as $installment)
                         <tr>
-                            <td>{{ $installment->amount_paid }} ج.م</td>
+                            <td>{{ $installment->amount_paid }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                             <td>{{ $installment->date_paid }}</td>
                             <td>
                                 <!-- Option to delete or update installment if needed -->

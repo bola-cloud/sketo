@@ -17,20 +17,20 @@
                 <p>{{ __('app.invoices.buyer_phone') }}: {{ $invoice->buyer_phone }}</p>
                 <p>{{ __('app.invoices.seller') }}: {{ $invoice->user->name }}</p>
                 <p>{{ __('app.invoices.subtotal') }}: {{ number_format($invoice->subtotal, 2) }}
-                    {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</p>
+                    {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</p>
                 <p>{{ __('app.invoices.discount') }}: {{ number_format($invoice->discount, 2) }}
-                    {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</p>
+                    {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</p>
                 <p>{{ __('app.invoices.total') }}: {{ number_format($invoice->total_amount, 2) }}
-                    {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</p>
+                    {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</p>
                 <p>{{ __('app.invoices.paid_amount') }}: {{ number_format($invoice->paid_amount, 2) }}
-                    {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</p>
+                    {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</p>
                 <p>
                     @if($invoice->change < 0)
                         {{ __('app.invoices.remaining_amount') }}: {{ number_format(abs($invoice->change), 2) }}
-                        {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                        {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}
                     @elseif($invoice->change > 0)
                         {{ __('app.invoices.change_amount') }}: {{ number_format($invoice->change, 2) }}
-                        {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                        {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}
                     @else
                         {{ __('app.invoices.fully_paid') }}
                     @endif
@@ -47,7 +47,7 @@
                         <i class="fa fa-info-circle"></i>
                         <strong>{{ __('app.common.notice') }}:</strong>
                         {{ __('app.invoices.return_alert', ['count' => $returnsCount, 'amount' => number_format($totalReturns, 2)]) }}
-                        {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                        {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}
                         <a href="{{ route('customer-returns.index') }}?invoice_code={{ $invoice->invoice_code }}"
                             class="btn btn-sm btn-info ml-2">
                             {{ __('app.invoices.view_returns') }}
@@ -172,29 +172,29 @@
                 <tr>
                     <th colspan="{{ $invoice->returns()->count() > 0 ? '4' : '3' }}" class="text-right">
                         {{ __('app.invoices.subtotal') }}:</th>
-                    <th>{{ number_format($invoice->subtotal, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</th>
+                    <th>{{ number_format($invoice->subtotal, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</th>
                 </tr>
                 <tr>
                     <th colspan="{{ $invoice->returns()->count() > 0 ? '4' : '3' }}" class="text-right">
                         {{ __('app.invoices.discount') }}:</th>
-                    <th>{{ number_format($invoice->discount, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</th>
+                    <th>{{ number_format($invoice->discount, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</th>
                 </tr>
                 @if($invoice->returns()->count() > 0)
                     <tr>
                         <th colspan="4" class="text-right">{{ __('app.invoices.total_returns') }}:</th>
                         <th class="text-danger">-{{ number_format($invoice->returns()->sum('return_amount'), 2) }}
-                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</th>
+                            {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</th>
                     </tr>
                 @endif
                 <tr>
                     <th colspan="{{ $invoice->returns()->count() > 0 ? '4' : '3' }}" class="text-right">
                         {{ __('app.invoices.total') }}:</th>
-                    <th>{{ number_format($invoice->total_amount, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</th>
+                    <th>{{ number_format($invoice->total_amount, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</th>
                 </tr>
                 <tr>
                     <th colspan="{{ $invoice->returns()->count() > 0 ? '4' : '3' }}" class="text-right">
                         {{ __('app.invoices.paid_amount') }}:</th>
-                    <th>{{ number_format($invoice->paid_amount, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</th>
+                    <th>{{ number_format($invoice->paid_amount, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</th>
                 </tr>
                 <tr>
                     <th colspan="{{ $invoice->returns()->count() > 0 ? '4' : '3' }}" class="text-right">
@@ -209,10 +209,10 @@
                     <th>
                         @if($invoice->change < 0)
                             <span class="text-danger">{{ number_format(abs($invoice->change), 2) }}
-                                {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span>
+                                {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</span>
                         @elseif($invoice->change > 0)
                             <span class="text-success">{{ number_format($invoice->change, 2) }}
-                                {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span>
+                                {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</span>
                         @else
                             <span class="text-success">{{ __('app.invoices.fully_paid') }}</span>
                         @endif
@@ -243,7 +243,7 @@
                     <select name="product_id" id="product_id" class="form-control" required>
                         @foreach($products as $product)
                             <option value="{{ $product->id }}">{{ $product->name }} -
-                                {{ number_format($product->selling_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                                {{ number_format($product->selling_price, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}
                             </option>
                         @endforeach
                     </select>

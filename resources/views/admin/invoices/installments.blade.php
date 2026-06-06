@@ -20,7 +20,7 @@
                         @foreach($installments as $installment)
                             <tr>
                                 <td>{{ number_format($installment->amount_paid, 2) }}
-                                    {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                    {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                                 <td>{{ $installment->date_paid }}</td>
                                 <td>
                                     <!-- Edit Button that opens the modal -->

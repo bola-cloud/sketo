@@ -44,6 +44,22 @@
                                     </div>
                                 </div>
 
+                                <div class="col-md-12 mb-4">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold text-muted small mb-1">{{ __('app.platform.currency') ?? 'العملة الأساسية' }}</label>
+                                        <select name="currency" class="form-control" required>
+                                            <option value="{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}">الجنيه المصري ({{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }})</option>
+                                            <option value="ريال">الريال السعودي (ريال)</option>
+                                            <option value="د.ك">الدينار الكويتي (د.ك)</option>
+                                            <option value="د.إ">الدرهم الإماراتي (د.إ)</option>
+                                            <option value="ر.ع.">الريال العماني (ر.ع.)</option>
+                                            <option value="د.ب.">الدينار البحريني (د.ب.)</option>
+                                            <option value="ر.ق.">الريال القطري (ر.ق.)</option>
+                                            <option value="$">الدولار الأمريكي ($)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
                                 <div class="col-md-12 mb-3 mt-2">
                                     <hr class="opacity-25" style="border-color: rgba(255,255,255,0.1);">
                                     <h5 class="font-weight-bold text-gradient-premium mb-4 mt-2"><i class="la la-user-tie mr-2"></i>

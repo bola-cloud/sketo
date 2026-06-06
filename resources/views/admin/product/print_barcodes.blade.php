@@ -74,7 +74,7 @@
         @foreach($products as $product)
             <div class="barcode_content">
                 <!-- <p >style</p> -->
-                <p class="code_price"> price: {{$product->selling_price}} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                <p class="code_price"> price: {{$product->selling_price}} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}
                 </p> <!-- Display product name -->
                 <img id="barcode-{{ $product->id }}" /> <!-- Barcode image for each product -->
             </div>

@@ -37,6 +37,9 @@ class CashierController extends Controller
         if (!$product) {
             return redirect()->route('cashier.viewCart')->with('error', 'المنتج غير موجود.');
         }
+        if ($product->type !== 'service' && $product->quantity <= 0) {
+            return redirect()->route('cashier.viewCart')->with('error', 'الكمية غير متوفرة في المخزن.');
+        }
         $cart = session()->get('cart', []);
         if (!isset($cart[$barcode])) {
             $cart[$barcode] = [
@@ -50,7 +53,11 @@ class CashierController extends Controller
                 'type' => $product->type,
             ];
         } else {
-            $cart[$barcode]['quantity'] += 1;
+            $newQuantity = $cart[$barcode]['quantity'] + 1;
+            if ($product->type !== 'service' && $newQuantity > $product->quantity) {
+                return redirect()->route('cashier.viewCart')->with('error', 'الكمية المطلوبة تتجاوز المخزون المتاح.');
+            }
+            $cart[$barcode]['quantity'] = $newQuantity;
         }
         session()->put('cart', $cart);
         if ($request->ajax()) {
@@ -85,6 +92,10 @@ class CashierController extends Controller
                 if ($newQuantity != round($newQuantity)) {
                     $newQuantity = round($newQuantity);
                 }
+            }
+
+            if ($product && !$isService && $newQuantity > $product->quantity) {
+                $newQuantity = $product->quantity;
             }
 
             if ($newQuantity > 0) {
@@ -214,7 +225,7 @@ class CashierController extends Controller
         DB::beginTransaction();
         try {
             $invoice = Invoice::create([
-                'invoice_code' => $invoiceCode ?? strtoupper(uniqid('INV-')),
+                'invoice_code' => $invoiceCode ?? date('ymd') . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT),
                 'subtotal' => $subtotal,
                 'discount' => $discount,
                 'total_amount' => $totalAfterDiscount,
@@ -323,12 +334,20 @@ class CashierController extends Controller
     {
         $query = $request->input('query');
         if ($query === null || $query === '') {
-            $products = Product::where('quantity', '>', 0)->get();
+            $products = Product::where(function ($q) {
+                $q->where('quantity', '>', 0)
+                  ->orWhere('type', 'service');
+            })->get();
         } else {
-            $products = Product::where('name', 'LIKE', "%{$query}%")
-                ->orWhere('barcode', 'LIKE', "%{$query}%")
-                ->where('quantity', '>', 0)
-                ->get();
+            $products = Product::where(function ($q) use ($query) {
+                $q->where('name', 'LIKE', "%{$query}%")
+                  ->orWhere('barcode', 'LIKE', "%{$query}%");
+            })
+            ->where(function ($q) {
+                $q->where('quantity', '>', 0)
+                  ->orWhere('type', 'service');
+            })
+            ->get();
         }
         $results = $products->map(function ($product) {
             return [

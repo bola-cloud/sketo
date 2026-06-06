@@ -69,12 +69,12 @@
                         </td>
                         <td class="text-center">
                             <span class="badge bg-info fs-6">{{ number_format($details['price'], 2) }}
-                                {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span>
+                                {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</span>
                         </td>
                         <td class="text-center">
                             <span
                                 class="fw-bold text-success fs-6">{{ number_format($details['price'] * $details['quantity'], 2) }}
-                                {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span>
+                                {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</span>
                         </td>
                         <td class="text-center">
                             <form action="{{ route('cashier.removeFromCart') }}" method="POST" style="display:inline;">

@@ -35,7 +35,7 @@
                                 <div class="media-body text-left">
                                     <h3 class="primary text-bold-700">{{ number_format($totalPurchases, 2) }} <small
                                             class="text-muted"
-                                            style="font-size: 0.8rem;">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                            style="font-size: 0.8rem;">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</small>
                                     </h3>
                                     <span
                                         class="text-bold-600 text-muted small uppercase">{{ __('app.suppliers.total_purchases') }}</span>
@@ -57,7 +57,7 @@
                                 <div class="media-body text-left">
                                     <h3 class="success text-bold-700">{{ number_format($totalPaidAmount, 2) }} <small
                                             class="text-muted"
-                                            style="font-size: 0.8rem;">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                            style="font-size: 0.8rem;">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</small>
                                     </h3>
                                     <span
                                         class="text-bold-600 text-muted small uppercase">{{ __('app.suppliers.total_paid') }}</span>
@@ -79,7 +79,7 @@
                                 <div class="media-body text-left">
                                     <h3 class="danger text-bold-700">{{ number_format($totalChange, 2) }} <small
                                             class="text-muted"
-                                            style="font-size: 0.8rem;">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                            style="font-size: 0.8rem;">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</small>
                                     </h3>
                                     <span
                                         class="text-bold-600 text-muted small uppercase">{{ __('app.suppliers.total_due') }}</span>
@@ -125,12 +125,12 @@
                                                 <td><span
                                                         class="text-bold-700 text-dark">{{ number_format($purchase->total_amount, 2) }}</span>
                                                     <small
-                                                        class="text-muted">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                                        class="text-muted">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</small>
                                                 </td>
                                                 <td><span
                                                         class="success text-bold-600">{{ number_format($purchase->paid_amount, 2) }}</span>
                                                     <small
-                                                        class="text-muted">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                                        class="text-muted">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</small>
                                                 </td>
                                                 <td>
                                                     <span
@@ -138,7 +138,7 @@
                                                         {{ number_format($purchase->change, 2) }}
                                                     </span>
                                                     <small
-                                                        class="text-muted">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</small>
+                                                        class="text-muted">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</small>
                                                 </td>
                                                 <td class="text-right">
                                                     <a href="{{ route('purchases.show', $purchase->id) }}"

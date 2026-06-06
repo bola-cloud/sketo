@@ -137,6 +137,10 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_stagnant_products',
                     'description' => 'Get a list of stagnant products that have had zero sales in the last 30 days.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[]
+                    ]
                 ]
             ],
             [
@@ -144,6 +148,10 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_purchase_summary',
                     'description' => 'Get a summary of recent purchase invoices (stock incoming).',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[]
+                    ]
                 ]
             ],
             [
@@ -151,6 +159,10 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_top_selling_products',
                     'description' => 'Identify the top 5 best-selling products by quantity.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[]
+                    ]
                 ]
             ],
             [
@@ -172,6 +184,21 @@ class AiAgentService
                 'function' => [
                     'name' => 'get_recent_invoices',
                     'description' => 'Get the 5 most recent sales invoices including client name and paid amount.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[]
+                    ]
+                ]
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'get_financial_dues',
+                    'description' => 'Get a summary of unpaid invoices (debts we owe to suppliers, and credits clients owe us) to help with financial scheduling.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[]
+                    ]
                 ]
             ]
         ];
@@ -189,8 +216,8 @@ class AiAgentService
             switch ($functionName) {
                 case 'get_today_summary':
                 case 'get_sales_overview':
-                    $days = $args['days'] ?? ($functionName === 'get_today_summary' ? 1 : 7);
-                    $startDate = Carbon::now()->subDays($days)->startOfDay();
+                    $days = $args['days'] ?? ($functionName === 'get_today_summary' ? 0 : 7);
+                    $startDate = $days == 0 ? Carbon::today() : Carbon::now()->subDays($days)->startOfDay();
                     
                     $totalSold = Sales::where('vendor_id', $vendorId)
                         ->where('created_at', '>=', $startDate)
@@ -202,12 +229,12 @@ class AiAgentService
                     
                     return json_encode([
                         'status' => 'success', 
-                        'period' => "آخر $days أيام",
+                        'period' => $days == 0 ? "اليوم" : "آخر $days أيام",
                         'from_date' => $startDate->toDateString(),
                         'to_date' => Carbon::now()->toDateString(),
                         'total_items_sold' => (float)$totalSold, 
                         'total_revenue' => (float)$totalRevenue,
-                        'currency' => 'ج.م'
+                        'currency' => auth()->user()->vendor->currency ?? 'ج.م'
                     ]);
 
                 case 'get_categories':
@@ -263,8 +290,8 @@ class AiAgentService
                     return json_encode(['status' => 'success', 'recent_purchases' => $recentPurchases]);
 
                 case 'get_profit_summary':
-                    $days = $args['days'] ?? 1;
-                    $startDate = Carbon::now()->subDays($days);
+                    $days = $args['days'] ?? 0; // 0 means today
+                    $startDate = $days == 0 ? Carbon::today() : Carbon::now()->subDays($days)->startOfDay();
                     
                     $sales = Sales::where('vendor_id', $vendorId)
                         ->where('created_at', '>=', $startDate)
@@ -313,8 +340,71 @@ class AiAgentService
                         $query->whereRaw('DATEDIFF(expiry_date, CURDATE()) <= expiry_alert_days');
                     }
                     
-                    $products = $query->select('name', 'expiry_date')->get();
-                    return json_encode(['status' => 'success', 'expiring_items' => $products]);
+                    $products = $query->select('name', 'expiry_date', 'quantity', 'cost_price', 'selling_price')->get();
+                    
+                    // Calculate potential revenue and loss
+                    $potential_loss = 0;
+                    $potential_revenue = 0;
+                    foreach ($products as $p) {
+                        $potential_loss += ($p->cost_price * $p->quantity);
+                        $potential_revenue += ($p->selling_price * $p->quantity);
+                    }
+                    
+                    return json_encode([
+                        'status' => 'success', 
+                        'expiring_items' => $products,
+                        'financial_impact' => [
+                            'potential_loss_if_expired' => $potential_loss,
+                            'potential_revenue_if_sold' => $potential_revenue
+                        ]
+                    ]);
+
+                case 'get_financial_dues':
+                    $supplierDues = \App\Models\Purchase::where('vendor_id', $vendorId)
+                        ->whereRaw('total_amount > paid_amount')
+                        ->with('supplier:id,name,phone')
+                        ->select('id', 'supplier_id', 'invoice_number', 'total_amount', 'paid_amount', 'created_at')
+                        ->orderBy('created_at', 'asc')
+                        ->get()
+                        ->map(function ($purchase) {
+                            return [
+                                'type' => 'debt_to_supplier',
+                                'invoice_number' => $purchase->invoice_number,
+                                'supplier' => $purchase->supplier->name ?? 'غير محدد',
+                                'date' => $purchase->created_at->toDateString(),
+                                'total_amount' => $purchase->total_amount,
+                                'paid_amount' => $purchase->paid_amount,
+                                'remaining_due' => $purchase->total_amount - $purchase->paid_amount,
+                            ];
+                        });
+                        
+                    $clientDues = Invoice::where('vendor_id', $vendorId)
+                        ->whereRaw('total_amount > paid_amount')
+                        ->with('client:id,name,phone')
+                        ->select('id', 'client_id', 'invoice_code', 'total_amount', 'paid_amount', 'created_at')
+                        ->orderBy('created_at', 'asc')
+                        ->get()
+                        ->map(function ($invoice) {
+                            return [
+                                'type' => 'credit_from_client',
+                                'invoice_number' => $invoice->invoice_code,
+                                'client' => $invoice->client->name ?? 'غير محدد',
+                                'date' => $invoice->created_at->toDateString(),
+                                'total_amount' => $invoice->total_amount,
+                                'paid_amount' => $invoice->paid_amount,
+                                'remaining_due' => $invoice->total_amount - $invoice->paid_amount,
+                            ];
+                        });
+
+                    return json_encode([
+                        'status' => 'success', 
+                        'what_we_owe_suppliers' => $supplierDues,
+                        'what_clients_owe_us' => $clientDues,
+                        'summary' => [
+                            'total_debts_to_suppliers' => $supplierDues->sum('remaining_due'),
+                            'total_credits_from_clients' => $clientDues->sum('remaining_due')
+                        ]
+                    ]);
 
                 case 'get_recent_clients':
                     $clients = \App\Models\Client::where('vendor_id', $vendorId)
@@ -329,7 +419,7 @@ class AiAgentService
                         ->with('client:id,name')
                         ->orderBy('created_at', 'desc')
                         ->limit(5)
-                        ->select('id', 'client_id', 'total_amount', 'paid_amount', 'remaining_amount', 'created_at')
+                        ->select('id', 'client_id', 'total_amount', 'paid_amount', 'created_at')
                         ->get();
                     return json_encode(['status' => 'success', 'recent_invoices' => $invoices]);
 
@@ -404,7 +494,41 @@ class AiAgentService
         $responseMessage = $responseData['choices'][0]['message'];
 
         if (empty($responseMessage['tool_calls'])) {
-            return $responseMessage;
+            // FALLBACK FOR PROXIES THAT LEAK JSON IN TEXT
+            $content = $responseMessage['content'] ?? '';
+            if (preg_match('/"name"\s*:\s*"([^"]+)"/', $content, $matches)) {
+                $functionName = $matches[1];
+                $validTools = array_column(array_column($tools, 'function'), 'name');
+                
+                if (in_array($functionName, $validTools)) {
+                    $functionArgs = [];
+                    // Try to extract JSON arguments
+                    if (preg_match('/"arguments"\s*:\s*(\{.*?\})/s', $content, $argMatches)) {
+                        $functionArgs = json_decode($argMatches[1], true) ?? [];
+                    } elseif (preg_match('/"arguments"\s*:\s*"(.*?)"/s', $content, $argMatches)) {
+                        $decoded = str_replace(['\"', "\\'"], ['"', "'"], $argMatches[1]);
+                        $functionArgs = json_decode($decoded, true) ?? [];
+                    }
+                    
+                    // Emulate tool_call structure
+                    $responseMessage['tool_calls'] = [[
+                        'id' => 'call_' . uniqid(),
+                        'type' => 'function',
+                        'function' => [
+                            'name' => $functionName,
+                            'arguments' => json_encode($functionArgs)
+                        ]
+                    ]];
+                    
+                    // Clean up the content so the user doesn't see the raw JSON if the AI fails later
+                    $responseMessage['content'] = preg_replace('/```json\s*\{.*?"name".*?\}\s*```/s', '', $content);
+                    $responseMessage['content'] = preg_replace('/\{.*?"name"\s*:\s*"([^"]+)".*?\}/s', '', $responseMessage['content']);
+                }
+            }
+            
+            if (empty($responseMessage['tool_calls'])) {
+                return $responseMessage;
+            }
         }
 
         $messages[] = $responseMessage;

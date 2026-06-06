@@ -349,7 +349,7 @@
                                             <div class="col-6">
                                                 <h6 class="text-success mb-0" id="cart-total-amount">
                                                     {{ number_format($subtotal ?? 0, 2) }}
-                                                    {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                                                    {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}
                                                 </h6>
                                                 <small class="text-muted">{{ __('app.cashier.total_amount') }}</small>
                                             </div>
@@ -435,6 +435,14 @@
 
     <script>
         $(document).ready(function () {
+            // Global AJAX error handling for CSRF/Session expiration
+            $(document).ajaxError(function (event, xhr, settings) {
+                if (xhr.status === 419 || (xhr.responseJSON && xhr.responseJSON.message && xhr.responseJSON.message.includes('CSRF'))) {
+                    alert("انتهت صلاحية الجلسة أو رمز الحماية (CSRF). سيتم إعادة تحميل الصفحة لتحديث الجلسة تلقائياً.");
+                    location.reload();
+                }
+            });
+
             // Initialize Select2 for client dropdown
             $('.select2-client').select2({
                 placeholder: "{{ __('app.cashier.select_client') }}",
@@ -655,7 +663,7 @@
                             '</small>' +
                             '</div>' +
                             '<div class="text-end">' +
-                            '<span class="badge bg-info">' + price.toFixed(2) + ' {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span>' +
+                            '<span class="badge bg-info">' + price.toFixed(2) + ' {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</span>' +
                             '<br><small class="text-muted">{{ __('app.cashier.available') }}: ' + qty + '</small>' +
                             '</div>' +
                             '</li>'
@@ -795,7 +803,7 @@
                     
                     // Update total from the new HTML
                     let totalVal = $('#total_after_discount').text() || '0';
-                    $('#cart-total-amount').text(totalVal + ' {{ App::getLocale() == "ar" ? "ج.م" : "EGP" }}');
+                    $('#cart-total-amount').text(totalVal + ' {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}');
                 },
                 error: function () {
                     // fallback: reload if AJAX fails

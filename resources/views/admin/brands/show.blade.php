@@ -96,7 +96,7 @@
                                                     </td>
                                                     <td class="primary text-bold-700">
                                                         {{ number_format($product->selling_price, 2) }}
-                                                        {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                                                        {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}
                                                     </td>
                                                     <td>
                                                         <span

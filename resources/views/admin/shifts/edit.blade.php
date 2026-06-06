@@ -40,20 +40,20 @@
                                         <div class="p-2 bg-light-primary rounded-lg border-0 shadow-sm">
                                             <h6 class="text-muted small mb-1 text-bold-600">{{ __('app.shifts.starting_cash') }}</h6>
                                             <h4 class="text-primary text-bold-700">
-                                                {{ number_format($shift->starting_cash, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</h4>
+                                                {{ number_format($shift->starting_cash, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</h4>
                                         </div>
                                     </div>
                                     <div class="col-md-4 text-center">
                                         <div class="p-2 bg-light-success rounded-lg border-0 shadow-sm">
                                             <h6 class="text-muted small mb-1 text-bold-600">{{ __('app.shifts.total_sales') }}</h6>
-                                            <h4 class="text-success text-bold-700">{{ number_format($totalSales, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                                            <h4 class="text-success text-bold-700">{{ number_format($totalSales, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}
                                             </h4>
                                         </div>
                                     </div>
                                     <div class="col-md-4 text-center">
                                         <div class="p-2 bg-light-warning rounded-lg border-0 shadow-sm">
                                             <h6 class="text-muted small mb-1 text-bold-600">{{ __('app.shifts.expected_cash') }}</h6>
-                                            <h4 class="text-warning text-bold-700">{{ number_format($expectedCash, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                                            <h4 class="text-warning text-bold-700">{{ number_format($expectedCash, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}
                                             </h4>
                                         </div>
                                     </div>

@@ -44,9 +44,9 @@
                         <strong>{{ __('app.products.quantity') }}:</strong> <span
                             class="badge bg-success">{{ $remainingQuantity }}</span><br>
                         <strong>{{ __('app.purchases.current_cost') }}:</strong>
-                        {{ number_format($product->cost_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}<br>
+                        {{ number_format($product->cost_price, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}<br>
                         <strong>{{ __('app.purchases.current_selling') }}:</strong>
-                        {{ number_format($product->selling_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                        {{ number_format($product->selling_price, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}
                     </div>
                 </div>
             </div>
@@ -143,7 +143,7 @@
                                     {{ $purchaseOption->invoice_number }} -
                                     {{ $purchaseOption->supplier->name ?? __('app.products.undefined') }}
                                     ({{ number_format($purchaseOption->total_amount, 2) }}
-                                    {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }})
+                                    {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }})
                                 </option>
                             @endforeach
                         </select>
@@ -196,16 +196,16 @@
                             <strong>{{ __('app.purchases.new_prices') }}:</strong><br>
                             <span class="text-info">{{ __('app.purchases.cost') }}: <span
                                     id="cost-summary">{{ old('new_cost_price', $product->cost_price) }}</span>
-                                {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span><br>
+                                {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</span><br>
                             <span class="text-success">{{ __('app.purchases.selling') }}: <span
                                     id="selling-summary">{{ old('new_selling_price', $product->selling_price) }}</span>
-                                {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span>
+                                {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</span>
                         </div>
                         <div class="col-md-6">
                             <strong>{{ __('app.purchases.expected_profit') }}:</strong><br>
                             <span class="text-warning" id="profit-summary">
                                 {{ number_format((old('new_selling_price', $product->selling_price) - old('new_cost_price', $product->cost_price)) * old('transfer_quantity', $remainingQuantity), 2) }}
-                                {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                                {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}
                             </span>
                         </div>
                     </div>
@@ -237,7 +237,7 @@
                 width: '100%'
             });
 
-            const currencySymbol = "{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}";
+            const currencySymbol = "{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}";
 
             // Real-time summary updates
             function updateSummary() {

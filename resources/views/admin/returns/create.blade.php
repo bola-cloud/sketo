@@ -62,7 +62,7 @@
                                             <td>{{ $invoice->buyer_name }}</td>
                                             <td>{{ $invoice->created_at->format('Y-m-d') }}</td>
                                             <td>{{ number_format($invoice->total_amount, 2) }}
-                                                {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                                {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                                             <td>
                                                 <a href="{{ route('customer-returns.createForInvoice', $invoice) }}"
                                                     class="btn btn-sm btn-primary">

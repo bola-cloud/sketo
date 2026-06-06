@@ -184,7 +184,7 @@ class PurchasesController extends Controller
                 $product->remaining_quantity = max($remainingQuantity, 0);
                 $product->profit_from_this_batch = ($product->selling_price - $purchaseProduct->cost_price) * $soldQuantityFromThisBatch;
                 $product->has_transfers = $hasTransfers;
-                $product->original_purchase_quantity = $purchaseProduct->quantity;
+                $product->original_purchase_quantity = $purchaseProduct->quantity + $transferredQuantityFromThisBatch;
                 $product->transferred_quantity = $transferredQuantityFromThisBatch;
             }
         }
@@ -326,6 +326,7 @@ class PurchasesController extends Controller
                 'color' => $product->color . '-منقول', // Add transfer indicator
                 'category_id' => $product->category_id,
                 'brand_id' => $product->brand_id,
+                'is_weighted' => $product->is_weighted,
                 'quantity' => $validatedData['transfer_quantity'],
                 'threshold' => $product->threshold,
                 'image' => $imagePath,
@@ -336,6 +337,7 @@ class PurchasesController extends Controller
             // Step 5: Attach the new product to the target purchase
             $newPurchase = Purchase::find($validatedData['new_purchase_id']);
             $newPurchase->products()->attach($newProduct->id, [
+                'vendor_id' => auth()->user()->vendor_id,
                 'quantity' => $validatedData['transfer_quantity'],
                 'cost_price' => $validatedData['new_cost_price'],
                 'remaining_quantity' => $validatedData['transfer_quantity'],
@@ -369,6 +371,7 @@ class PurchasesController extends Controller
 
             // Step 7: Update the original product's total quantity
             $product->recalculateProductQuantity();
+            $newProduct->recalculateProductQuantity();
 
             // Step 8: Record the transfer in the product_transfers table
             DB::table('product_transfers')->insert([

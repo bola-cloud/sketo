@@ -42,7 +42,7 @@
                                             <tr>
                                                 <td><strong>{{ __('app.returns.return_amount') }}:</strong></td>
                                                 <td>{{ number_format($customerReturn->return_amount, 2) }}
-                                                    {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                                    {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                                             </tr>
                                             <tr>
                                                 <td><strong>{{ __('app.returns.return_reason') }}:</strong></td>
@@ -114,7 +114,7 @@
                                             <tr>
                                                 <td><strong>{{ __('app.returns.invoice_total') }}:</strong></td>
                                                 <td>{{ number_format($customerReturn->invoice->total_amount, 2) }}
-                                                    {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                                    {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                                             </tr>
                                         </table>
                                     </div>
@@ -145,7 +145,7 @@
                                                     <tr>
                                                         <td><strong>{{ __('app.products.selling_price') }}:</strong></td>
                                                         <td>{{ number_format($customerReturn->product->selling_price, 2) }}
-                                                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                                            {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                                                     </tr>
                                                 </table>
                                             </div>

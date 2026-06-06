@@ -26,11 +26,11 @@
                 <div class="row">
                     <div class="col-md-6">
                         <h4>{{ __('app.treasury.total_sales_installments') }} {{ number_format($salesInstallments, 2) }}
-                            {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</h4>
+                            {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</h4>
                     </div>
                     <div class="col-md-6">
                         <h4>{{ __('app.treasury.total_purchase_installments') }}
-                            {{ number_format($purchaseInstallments, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                            {{ number_format($purchaseInstallments, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}
                         </h4>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
 
                 <h3 class="text-center">
                     {{ __('app.treasury.difference') }}
-                    <strong>{{ number_format($difference, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</strong>
+                    <strong>{{ number_format($difference, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</strong>
                 </h3>
 
                 @if ($difference > 0)
@@ -107,7 +107,7 @@
                 <!-- Supplier Returns (مردودات الموردين) -->
                 <h4 class="mt-4">{{ __('app.treasury.supplier_returns_header') }}</h4>
                 <h5>{{ __('app.treasury.total_supplier_returns') }} {{ number_format($supplierReturnsTotal, 2) }}
-                    {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</h5>
+                    {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</h5>
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
@@ -138,7 +138,7 @@
                 <!-- Customer Returns (مردودات العملاء) -->
                 <h4 class="mt-4">{{ __('app.treasury.customer_returns_header') }}</h4>
                 <h5>{{ __('app.treasury.total_customer_returns') }} {{ number_format($customerReturnsTotal, 2) }}
-                    {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</h5>
+                    {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</h5>
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>

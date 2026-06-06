@@ -179,9 +179,9 @@
                                             </div>
                                         </td>
                                         @if($user->hasRole('admin'))
-                                            <td class="text-bold-600">{{ number_format($product->cost_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                            <td class="text-bold-600">{{ number_format($product->cost_price, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                                         @endif
-                                        <td class="text-bold-700 primary">{{ number_format($product->selling_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                                        <td class="text-bold-700 primary">{{ number_format($product->selling_price, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}
                                         </td>
                                         <td class="text-center">
                                             @if($product->type === 'service')

@@ -44,6 +44,7 @@ class VendorController extends Controller
                 'owner_id' => $user->id,
                 'business_name' => $request->business_name,
                 'status' => 'active',
+                'currency' => $request->input('currency', 'ج.م'),
             ]);
 
             $user->update(['vendor_id' => $vendor->id]);

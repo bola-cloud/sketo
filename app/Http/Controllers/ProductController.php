@@ -653,13 +653,29 @@ class ProductController extends Controller
 
     public function productTransactions()
     {
-        // Fetch added quantities (purchases) from Purchase & QuantityUpdates
-        $addedQuantities = DB::table('quantity_updates')
+        // Fetch added quantities from purchases (Invoice additions)
+        $purchasesAdditions = DB::table('purchase_products')
+            ->join('products', 'purchase_products.product_id', '=', 'products.id')
+            ->join('purchases', 'purchase_products.purchase_id', '=', 'purchases.id')
+            ->where('products.type', '!=', 'service')
+            ->select(
+                'purchase_products.product_id',
+                'products.name as product_name',
+                DB::raw('0 as old_quantity'),
+                'purchase_products.quantity as new_quantity',
+                DB::raw('"إضافة (فاتورة)" as action'),
+                DB::raw('"---" as user_name'),
+                'purchases.invoice_number as purchase_invoice',
+                'purchase_products.created_at'
+            )
+            ->get();
+
+        // Fetch manual quantity updates/transfers (excluding initial creation which is covered by purchases)
+        $manualUpdates = DB::table('quantity_updates')
             ->join('products', 'quantity_updates.product_id', '=', 'products.id')
             ->join('users', 'quantity_updates.user_id', '=', 'users.id')
-            ->leftJoin('purchase_products', 'quantity_updates.product_id', '=', 'purchase_products.product_id')
-            ->leftJoin('purchases', 'purchase_products.purchase_id', '=', 'purchases.id')
             ->where('products.type', '!=', 'service')
+            ->where('quantity_updates.action', '!=', 'إضافة')
             ->select(
                 'quantity_updates.product_id',
                 'products.name as product_name',
@@ -667,10 +683,12 @@ class ProductController extends Controller
                 'quantity_updates.new_quantity',
                 'quantity_updates.action',
                 'users.name as user_name',
-                'purchases.invoice_number as purchase_invoice',
+                DB::raw('NULL as purchase_invoice'),
                 'quantity_updates.created_at'
             )
             ->get();
+
+        $addedQuantities = $purchasesAdditions->concat($manualUpdates)->sortByDesc('created_at')->values();
 
         // Fetch sold quantities from Sales, including invoice details
         $soldQuantities = DB::table('sales')

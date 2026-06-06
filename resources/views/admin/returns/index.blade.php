@@ -95,7 +95,7 @@
                                             <td>{{ $return->product->name }}</td>
                                             <td>{{ $return->quantity_returned }}</td>
                                             <td>{{ number_format($return->return_amount, 2) }}
-                                                {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                                {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                                             <td>{{ $return->reason }}</td>
                                             <td>
                                                 @if($return->status == 'pending')

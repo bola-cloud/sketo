@@ -25,7 +25,7 @@
                                     <p><strong>{{ __('app.clients.name') }}:</strong> {{ $invoice->buyer_name }}</p>
                                     <p><strong>{{ __('app.clients.phone') }}:</strong> {{ $invoice->buyer_phone }}</p>
                                     <p><strong>{{ __('app.returns.invoice_date') }}:</strong> {{ $invoice->created_at->format('Y-m-d H:i') }}</p>
-                                    <p><strong>{{ __('app.returns.invoice_total') }}:</strong> {{ number_format($invoice->total_amount, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</p>
+                                    <p><strong>{{ __('app.returns.invoice_total') }}:</strong> {{ number_format($invoice->total_amount, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -77,15 +77,15 @@
                                                         <option value="أخرى">{{ __('app.returns.reason_other') }}</option>
                                                     </select>
                                                 </td>
-                                                <td>{{ number_format($item->total_price / $item->quantity, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
-                                                <td class="return-amount">0.00 {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                                <td>{{ number_format($item->total_price / $item->quantity, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
+                                                <td class="return-amount">0.00 {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <th colspan="6">{{ __('app.returns.total_return_amount') }}</th>
-                                            <th id="total-return-amount">0.00 {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</th>
+                                            <th id="total-return-amount">0.00 {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</th>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -128,7 +128,7 @@ function calculateReturnAmount(input) {
     const returnAmount = quantity * price;
 
     // Update return amount for this row
-    row.querySelector('.return-amount').textContent = returnAmount.toFixed(2) + ' {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}';
+    row.querySelector('.return-amount').textContent = returnAmount.toFixed(2) + ' {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}';
 
     // Enable/disable reason select
     const reasonSelect = row.querySelector('.reason-select');
@@ -156,7 +156,7 @@ function calculateTotalReturnAmount() {
         total += quantity * price;
     });
 
-    document.getElementById('total-return-amount').textContent = total.toFixed(2) + ' {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}';
+    document.getElementById('total-return-amount').textContent = total.toFixed(2) + ' {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}';
 }
 
 function updateSubmitButton() {

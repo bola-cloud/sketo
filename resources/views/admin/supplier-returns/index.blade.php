@@ -45,8 +45,8 @@
                             <td>{{ $return->product->name }}</td>
                             <td>{{ $return->supplier->name }}</td>
                             <td>{{ $return->quantity_returned }}</td>
-                            <td>{{ number_format($return->cost_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
-                            <td>{{ number_format($return->total_value, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                            <td>{{ number_format($return->cost_price, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
+                            <td>{{ number_format($return->total_value, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                             <td>{{ $return->reason ?? __('app.common.not_specified') }}</td>
                             <td>
                                 @switch($return->status)

@@ -84,14 +84,19 @@
                                     <div class="col-md-6">
                                         <div class="form-group mb-2">
                                             <label for="purchase_id_existing" class="text-bold-600">{{ __('app.products.purchase_invoice') }}</label>
-                                            <select class="form-control select2-single border-primary" id="purchase_id_existing" name="purchase_id_existing">
-                                                <option value="" disabled selected>{{ __('app.products.select_invoice') }}</option>
-                                                @foreach($purchases as $purchase)
-                                                    @if($purchase->type == 'product')
-                                                        <option value="{{ $purchase->id }}">{{ $purchase->invoice_number }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
+                                            <div class="input-group flex-nowrap">
+                                                <select class="form-control select2-single border-primary" id="purchase_id_existing" name="purchase_id_existing">
+                                                    <option value="" disabled selected>{{ __('app.products.select_invoice') }}</option>
+                                                    @foreach($purchases as $purchase)
+                                                        @if($purchase->type == 'product')
+                                                            <option value="{{ $purchase->id }}">{{ $purchase->invoice_number }}</option>
+                                                        @endif
+                                                    @endforeach
+                                                </select>
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#quickPurchaseModal"><i class="la la-plus"></i></button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -192,7 +197,7 @@
                                             <div class="input-group">
                                                 <input type="number" step="0.01" class="form-control round border-primary" id="cost_price" name="cost_price" 
                                                     value="{{ old('cost_price') }}" placeholder="0.00" required>
-                                                <div class="input-group-append"><span class="input-group-text bg-transparent border-0">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span></div>
+                                                <div class="input-group-append"><span class="input-group-text bg-transparent border-0">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</span></div>
                                             </div>
                                         </div>
                                     </div>
@@ -202,7 +207,7 @@
                                             <div class="input-group">
                                                 <input type="number" step="0.01" class="form-control round border-primary" id="selling_price" name="selling_price" 
                                                     value="{{ old('selling_price') }}" placeholder="0.00" required>
-                                                <div class="input-group-append"><span class="input-group-text bg-transparent border-0">{{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span></div>
+                                                <div class="input-group-append"><span class="input-group-text bg-transparent border-0">{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</span></div>
                                             </div>
                                         </div>
                                     </div>
@@ -608,8 +613,10 @@
                 },
                 success: function(response) {
                     if(response.success) {
-                        var newOption = new Option(response.purchase.invoice_number, response.purchase.id, true, true);
-                        $('#purchase_id').append(newOption).trigger('change');
+                        var newOption1 = new Option(response.purchase.invoice_number, response.purchase.id, true, true);
+                        var newOption2 = new Option(response.purchase.invoice_number, response.purchase.id, true, true);
+                        $('#purchase_id').append(newOption1).trigger('change');
+                        $('#purchase_id_existing').append(newOption2).trigger('change');
                         $('#quickPurchaseModal').modal('hide');
                         $('#quickPurchaseNumber').val('');
                         alert("{{ __('app.products.purchase_add_success') }}");

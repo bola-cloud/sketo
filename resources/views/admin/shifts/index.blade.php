@@ -41,7 +41,7 @@
                                         <h3 class="white">{{ __('app.shifts.current_open_shift') }}</h3>
                                         <span>{{ __('app.shifts.started_at') }} {{ $activeShift->start_time }}</span>
                                         <br>
-                                        <span>{{ __('app.shifts.starting_cash_label') }} {{ number_format($activeShift->starting_cash, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</span>
+                                        <span>{{ __('app.shifts.starting_cash_label') }} {{ number_format($activeShift->starting_cash, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</span>
                                     </div>
                                     <div class="align-self-center">
                                         <i class="la la-clock-o white font-large-2 float-right"></i>
@@ -85,13 +85,13 @@
                                         </td>
                                         <td>{{ $shift->start_time }}</td>
                                         <td>{{ $shift->end_time ?? '-' }}</td>
-                                        <td class="text-success text-bold-600">{{ number_format($shift->starting_cash, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}
+                                        <td class="text-success text-bold-600">{{ number_format($shift->starting_cash, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}
                                         </td>
                                         <td class="text-danger text-bold-600">
-                                            {{ $shift->ending_cash ? number_format($shift->ending_cash, 2) . (App::getLocale() == 'ar' ? ' ج.م' : ' EGP') : '-' }}
+                                            {{ $shift->ending_cash ? number_format($shift->ending_cash, 2) . (App::getLocale() == 'ar' ? ' {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}' : ' EGP') : '-' }}
                                         </td>
                                         <td class="text-primary text-bold-600">
-                                            {{ $shift->total_sales ? number_format($shift->total_sales, 2) . (App::getLocale() == 'ar' ? ' ج.م' : ' EGP') : '-' }}
+                                            {{ $shift->total_sales ? number_format($shift->total_sales, 2) . (App::getLocale() == 'ar' ? ' {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}' : ' EGP') : '-' }}
                                         </td>
                                         <td>
                                             @if($shift->status == 'open')

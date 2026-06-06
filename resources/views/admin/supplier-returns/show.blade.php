@@ -83,11 +83,11 @@
                                     </tr>
                                     <tr>
                                         <th>{{ __('app.supplier_returns.cost_price') }}:</th>
-                                        <td>{{ number_format($supplierReturn->cost_price, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</td>
+                                        <td>{{ number_format($supplierReturn->cost_price, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                                     </tr>
                                     <tr>
                                         <th>{{ __('app.supplier_returns.total_value') }}:</th>
-                                        <td><strong>{{ number_format($supplierReturn->total_value, 2) }} {{ App::getLocale() == 'ar' ? 'ج.م' : 'EGP' }}</strong></td>
+                                        <td><strong>{{ number_format($supplierReturn->total_value, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</strong></td>
                                     </tr>
                                 </table>
                             </div>
