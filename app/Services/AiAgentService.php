@@ -200,6 +200,17 @@ class AiAgentService
                         'properties' => (object)[]
                     ]
                 ]
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'get_recent_returns',
+                    'description' => 'Get a summary of recent customer returns (products that were returned by clients). Use this when asked about returns.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[]
+                    ]
+                ]
             ]
         ];
     }
@@ -226,6 +237,21 @@ class AiAgentService
                     $totalRevenue = Invoice::where('vendor_id', $vendorId)
                         ->where('created_at', '>=', $startDate)
                         ->sum('total_amount');
+                        
+                    $topSoldThisPeriod = Sales::where('vendor_id', $vendorId)
+                        ->where('created_at', '>=', $startDate)
+                        ->select('product_id', DB::raw('SUM(quantity) as total_qty'))
+                        ->with('product:id,name')
+                        ->groupBy('product_id')
+                        ->orderByDesc('total_qty')
+                        ->limit(3)
+                        ->get()
+                        ->map(function($sale) {
+                            return [
+                                'product_name' => $sale->product->name ?? 'غير محدد',
+                                'quantity_sold' => (float)$sale->total_qty
+                            ];
+                        });
                     
                     return json_encode([
                         'status' => 'success', 
@@ -234,6 +260,7 @@ class AiAgentService
                         'to_date' => Carbon::now()->toDateString(),
                         'total_items_sold' => (float)$totalSold, 
                         'total_revenue' => (float)$totalRevenue,
+                        'top_items_sold_this_period' => $topSoldThisPeriod,
                         'currency' => auth()->user()->vendor->currency ?? 'ج.م'
                     ]);
 
@@ -310,7 +337,8 @@ class AiAgentService
                         'period_days' => $days,
                         'revenue' => $totalRevenue,
                         'cost' => $totalCost,
-                        'gross_profit' => $totalRevenue - $totalCost
+                        'gross_profit' => $totalRevenue - $totalCost,
+                        'currency' => auth()->user()->vendor->currency ?? 'ج.م'
                     ]);
 
                 case 'get_stagnant_products':
@@ -355,7 +383,8 @@ class AiAgentService
                         'expiring_items' => $products,
                         'financial_impact' => [
                             'potential_loss_if_expired' => $potential_loss,
-                            'potential_revenue_if_sold' => $potential_revenue
+                            'potential_revenue_if_sold' => $potential_revenue,
+                            'currency' => auth()->user()->vendor->currency ?? 'ج.م'
                         ]
                     ]);
 
@@ -403,7 +432,8 @@ class AiAgentService
                         'summary' => [
                             'total_debts_to_suppliers' => $supplierDues->sum('remaining_due'),
                             'total_credits_from_clients' => $clientDues->sum('remaining_due')
-                        ]
+                        ],
+                        'currency' => auth()->user()->vendor->currency ?? 'ج.م'
                     ]);
 
                 case 'get_recent_clients':
@@ -413,6 +443,26 @@ class AiAgentService
                         ->select('name', 'phone', 'created_at')
                         ->get();
                     return json_encode(['status' => 'success', 'recent_clients' => $clients]);
+
+                case 'get_recent_returns':
+                    $returns = \App\Models\CustomerReturn::with(['product:id,name', 'invoice:id,invoice_code'])
+                        ->orderBy('created_at', 'desc')
+                        ->limit(5)
+                        ->get()
+                        ->map(function($ret) {
+                            return [
+                                'product_name' => $ret->product->name ?? 'غير محدد',
+                                'invoice_code' => $ret->invoice->invoice_code ?? 'غير محدد',
+                                'quantity_returned' => $ret->quantity_returned,
+                                'return_amount' => $ret->return_amount,
+                                'date' => $ret->created_at->toDateString()
+                            ];
+                        });
+                    return json_encode([
+                        'status' => 'success', 
+                        'recent_returns' => $returns,
+                        'currency' => auth()->user()->vendor->currency ?? 'ج.م'
+                    ]);
 
                 case 'get_recent_invoices':
                     $invoices = Invoice::where('vendor_id', $vendorId)

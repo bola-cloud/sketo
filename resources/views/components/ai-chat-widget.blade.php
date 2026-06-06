@@ -412,9 +412,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     currentChatId = data.chat_id;
                     loadChatHistory();
                 }
+            } else {
+                appendMessage('system', '⚠ ' + (data.message || 'عذراً، واجهت مشكلة مؤقتة.'));
             }
         } catch (error) {
-            document.getElementById(typingId).remove();
+            const typingIndicator = document.getElementById(typingId);
+            if(typingIndicator) typingIndicator.remove();
             appendMessage('system', '⚠ حدث خطأ في الاتصال بالسيرفر');
         }
     });

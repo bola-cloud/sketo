@@ -61,6 +61,7 @@
                                                            class="form-control quantity-input"
                                                            min="0"
                                                            max="{{ $item->available_for_return }}"
+                                                           step="any"
                                                            value="0"
                                                            data-price="{{ $item->total_price / $item->quantity }}"
                                                            onchange="calculateReturnAmount(this)">
@@ -123,7 +124,7 @@
 <script>
 function calculateReturnAmount(input) {
     const row = input.closest('tr');
-    const quantity = parseInt(input.value) || 0;
+    const quantity = parseFloat(input.value) || 0;
     const price = parseFloat(input.dataset.price);
     const returnAmount = quantity * price;
 
@@ -151,7 +152,7 @@ function calculateReturnAmount(input) {
 function calculateTotalReturnAmount() {
     let total = 0;
     document.querySelectorAll('.quantity-input').forEach(input => {
-        const quantity = parseInt(input.value) || 0;
+        const quantity = parseFloat(input.value) || 0;
         const price = parseFloat(input.dataset.price);
         total += quantity * price;
     });
@@ -160,7 +161,7 @@ function calculateTotalReturnAmount() {
 }
 
 function updateSubmitButton() {
-    const hasQuantity = Array.from(document.querySelectorAll('.quantity-input')).some(input => parseInt(input.value) > 0);
+    const hasQuantity = Array.from(document.querySelectorAll('.quantity-input')).some(input => parseFloat(input.value) > 0);
     const hasReasons = Array.from(document.querySelectorAll('.reason-select:not([disabled])')).every(select => select.value !== '');
 
     document.getElementById('submit-btn').disabled = !hasQuantity || !hasReasons;

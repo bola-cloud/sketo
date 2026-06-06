@@ -52,22 +52,41 @@
                                 <tbody>
                                     @php
                                         $recentInvoices = \App\Models\Invoice::with('client')
+                                            ->withSum('sales', 'quantity')
+                                            ->withCount('returns')
                                             ->orderBy('created_at', 'desc')
                                             ->limit(10)
                                             ->get();
                                     @endphp
                                     @foreach($recentInvoices as $invoice)
+                                        @php
+                                            $isFullyReturned = $invoice->returns_count > 0 && $invoice->sales_sum_quantity <= 0.0001;
+                                            $hasPartialReturns = $invoice->returns_count > 0 && $invoice->sales_sum_quantity > 0.0001;
+                                        @endphp
                                         <tr>
-                                            <td>{{ $invoice->invoice_code }}</td>
+                                            <td>
+                                                {{ $invoice->invoice_code }}
+                                                @if($isFullyReturned)
+                                                    <span class="badge badge-danger ml-1" style="font-size: 11px;">مرتجع بالكامل</span>
+                                                @elseif($hasPartialReturns)
+                                                    <span class="badge badge-warning text-dark ml-1" style="font-size: 11px;">مرتجع جزئي</span>
+                                                @endif
+                                            </td>
                                             <td>{{ $invoice->buyer_name }}</td>
                                             <td>{{ $invoice->created_at->format('Y-m-d') }}</td>
                                             <td>{{ number_format($invoice->total_amount, 2) }}
                                                 {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}</td>
                                             <td>
-                                                <a href="{{ route('customer-returns.createForInvoice', $invoice) }}"
-                                                    class="btn btn-sm btn-primary">
-                                                    {{ __('app.returns.return_products_btn') }}
-                                                </a>
+                                                @if($isFullyReturned)
+                                                    <button class="btn btn-sm btn-secondary" disabled>
+                                                        مرتجع بالكامل
+                                                    </button>
+                                                @else
+                                                    <a href="{{ route('customer-returns.createForInvoice', $invoice) }}"
+                                                        class="btn btn-sm btn-primary">
+                                                        {{ __('app.returns.return_products_btn') }}
+                                                    </a>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach

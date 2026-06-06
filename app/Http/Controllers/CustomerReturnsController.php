@@ -42,11 +42,7 @@ class CustomerReturnsController extends Controller
 
         // Get sales items that haven't been fully returned
         $availableItems = $invoice->sales->map(function ($sale) {
-            $alreadyReturned = CustomerReturn::where('invoice_id', $sale->invoice_id)
-                ->where('product_id', $sale->product_id)
-                ->sum('quantity_returned');
-
-            $sale->available_for_return = $sale->quantity - $alreadyReturned;
+            $sale->available_for_return = $sale->quantity;
             return $sale;
         })->filter(function ($sale) {
             return $sale->available_for_return > 0;
@@ -98,11 +94,7 @@ class CustomerReturnsController extends Controller
                 }
 
                 // Check available quantity for return
-                $alreadyReturned = CustomerReturn::where('invoice_id', $invoice->id)
-                    ->where('product_id', $product->id)
-                    ->sum('quantity_returned');
-
-                $availableForReturn = $sale->quantity - $alreadyReturned;
+                $availableForReturn = $sale->quantity;
 
                 if ($quantity > $availableForReturn) {
                     throw new \Exception("الكمية المطلوب إرجاعها أكبر من المتاحة للمنتج: " . $product->name);
@@ -124,6 +116,16 @@ class CustomerReturnsController extends Controller
 
                 // Return products to inventory using FIFO logic
                 $this->returnProductsToInventory($sale, $quantity);
+                
+                // *** Update Sales record to reflect net sales for statistics ***
+                $sale->quantity -= $quantity;
+                if ($sale->quantity <= 0.0001) { // If fully returned
+                    $sale->total_price = 0;
+                    $sale->quantity = 0;
+                } else {
+                    $sale->total_price -= $returnAmount;
+                }
+                $sale->save();
 
                 $totalReturnAmount += $returnAmount;
             }
@@ -257,6 +259,13 @@ class CustomerReturnsController extends Controller
 
         // Also update the main product quantity
         $customerReturn->product->decrement('quantity', $customerReturn->quantity_returned);
+        
+        // *** NEW: Reverse the sales record deduction ***
+        if ($sale) {
+            $sale->quantity += $customerReturn->quantity_returned;
+            $sale->total_price += $customerReturn->return_amount;
+            $sale->save();
+        }
     }
 
     /**
