@@ -46,16 +46,16 @@
 
                                 <div class="col-md-12 mb-4">
                                     <div class="form-group">
-                                        <label class="font-weight-bold text-muted small mb-1">{{ __('app.platform.currency') ?? 'العملة الأساسية' }}</label>
-                                        <select name="currency" class="form-control" required>
-                                            <option value="{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}">الجنيه المصري ({{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }})</option>
-                                            <option value="ريال">الريال السعودي (ريال)</option>
-                                            <option value="د.ك">الدينار الكويتي (د.ك)</option>
-                                            <option value="د.إ">الدرهم الإماراتي (د.إ)</option>
-                                            <option value="ر.ع.">الريال العماني (ر.ع.)</option>
-                                            <option value="د.ب.">الدينار البحريني (د.ب.)</option>
-                                            <option value="ر.ق.">الريال القطري (ر.ق.)</option>
-                                            <option value="$">الدولار الأمريكي ($)</option>
+                                        <label class="font-weight-bold text-muted small mb-1">{{ __('app.platform.currency') }}</label>
+                                        <select name="currency" class="form-control premium-select" required>
+                                            <option value="{{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}">{{ __('app.platform.currency_egp') }}</option>
+                                            <option value="ريال">{{ __('app.platform.currency_sar') }}</option>
+                                            <option value="د.ك">{{ __('app.platform.currency_kwd') }}</option>
+                                            <option value="د.إ">{{ __('app.platform.currency_aed') }}</option>
+                                            <option value="ر.ع.">{{ __('app.platform.currency_omr') }}</option>
+                                            <option value="د.ب.">{{ __('app.platform.currency_bhd') }}</option>
+                                            <option value="ر.ق.">{{ __('app.platform.currency_qar') }}</option>
+                                            <option value="$">{{ __('app.platform.currency_usd') }}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -131,6 +131,32 @@
             color: #475569 !important;
         }
         body.light-mode .text-white {
+            color: #0f172a !important;
+        }
+        .premium-select {
+            background-color: rgba(30, 41, 59, 0.8) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 8px;
+            padding: 10px 15px;
+            height: auto;
+            transition: all 0.3s ease;
+        }
+        .premium-select:focus {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2) !important;
+        }
+        .premium-select option {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+        }
+        body.light-mode .premium-select {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        body.light-mode .premium-select option {
+            background-color: #ffffff !important;
             color: #0f172a !important;
         }
     </style>
