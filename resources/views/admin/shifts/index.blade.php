@@ -88,10 +88,10 @@
                                         <td class="text-success text-bold-600">{{ number_format($shift->starting_cash, 2) }} {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}
                                         </td>
                                         <td class="text-danger text-bold-600">
-                                            {{ $shift->ending_cash ? number_format($shift->ending_cash, 2) . (App::getLocale() == 'ar' ? ' {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}' : ' EGP') : '-' }}
+                                            {{ $shift->ending_cash ? number_format($shift->ending_cash, 2) . ' ' . (auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م') : '-' }}
                                         </td>
                                         <td class="text-primary text-bold-600">
-                                            {{ $shift->total_sales ? number_format($shift->total_sales, 2) . (App::getLocale() == 'ar' ? ' {{ auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م' }}' : ' EGP') : '-' }}
+                                            {{ $shift->total_sales ? number_format($shift->total_sales, 2) . ' ' . (auth()->check() ? (auth()->user()->vendor->currency ?? 'ج.م') : 'ج.م') : '-' }}
                                         </td>
                                         <td>
                                             @if($shift->status == 'open')
