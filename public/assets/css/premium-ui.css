@@ -410,6 +410,8 @@ body {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior-y: contain;
     display: block !important;
     padding-bottom: 120px !important;
 }
@@ -523,7 +525,17 @@ body {
 @media (max-width: 991.98px) {
     body.menu-open .main-menu {
         z-index: 1050 !important;
-        /* On top on mobile */
+        position: fixed !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        height: 100vh !important;
+        overflow: hidden !important;
+    }
+    .main-menu-content {
+        height: 100% !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        touch-action: pan-y !important;
     }
 
     /* Mobile Icon Visibility and Sizing */
