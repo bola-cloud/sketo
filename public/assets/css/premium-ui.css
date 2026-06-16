@@ -656,41 +656,165 @@ body.light-mode .text-gradient-premium {
 }
 
 @media (max-width: 991.98px) {
+    /* === GLOBAL MOBILE RESET === */
+    .app-content {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .app-content.content {
+        padding: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
     .content-wrapper {
         padding: 0.5rem 0.25rem !important;
+        margin: 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
     }
-    .container, .container-fluid {
+    .content-header {
+        padding: 0.5rem 0.25rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    .content-body {
+        padding: 0 !important;
+    }
+    .container, .container-fluid, .container-sm, .container-md {
         padding-left: 0 !important;
         padding-right: 0 !important;
         max-width: 100% !important;
+        margin: 0 !important;
     }
+    
+    /* === ROWS & COLUMNS === */
+    .row {
+        margin-left: -2px !important;
+        margin-right: -2px !important;
+    }
+    .row > [class*="col-"] {
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+    }
+    
+    /* === CARDS === */
     .premium-card {
-        padding: 1rem 0.75rem !important;
-        border-radius: 16px !important;
-        margin-bottom: 0.75rem !important;
+        padding: 0.75rem 0.5rem !important;
+        border-radius: 12px !important;
+        margin-bottom: 0.5rem !important;
+        margin-left: 2px !important;
+        margin-right: 2px !important;
     }
     .card:not(.premium-card) {
-        border-radius: 12px !important;
-        margin-bottom: 0.75rem !important;
+        border-radius: 10px !important;
+        margin-bottom: 0.5rem !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
     .card-body {
-        padding: 0.75rem 0.5rem;
+        padding: 0.5rem 0.4rem !important;
     }
     .card-body.p-0 {
         padding: 0 !important;
     }
-    .table-premium-wrapper {
-        padding: 5px !important;
+    .card-content {
+        padding: 0 !important;
+    }
+    .card-footer {
+        padding: 0.5rem !important;
     }
     
+    /* === TABLES === */
+    .table-premium-wrapper {
+        padding: 2px !important;
+        border-radius: 8px !important;
+    }
+    .table-responsive {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .table td, .table th {
+        padding: 8px 6px !important;
+        font-size: 0.8rem !important;
+    }
+    .table-premium td, .table-premium th {
+        padding: 10px 6px !important;
+        font-size: 0.8rem !important;
+    }
+    
+    /* === BUTTONS === */
     .btn-group {
-        display: flex;
-        flex-wrap: wrap;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 4px;
+        width: 100%;
     }
     .btn-group .btn {
         flex: 1 1 auto;
         border-radius: 8px !important;
-        margin-bottom: 5px;
+        font-size: 0.8rem !important;
+        padding: 6px 10px !important;
+    }
+    .content-header-right .btn-group {
+        justify-content: flex-start;
+    }
+    .btn {
+        font-size: 0.85rem !important;
+        padding: 8px 12px !important;
+    }
+    .btn-sm {
+        font-size: 0.75rem !important;
+        padding: 4px 8px !important;
+    }
+    
+    /* === FORMS === */
+    .form-group {
+        margin-bottom: 0.5rem !important;
+    }
+    .form-control {
+        font-size: 0.85rem !important;
+        padding: 6px 10px !important;
+    }
+    select.form-control {
+        padding: 6px 8px !important;
+    }
+    .input-group {
+        margin-bottom: 0.25rem !important;
+    }
+    label {
+        margin-bottom: 0.15rem !important;
+        font-size: 0.8rem !important;
+    }
+    
+    /* === BREADCRUMB & HEADER === */
+    .breadcrumb {
+        padding: 0.25rem 0 !important;
+        font-size: 0.75rem !important;
+    }
+    .content-header-title {
+        font-size: 1.1rem !important;
+    }
+    
+    /* === BADGES === */
+    .badge {
+        font-size: 0.7rem !important;
+        padding: 4px 8px !important;
+    }
+    
+    /* === ALERT === */
+    .alert {
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.8rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    /* === PAGINATION === */
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .page-link {
+        padding: 4px 8px !important;
+        font-size: 0.8rem !important;
     }
 }
 
