@@ -657,26 +657,27 @@ body.light-mode .text-gradient-premium {
 
 @media (max-width: 991.98px) {
     /* === GLOBAL MOBILE RESET === */
-    .app-content {
+    /* Must match template specificity: html body .content .content-wrapper */
+    html body .content.app-content {
         padding: 0 !important;
         margin: 0 !important;
+        overflow: visible !important;
     }
-    .app-content.content {
-        padding: 0 !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-    }
-    .content-wrapper {
-        padding: 0.5rem 0.25rem !important;
+    html body .content .content-wrapper {
+        padding: 0.25rem !important;
         margin: 0 !important;
         border: none !important;
         border-radius: 0 !important;
+        background: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        box-shadow: none !important;
     }
-    .content-header {
-        padding: 0.5rem 0.25rem !important;
-        margin-bottom: 0.5rem !important;
+    html body .content .content-wrapper .content-header {
+        padding: 0.25rem !important;
+        margin-bottom: 0.25rem !important;
     }
-    .content-body {
+    html body .content .content-wrapper .content-body {
         padding: 0 !important;
     }
     .container, .container-fluid, .container-sm, .container-md {
@@ -688,8 +689,8 @@ body.light-mode .text-gradient-premium {
     
     /* === ROWS & COLUMNS === */
     .row {
-        margin-left: -2px !important;
-        margin-right: -2px !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
     .row > [class*="col-"] {
         padding-left: 4px !important;
