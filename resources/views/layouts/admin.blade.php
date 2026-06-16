@@ -191,7 +191,7 @@
         </div>
     </nav>
     <!-- ////////////////////////////////////////////////////////////////////////////-->
-    <div class="main-menu menu-fixed menu-dark menu-accordion menu-shadow" data-scroll-to-active="true">
+    <div class="main-menu menu-fixed menu-dark menu-accordion menu-shadow menu-native-scroll" data-scroll-to-active="true">
         <div class="main-menu-content">
             <div class="mobile-close-sidebar d-md-none">
                 <a href="#" class="menu-toggle text-white"><i class="ft-x font-large-1"></i></a>
