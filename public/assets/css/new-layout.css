@@ -524,6 +524,8 @@ body.vertical-layout.vertical-menu-modern.menu-expanded .main-menu .navigation l
     backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     margin-top: 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .table-premium {
@@ -541,6 +543,7 @@ body.vertical-layout.vertical-menu-modern.menu-expanded .main-menu .navigation l
     font-size: 0.8rem !important;
     padding: 18px 15px !important;
     border-radius: 0;
+    white-space: nowrap;
 }
 
 .table-premium-wrapper {
@@ -567,6 +570,7 @@ body.vertical-layout.vertical-menu-modern.menu-expanded .main-menu .navigation l
     vertical-align: middle !important;
     color: #ffffff !important;
     font-weight: 500;
+    white-space: nowrap;
 }
 
 .table-premium td:first-child {
