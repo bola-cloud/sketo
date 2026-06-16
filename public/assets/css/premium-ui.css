@@ -645,20 +645,40 @@ body.light-mode .text-gradient-premium {
 
 @media (max-width: 991.98px) {
     .content-wrapper {
-        padding: 0.75rem 0.5rem !important;
+        padding: 0.5rem 0.25rem !important;
     }
     .container, .container-fluid {
         padding-left: 0 !important;
         padding-right: 0 !important;
         max-width: 100% !important;
     }
-    .premium-card, .card {
+    .premium-card {
         padding: 1rem 0.75rem !important;
         border-radius: 16px !important;
         margin-bottom: 0.75rem !important;
     }
+    .card:not(.premium-card) {
+        border-radius: 12px !important;
+        margin-bottom: 0.75rem !important;
+    }
+    .card-body {
+        padding: 0.75rem 0.5rem;
+    }
+    .card-body.p-0 {
+        padding: 0 !important;
+    }
     .table-premium-wrapper {
-        padding: 10px !important;
+        padding: 5px !important;
+    }
+    
+    .btn-group {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .btn-group .btn {
+        flex: 1 1 auto;
+        border-radius: 8px !important;
+        margin-bottom: 5px;
     }
 }
 
