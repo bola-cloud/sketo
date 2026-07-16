@@ -106,6 +106,7 @@
                             <span>{{ __('app.cashier.subtotal_before_discount') }}:</span>
                             <span class="fw-bold">{{ number_format($subtotal, 2) }}</span>
                         </div>
+                        @can('apply_discount')
                         <div class="d-flex justify-content-between mb-2">
                             <span>{{ __('app.cashier.discount') }}:</span>
                             <div class="input-group input-group-sm" style="width: 120px;">
@@ -113,6 +114,15 @@
                                     placeholder="{{ __('app.cashier.discount_placeholder') }}">
                             </div>
                         </div>
+                        @else
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>{{ __('app.cashier.discount') }}:</span>
+                            <div class="input-group input-group-sm" style="width: 120px;">
+                                <input type="text" id="discount" name="discount" class="form-control text-center text-muted" value="0"
+                                    placeholder="غير مصرح" readonly disabled title="ليس لديك صلاحية لإضافة خصم">
+                            </div>
+                        </div>
+                        @endcan
                         <hr>
                         <div class="d-flex justify-content-between">
                             <span class="fw-bold text-success">{{ __('app.cashier.final_total') }}:</span>

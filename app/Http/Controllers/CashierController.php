@@ -157,15 +157,19 @@ class CashierController extends Controller
         }
 
         $cart = session()->get('cart', []);
-        $discount = 0;
-        if (auth()->user()->can('apply_discount')) {
-            $discount = $request->input('apply_discount_hidden', 0);
+        
+        $discount = $request->input('apply_discount_hidden', 0);
+        // Clean Validation for Solid Principle: Reject unauthorized discounts completely instead of silently ignoring.
+        if ($discount > 0 && !auth()->user()->can('apply_discount')) {
+            return redirect()->route('cashier.viewCart')->with('error', 'ليس لديك صلاحية لعمل خصم على الفاتورة.');
         }
+
         $paidAmount = $request->input('paid_amount');
         $clientId = $request->input('client_id');
 
         $validator = Validator::make($request->all(), [
             'paid_amount' => 'required|numeric|min:0',
+            'apply_discount_hidden' => 'nullable|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
